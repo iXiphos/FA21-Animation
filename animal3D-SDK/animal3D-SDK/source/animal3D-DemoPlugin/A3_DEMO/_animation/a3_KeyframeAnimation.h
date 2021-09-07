@@ -63,7 +63,7 @@ struct a3_Keyframe
 	a3f32 duration;
 
 	// reciprocal of duration
-	a3f32 duration_inv;
+	a3f32 durationInv;
 
 	// value of the sample described by a keyframe
 	a3i32 data;
@@ -108,16 +108,16 @@ struct a3_Clip
 	a3f32 duration;
 
 	// reciprocal of duration
-	a3f32 duration_inv;
+	a3f32 durationInv;
 
 	// number of keyframes referenced by clip (including first and last)
 	a3ui32 count;
 
 	// index of first keyframe in pool referenced by clip
-	a3ui32 first_keyframe;
+	a3ui32 firstKeyframe;
 	
 	// index of final keyframe in pool referenced by clip
-	a3ui32 last_keyframe;
+	a3ui32 lastKeyframe;
 
 	// pool of keyframes containing those included in the set
 	a3_KeyframePool* pool;
