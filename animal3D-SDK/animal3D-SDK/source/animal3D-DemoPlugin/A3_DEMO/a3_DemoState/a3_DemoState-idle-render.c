@@ -53,6 +53,8 @@ void a3starter_render_controls(a3_DemoState const* demoState, a3_DemoMode0_Start
 	a3f32 const textAlign, a3f32 const textDepth, a3f32 const textOffsetDelta, a3f32 textOffset);
 
 
+
+//Handle Control Display
 // display current mode controls
 void a3demo_render_controls(a3_DemoState const* demoState,
 	a3_TextRenderer const* text, a3vec4 const col,
@@ -99,6 +101,8 @@ void a3demo_render_controls_gen(a3_DemoState const* demoState,
 	};
 
 	// toggles
+
+	
 	a3textDraw(text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
 		"GRID (toggle 'g') %s | SKYBOX ('b') %s | HIDDEN VOLUMES ('h') %s", boolText[demoState->displayGrid], boolText[demoState->displaySkybox], boolText[demoState->displayHiddenVolumes]);
 	a3textDraw(text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
@@ -161,6 +165,27 @@ void a3demo_render_data(const a3_DemoState* demoState,
 		"Toggle text display:        't' (toggle) | 'T' (alloc/dealloc) ");
 	a3textDraw(text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
 		"Reload all shader programs: 'P' ****CHECK CONSOLE FOR ERRORS!**** ");
+}
+
+void a3demo_render_animation(const a3_DemoState* demoState,
+	a3_TextRenderer const* text, a3vec4 const col,
+	a3f32 const textAlign, a3f32 const textDepth, a3f32 const textOffsetDelta, a3f32 textOffset)
+{
+	// display some general data
+	a3textDraw(text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
+		"Toggle Forward( l )", demoState->timer->ticksPerSecond);//(a3f64)demoState->timer_display->ticks / demoState->timer_display->totalTime);
+	a3textDraw(text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
+		"Stop/Play Player ( + )", (a3f64)demoState->n_timer / (demoState->dt_timer_tot));//(a3f64)demoState->n_timer / demoState->timer_display->totalTime);//(a3f64)demoState->timer_display->ticks / demoState->timer_display->totalTime);
+	a3textDraw(text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
+		"Cycle Clip ( Insert Button | Insert Button)", (demoState->dt_timer) * 1000.0);//demoState->timer_display->previousTick * 1000.0);
+
+	//Display Clip
+
+
+	// global controls
+	textOffset = -0.9f;
+	a3textDraw(text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
+		"Toggle text display:        't' (toggle) | 'T' (alloc/dealloc) ");
 }
 
 /*
@@ -228,6 +253,10 @@ void a3demo_render(a3_DemoState const* demoState, a3f64 const dt)
 			switch (demoState->textMode)
 			{
 				// controls for current mode
+			case demoState_animationData:
+				a3demo_render_animation(demoState, text, col, textAlign + x, textDepth, textOffsetDelta, textOffset + y);
+				break;
+
 			case demoState_textControls:
 				a3demo_render_controls(demoState, text, col, textAlign + x, textDepth, textOffsetDelta, textOffset + y);
 				break;

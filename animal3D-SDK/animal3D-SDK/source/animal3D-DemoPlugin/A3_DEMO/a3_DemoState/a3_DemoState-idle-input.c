@@ -173,6 +173,13 @@ void a3demo_input_keyCharPress(a3_DemoState* demoState, a3i32 const asciiKey)
 
 		// toggle stencil test
 		a3demoCtrlCaseToggle(demoState->skipIntermediatePasses, 'I');
+
+		//Animation Controls
+		a3demoCtrlCaseToggle(demoState->playing, '+');
+
+		//set forward
+		a3demoCtrlCaseToggle(demoState->forward, 'l');
+
 	}
 
 

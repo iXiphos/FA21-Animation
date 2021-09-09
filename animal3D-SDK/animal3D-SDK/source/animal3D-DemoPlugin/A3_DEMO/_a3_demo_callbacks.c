@@ -146,6 +146,7 @@ void a3demo_load(a3_DemoState* demoState)
 	demoState->updateAnimation = a3true;
 	demoState->stencilTest = a3false;
 	demoState->skipIntermediatePasses = a3false;
+	demoState->playing = a3false;
 
 
 	// demo modes
@@ -243,7 +244,7 @@ A3DYLIBSYMBOL a3_DemoState *a3demoCB_load(a3_DemoState *demoState, a3boolean hot
 		// text
 		a3demo_initializeText(demoState);
 		demoState->textInit = a3true;
-		demoState->textMode = demoState_textControls;
+		demoState->textMode = demoState_animationData;
 
 
 		// enable asset streaming between loads
