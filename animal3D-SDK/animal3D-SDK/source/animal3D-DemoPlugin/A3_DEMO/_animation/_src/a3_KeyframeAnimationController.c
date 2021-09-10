@@ -38,6 +38,7 @@ a3i32 a3clipControllerInit(a3_ClipController* clipCtrl_out, const a3byte ctrlNam
 	clipCtrl_out->keyframeTime = 0;
 	clipCtrl_out->direction = 1;
 	clipCtrl_out->keyframe = clipPool->clip[clipIndex_pool].firstKeyframe;
+	clipCtrl_out->clipPool = clipPool;
 	return 1;
 }
 
