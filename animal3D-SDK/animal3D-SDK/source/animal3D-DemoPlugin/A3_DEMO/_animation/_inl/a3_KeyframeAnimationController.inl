@@ -63,7 +63,7 @@ inline a3i32 a3clipControllerUpdate(a3_ClipController* clipCtrl, const a3real dt
 	}
 	// end of clip reversed
 	else if (clipCtrl->clipTime < 0) {
-		float extraTime = clipCtrl->clipTime;
+		float extraTime = -clipCtrl->clipTime;
 		clipCtrl->clipTime = clip->duration + extraTime;
 		clipCtrl->keyframeTime = clip->duration + extraTime;
 		clipCtrl->keyframe = clip->lastKeyframe;

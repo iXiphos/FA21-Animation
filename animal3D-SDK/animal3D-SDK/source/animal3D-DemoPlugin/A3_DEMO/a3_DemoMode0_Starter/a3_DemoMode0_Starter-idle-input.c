@@ -75,9 +75,9 @@ void a3starter_input_keyCharPress(a3_DemoState const* demoState, a3_DemoMode0_St
 		case 'p': clipCtrl->direction = 0; break;
 
 		// first keyframe
-		case 'd': clipCtrl->keyframe = activeClip->firstKeyframe; break;
+		case 'd': clipCtrl->keyframe = activeClip->firstKeyframe; clipCtrl->keyframeTime = 0; clipCtrl->clipTime = 0;  break;
 		// last keyframe
-		case 'f': clipCtrl->keyframe = activeClip->lastKeyframe; break;
+		case 'f': clipCtrl->keyframe = activeClip->lastKeyframe; clipCtrl->keyframeTime = 0; clipCtrl->clipTime = 0;  break;
 
 		
 		a3demoCtrlToggle(demoMode->playbackSlowmo);
