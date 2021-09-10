@@ -106,19 +106,17 @@ void a3starter_render_controls(a3_DemoState const* demoState, a3_DemoMode0_Start
 
 	// display some general data
 	a3textDraw(text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
-		"Stop/Play Player ( + )         Toggle Forward( l )");
+		"Stop ( p )  Forward( i )  backwards ( o ) ");
 	a3textDraw(text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
-		"Go First Frame ( Insert Button)      Go Last Frame (Insert Button)");
+		"Go First Frame ( d )      Go Last Frame ( f )");
 	a3textDraw(text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
-		"Slow-Motion Toggle ( Insert Button )");
+		"Play Back Rate ( s )");
 	a3textDraw(text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
-		"Cycle Clip ( Insert Button | Insert Button )");
+		"Cycle Clip Controller( < | > )");
 	a3textDraw(text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
-		"Toggle Control ( Insert Button )");
-
-	for (a3ui32 i = 0; i < starterMaxCount_clipControllers; i++)
-	{
-		const a3_ClipController* clipController = demoMode->clipControllers + i;
+		"Cycle Clip ( n | m )");
+	
+		const a3_ClipController* clipController = demoMode->clipControllers + demoMode->activeClipController;
 		a3_Clip* clip = clipController->clipPool->clip + clipController->clip;
 		a3_Keyframe* keyframe = clip->pool->keyframe + clipController->keyframe;
 
@@ -130,7 +128,8 @@ void a3starter_render_controls(a3_DemoState const* demoState, a3_DemoMode0_Start
 			"Current KeyFrame: %u      Current KeyFrame Time: %f     KeyFrame Param: %f", clipController->keyframe, clipController->keyframeTime, clipController->keyframeParam);
 		a3textDraw(text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
 			"KeyFrame Data: %u      KeyFrame Duration: %f", keyframe->data, keyframe->duration);
-	}
+		a3textDraw(text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
+			"");
 
 
 }
