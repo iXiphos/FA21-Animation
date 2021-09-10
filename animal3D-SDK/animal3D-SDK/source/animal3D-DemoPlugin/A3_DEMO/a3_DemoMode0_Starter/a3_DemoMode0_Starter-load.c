@@ -173,7 +173,7 @@ void a3starter_load(a3_DemoState const* demoState, a3_DemoMode0_Starter* demoMod
 	a3keyframePoolCreate(demoMode->keyframePool, 20);
 
 	for (a3ui32 i = 0; i < 20; i++) {
-		a3keyframeInit(demoMode->keyframePool->keyframe + i, 1.0f/20.0f, 45-i);
+		a3keyframeInit(demoMode->keyframePool->keyframe + i, (float)i/20.0f, 45-i);
 	}
 
 	a3clipInit(demoMode->clipPool->clip + 0, " 0 -> 20", demoMode->keyframePool,  0, 20);
