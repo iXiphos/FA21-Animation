@@ -67,7 +67,7 @@ struct a3_ClipController
 	a3f32 keyframeParam;
 
 	// the active behavior of playback; +1 for forward, 0 for pause, and -1 for reverse.
-	a3ui8 direction;
+	a3i8 direction;
 
 	// the pool of clips that the controller will control
 	const a3_ClipPool* clipPool;

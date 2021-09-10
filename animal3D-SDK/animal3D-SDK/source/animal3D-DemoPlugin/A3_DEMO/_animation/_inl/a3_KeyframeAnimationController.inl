@@ -49,7 +49,14 @@ inline a3i32 a3clipControllerUpdate(a3_ClipController* clipCtrl, const a3real dt
 
 	clip = clipCtrl->clipPool->clip + clipCtrl->clip;
 	last_keyframe = clip->pool->keyframe + clipCtrl->keyframe;
-	a3ui32 next_frame_index = (((clipCtrl->keyframe - clip->firstKeyframe + clipCtrl->direction) % clip->count) + clip->lastKeyframe);
+	a3ui32 next_frame_index = clipCtrl->keyframe + clipCtrl->direction;
+	if (next_frame_index > clip->lastKeyframe) {
+		next_frame_index = clip->firstKeyframe;
+	}
+	else if (next_frame_index < clip->firstKeyframe) {
+		next_frame_index = clip->lastKeyframe;
+	}
+
 	next_keyframe = clip->pool->keyframe + next_frame_index;
 
 	
