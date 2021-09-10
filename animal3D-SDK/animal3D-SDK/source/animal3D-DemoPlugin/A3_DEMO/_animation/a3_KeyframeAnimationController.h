@@ -88,6 +88,13 @@ a3i32 a3clipControllerSetClip(a3_ClipController* clipCtrl, const a3_ClipPool* cl
 
 a3i32 a3clipControllerJumpToFrame(a3_ClipController* clipCtrl, const a3ui32 index);
 
+a3i32 a3clipControllerEvaulate(const a3_ClipController* clipCtrl, a3_Sample* sample_out);
+
+
+// get a frame based on an offset from the current frame
+// will follow termination behavior and play direction
+a3i32 a3clipControllerGetFrameByOffset(const a3_ClipController* clipCtrl, a3i32 offset);
+
 
 //-----------------------------------------------------------------------------
 

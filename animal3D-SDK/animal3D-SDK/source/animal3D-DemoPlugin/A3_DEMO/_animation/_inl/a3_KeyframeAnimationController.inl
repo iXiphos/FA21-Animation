@@ -111,6 +111,25 @@ inline a3i32 a3clipControllerSetClip(a3_ClipController* clipCtrl, const a3_ClipP
 
 
 
+inline a3i32 a3clipControllerEvaulate(const a3_ClipController* clipCtrl, a3_Sample* sample_out) {
+	if (clipCtrl && clipCtrl->clip != -1 && sample_out) {
+
+		// 0: no imterpolation: step
+		// return keyframe value
+
+		// 1: nearest
+
+		// 2: lerp
+
+
+		// 3: 
+
+
+		return 1;
+	}
+	return -1;
+}
+
 
 //-----------------------------------------------------------------------------
 

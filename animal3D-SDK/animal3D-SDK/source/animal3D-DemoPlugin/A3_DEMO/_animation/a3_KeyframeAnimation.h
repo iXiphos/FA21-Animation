@@ -36,6 +36,7 @@
 extern "C"
 {
 #else	// !__cplusplus
+typedef struct a3_Sample					a3_Sample;
 typedef struct a3_Keyframe					a3_Keyframe;
 typedef struct a3_KeyframePool				a3_KeyframePool;
 typedef struct a3_Clip						a3_Clip;
@@ -52,8 +53,15 @@ enum
 };
 
 
+// single generic value at time
+struct a3_Sample
+{
+	a3real time; // (the x axis)
+	a3real value; // (the y value)
+};
+
 // description of single keyframe
-// metaphor: moment
+// metaphor: interval
 struct a3_Keyframe
 {
 	// index in keyframe pool
@@ -65,8 +73,7 @@ struct a3_Keyframe
 	// reciprocal of duration
 	a3f32 durationInv;
 
-	// value of the sample described by a keyframe
-	a3ui32 data;
+	a3_Sample sample;
 };
 
 
@@ -91,6 +98,7 @@ a3i32 a3keyframePoolRelease(a3_KeyframePool* keyframePool);
 // initialize keyframe
 a3i32 a3keyframeInit(a3_Keyframe* keyframe_out, const a3real duration, const a3ui32 value_x);
 
+a3_Keyframe* a3keyframePoolGetAtIndex(a3_KeyframePool* pool, a3ui32 keyframeIndex);
 
 //-----------------------------------------------------------------------------
 

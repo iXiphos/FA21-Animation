@@ -146,8 +146,6 @@ void a3demo_load(a3_DemoState* demoState)
 	demoState->updateAnimation = a3true;
 	demoState->stencilTest = a3false;
 	demoState->skipIntermediatePasses = a3false;
-	demoState->playing = a3false;
-	demoState->forward = a3true;
 
 
 	// demo modes
