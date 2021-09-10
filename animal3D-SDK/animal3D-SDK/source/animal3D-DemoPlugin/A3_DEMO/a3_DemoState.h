@@ -77,6 +77,7 @@ enum a3_DemoState_TextDisplayName
 	demoState_textControls,			// display controls
 	demoState_textControls_gen,		// display general controls
 	demoState_textData,				// display data
+	demoState_animationData,        // display Animation Data
 
 	demoState_text_max
 };
@@ -178,6 +179,12 @@ struct a3_DemoState
 	a3boolean updateAnimation;
 	a3boolean stencilTest;
 	a3boolean skipIntermediatePasses;
+
+
+	//Animation Inputs
+	a3boolean playing;
+	a3boolean forward;
+
 
 
 	//-------------------------------------------------------------------------
