@@ -33,7 +33,8 @@
 //-----------------------------------------------------------------------------
 
 #include "_a3_demo_utilities/a3_DemoSceneObject.h"
-
+#include "_animation/a3_KeyframeAnimation.h"
+#include "_animation/a3_KeyframeAnimationController.h"
 
 //-----------------------------------------------------------------------------
 
@@ -59,6 +60,7 @@ typedef enum a3_DemoMode0_Starter_TargetName				a3_DemoMode0_Starter_TargetName;
 		starterMaxCount_sceneObject = 8,
 		starterMaxCount_cameraObject = 1,
 		starterMaxCount_projector = 1,
+		starterMaxCount_clipControllers = 3,
 	};
 
 	// scene object rendering program names
@@ -157,6 +159,13 @@ typedef enum a3_DemoMode0_Starter_TargetName				a3_DemoMode0_Starter_TargetName;
 					proj_camera_main[1];
 			};
 		};
+
+
+		a3_KeyframePool keyframePool[1];
+		a3_ClipPool clipPool[1];
+
+		a3_ClipController clipControllers[starterMaxCount_clipControllers];
+		
 	};
 
 
