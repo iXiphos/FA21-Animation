@@ -42,14 +42,19 @@ inline a3i32 a3clipControllerUpdate(a3_ClipController* clipCtrl, const a3real dt
 
 	a3_Clip* clip;
 	a3_Keyframe* last_keyframe;
+	a3_Keyframe* next_keyframe;
 
 	// case paused
 	if (clipCtrl->direction == 0) return 0;
+
 	clip = clipCtrl->clipPool->clip + clipCtrl->clip;
 	last_keyframe = clip->pool->keyframe + clipCtrl->keyframe;
+	a3ui32 next_frame_index = (((clipCtrl->keyframe - clip->firstKeyframe + clipCtrl->direction) % clip->count) + clip->lastKeyframe);
+	next_keyframe = clip->pool->keyframe + next_frame_index;
+
 	
-	clipCtrl->keyframeTime += dt * clipCtrl->direction;
-	clipCtrl->clipTime += dt * clipCtrl->direction;
+	clipCtrl->keyframeTime += dt * (float)clipCtrl->direction;
+	clipCtrl->clipTime += dt * (float)clipCtrl->direction;
 
 
 	// end of clip forward
@@ -64,8 +69,8 @@ inline a3i32 a3clipControllerUpdate(a3_ClipController* clipCtrl, const a3real dt
 	// end of clip reversed
 	else if (clipCtrl->clipTime < 0) {
 		float extraTime = -clipCtrl->clipTime;
-		clipCtrl->clipTime = clip->duration + extraTime;
-		clipCtrl->keyframeTime = clip->duration + extraTime;
+		clipCtrl->clipTime = clip->duration - extraTime;
+		clipCtrl->keyframeTime = next_keyframe->duration - extraTime;
 		clipCtrl->keyframe = clip->lastKeyframe;
 	}
 	// forward skip
@@ -76,7 +81,7 @@ inline a3i32 a3clipControllerUpdate(a3_ClipController* clipCtrl, const a3real dt
 	}	
 	// reverse skip
 	else if (clipCtrl->keyframeTime < 0) {
-		clipCtrl->keyframeTime = -clipCtrl->keyframeTime;
+		clipCtrl->keyframeTime = next_keyframe->duration - -clipCtrl->keyframeTime;
 		clipCtrl->keyframe--;
 	}
 
@@ -96,6 +101,8 @@ inline a3i32 a3clipControllerSetClip(a3_ClipController* clipCtrl, const a3_ClipP
 	clipCtrl->clipPool = clipPool;
 	return 1;
 }
+
+
 
 
 //-----------------------------------------------------------------------------

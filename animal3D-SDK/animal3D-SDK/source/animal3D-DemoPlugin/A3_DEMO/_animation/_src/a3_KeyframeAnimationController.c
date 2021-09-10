@@ -43,4 +43,20 @@ a3i32 a3clipControllerInit(a3_ClipController* clipCtrl_out, const a3byte ctrlNam
 }
 
 
+a3i32 a3clipControllerJumpToFrame(a3_ClipController* clipCtrl, const a3ui32 index) {
+	a3_Clip* clip = clipCtrl->clipPool->clip + clipCtrl->clip;
+	if (index < clip->firstKeyframe || index > clip->lastKeyframe) return -1;
+
+	float duration = 0;
+	const a3_KeyframePool* pool = clip->pool;
+	for (a3ui32 i = clip->firstKeyframe; i < index; i++) {
+		duration += pool->keyframe[i].duration;
+	}
+
+	clipCtrl->keyframe = index;
+	clipCtrl->clipTime = duration;
+	clipCtrl->keyframeTime = 0;
+	return 1;
+}
+
 //-----------------------------------------------------------------------------

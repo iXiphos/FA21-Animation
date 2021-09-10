@@ -86,6 +86,9 @@ a3i32 a3clipControllerUpdate(a3_ClipController* clipCtrl, const a3real dt);
 a3i32 a3clipControllerSetClip(a3_ClipController* clipCtrl, const a3_ClipPool* clipPool, const a3ui32 clipIndex_pool);
 
 
+a3i32 a3clipControllerJumpToFrame(a3_ClipController* clipCtrl, const a3ui32 index);
+
+
 //-----------------------------------------------------------------------------
 
 
