@@ -61,7 +61,7 @@ struct a3_ClipController
 	a3ui32 keyframe;
 
 	// current time relative to current keyframe; should always be between 0 and current keyframe's duration
-	a3ui32 keyframeTime;
+	a3f32 keyframeTime;
 
 	// normalized keyframe time; should always be between 0 and 1.
 	a3f32 keyframeParam;
@@ -70,7 +70,7 @@ struct a3_ClipController
 	a3ui8 direction;
 
 	// the pool of clips that the controller will control
-	a3_ClipPool* clipPool;
+	const a3_ClipPool* clipPool;
 };
 
 

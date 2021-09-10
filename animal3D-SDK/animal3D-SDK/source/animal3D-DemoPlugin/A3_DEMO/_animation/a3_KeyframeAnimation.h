@@ -66,7 +66,7 @@ struct a3_Keyframe
 	a3f32 durationInv;
 
 	// value of the sample described by a keyframe
-	a3i32 data;
+	a3ui32 data;
 };
 
 
@@ -120,7 +120,7 @@ struct a3_Clip
 	a3ui32 lastKeyframe;
 
 	// pool of keyframes containing those included in the set
-	a3_KeyframePool* pool;
+	const a3_KeyframePool* pool;
 };
 
 // group of clips

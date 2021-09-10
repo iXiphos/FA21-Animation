@@ -32,13 +32,69 @@
 // update clip controller
 inline a3i32 a3clipControllerUpdate(a3_ClipController* clipCtrl, const a3real dt)
 {
-	return -1;
+	// case reversed terminus
+	// case reversed skip
+	// case reversed
+	// case paused
+	// case forward
+	// case forward skip
+	// case forward terminus
+
+	a3_Clip* clip;
+	a3_Keyframe* last_keyframe;
+
+	// case paused
+	if (clipCtrl->direction == 0) return 0;
+	clip = clipCtrl->clipPool->clip + clipCtrl->clip;
+	last_keyframe = clip->pool->keyframe + clipCtrl->keyframe;
+	
+	clipCtrl->keyframeTime += dt * clipCtrl->direction;
+	clipCtrl->clipTime += dt * clipCtrl->direction;
+
+
+	// end of clip forward
+	if (clipCtrl->clipTime > clip->duration) {
+		// TODO "termination behavior"
+		// maintain extra duration from end
+		float extraTime = clipCtrl->clipTime - clip->duration;
+		clipCtrl->clipTime = 0 + extraTime;
+		clipCtrl->keyframeTime = 0 + extraTime;
+		clipCtrl->keyframe = clip->firstKeyframe;
+	}
+	// end of clip reversed
+	else if (clipCtrl->clipTime < 0) {
+		float extraTime = clipCtrl->clipTime;
+		clipCtrl->clipTime = clip->duration + extraTime;
+		clipCtrl->keyframeTime = clip->duration + extraTime;
+		clipCtrl->keyframe = clip->lastKeyframe;
+	}
+	// forward skip
+	else if (clipCtrl->keyframeTime > last_keyframe->duration)
+	{
+		clipCtrl->keyframeTime = clipCtrl->keyframeTime - last_keyframe->duration;
+		clipCtrl->keyframe++;
+	}	
+	// reverse skip
+	else if (clipCtrl->keyframeTime < 0) {
+		clipCtrl->keyframeTime = -clipCtrl->keyframeTime;
+		clipCtrl->keyframe--;
+	}
+
+	// case forward and
+	// case reverse
+	a3_Keyframe* current_keyframe = clip->pool->keyframe + clipCtrl->keyframe;
+	clipCtrl->clipParam = clipCtrl->clipTime * clip->durationInv;
+	clipCtrl->keyframeParam = clipCtrl->keyframeTime * current_keyframe->durationInv;
+
+	return 1;
 }
 
 // set clip to play
 inline a3i32 a3clipControllerSetClip(a3_ClipController* clipCtrl, const a3_ClipPool* clipPool, const a3ui32 clipIndex_pool)
 {
-	return -1;
+	clipCtrl->clip = clipIndex_pool;
+	clipCtrl->clipPool = clipPool;
+	return 1;
 }
 
 
