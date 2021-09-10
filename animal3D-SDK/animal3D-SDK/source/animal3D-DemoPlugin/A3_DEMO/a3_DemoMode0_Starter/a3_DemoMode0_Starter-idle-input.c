@@ -42,6 +42,9 @@
 // main demo mode callback
 void a3starter_input_keyCharPress(a3_DemoState const* demoState, a3_DemoMode0_Starter* demoMode, a3i32 const asciiKey, a3i32 const state)
 {
+
+	a3_ClipController* clipCtrl = demoMode->clipControllers + demoMode->activeClipController;
+	a3_Clip* activeClip = clipCtrl->clipPool->clip + clipCtrl->clip;
 	switch (asciiKey)
 	{
 		// toggle render program
@@ -61,6 +64,30 @@ void a3starter_input_keyCharPress(a3_DemoState const* demoState, a3_DemoMode0_St
 
 		// toggle pass to display
 		a3demoCtrlCasesLoop(demoMode->pass, starter_pass_max, ')', '(');
+
+
+		// animation
+		// forward
+		case 'i': clipCtrl->direction = 1; break;
+		// backward
+		case 'o': clipCtrl->direction = -1; break;
+		// pause
+		case 'p': clipCtrl->direction = 0; break;
+
+		// first keyframe
+		case 'd': clipCtrl->keyframe = activeClip->firstKeyframe; break;
+		// last keyframe
+		case 'f': clipCtrl->keyframe = activeClip->lastKeyframe; break;
+
+		
+		a3demoCtrlToggle(demoMode->playbackSlowmo);
+
+		a3demoCtrlCasesLoop(demoMode->activeClipController, starterMaxCount_clipControllers, '<', '>');
+
+		a3demoCtrlCasesLoop(demoMode->clipControllers[demoMode->activeClipController].clip, demoMode->clipPool->count, 'n', 'm');
+
+
+
 	}
 }
 

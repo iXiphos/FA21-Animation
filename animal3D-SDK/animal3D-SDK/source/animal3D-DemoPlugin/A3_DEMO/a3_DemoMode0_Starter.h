@@ -167,6 +167,10 @@ typedef enum a3_DemoMode0_Starter_TargetName				a3_DemoMode0_Starter_TargetName;
 		a3_ClipPool clipPool[1];
 
 		a3_ClipController clipControllers[starterMaxCount_clipControllers];
+
+		a3ui32 activeClipController;
+
+		a3boolean playbackSlowmo;
 		
 	};
 

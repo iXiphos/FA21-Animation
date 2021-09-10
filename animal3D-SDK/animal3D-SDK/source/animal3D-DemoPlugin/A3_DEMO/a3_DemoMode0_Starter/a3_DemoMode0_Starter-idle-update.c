@@ -84,6 +84,7 @@ void a3starter_update(a3_DemoState* demoState, a3_DemoMode0_Starter* demoMode, a
 			demoMode->object_scene[i].modelMat.m, a3mat4_identity.m);
 	}
 
+	a3f32 animDelta = (a3real)dt * (0.5f + (a3f32)demoMode->playbackSlowmo / 2.0f );
 	for(i = 0; i < starterMaxCount_clipControllers; i++)
 		a3clipControllerUpdate(demoMode->clipControllers + i, (a3real)dt);
 }
