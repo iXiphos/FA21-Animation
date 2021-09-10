@@ -124,6 +124,8 @@ typedef enum a3_DemoMode0_Starter_TargetName				a3_DemoMode0_Starter_TargetName;
 		a3_DemoMode0_Starter_DisplayProgramName display;
 		a3_DemoMode0_Starter_ActiveCameraName activeCamera;
 
+
+
 		a3_DemoMode0_Starter_PipelineName pipeline;
 		a3_DemoMode0_Starter_PassName pass;
 		a3_DemoMode0_Starter_TargetName targetIndex[starter_pass_max], targetCount[starter_pass_max];

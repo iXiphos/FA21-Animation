@@ -185,8 +185,6 @@ struct a3_DemoState
 	a3boolean playing;
 	a3boolean forward;
 
-
-
 	//-------------------------------------------------------------------------
 	// object arrays: organized as anonymous unions for two reasons: 
 	//	1. easy to manage entire sets of the same type of object using the 

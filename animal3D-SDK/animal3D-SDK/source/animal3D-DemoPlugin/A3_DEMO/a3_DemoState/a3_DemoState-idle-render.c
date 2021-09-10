@@ -173,11 +173,11 @@ void a3demo_render_animation(const a3_DemoState* demoState,
 {
 	// display some general data
 	a3textDraw(text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
-		"Toggle Forward( l )", demoState->timer->ticksPerSecond);//(a3f64)demoState->timer_display->ticks / demoState->timer_display->totalTime);
+		"Toggle Forward( l )");//(a3f64)demoState->timer_display->ticks / demoState->timer_display->totalTime);
 	a3textDraw(text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
-		"Stop/Play Player ( + )", (a3f64)demoState->n_timer / (demoState->dt_timer_tot));//(a3f64)demoState->n_timer / demoState->timer_display->totalTime);//(a3f64)demoState->timer_display->ticks / demoState->timer_display->totalTime);
+		"Stop/Play Player ( + )");//(a3f64)demoState->n_timer / demoState->timer_display->totalTime);//(a3f64)demoState->timer_display->ticks / demoState->timer_display->totalTime);
 	a3textDraw(text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
-		"Cycle Clip ( Insert Button | Insert Button)", (demoState->dt_timer) * 1000.0);//demoState->timer_display->previousTick * 1000.0);
+		"Cycle Clip ( Insert Button | Insert Button)");//demoState->timer_display->previousTick * 1000.0);
 
 	//Display Clip
 
@@ -252,13 +252,13 @@ void a3demo_render(a3_DemoState const* demoState, a3f64 const dt)
 			// choose text render mode
 			switch (demoState->textMode)
 			{
-				// controls for current mode
-			case demoState_animationData:
-				a3demo_render_animation(demoState, text, col, textAlign + x, textDepth, textOffsetDelta, textOffset + y);
-				break;
 
 			case demoState_textControls:
 				a3demo_render_controls(demoState, text, col, textAlign + x, textDepth, textOffsetDelta, textOffset + y);
+				break;
+				// controls for current mode
+			case demoState_animationData:
+				a3demo_render_animation(demoState, text, col, textAlign + x, textDepth, textOffsetDelta, textOffset + y);
 				break;
 
 				// controls for general
