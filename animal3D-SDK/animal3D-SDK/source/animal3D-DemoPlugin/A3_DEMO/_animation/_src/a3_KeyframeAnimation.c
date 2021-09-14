@@ -95,7 +95,7 @@ a3i32 a3clipPoolRelease(a3_ClipPool* clipPool)
 a3i32 a3clipPoolNewClip(a3_ClipPool* clipPool) {
 	if ( clipPool->count <= clipPool->capacity ) {
 		clipPool->capacity += 5; // TODO: maybe different growth factor
-		a3ReizeArray(clipPool->clips, clipPool->capacity, a3_Keyframe);
+		a3ResizeArray(clipPool->clips, clipPool->capacity, a3_Clip);
 	}
 
 	return clipPool->count++;
@@ -127,6 +127,7 @@ a3i32 a3clipGetIndexInPool(const a3_ClipPool* clipPool, const a3byte clipName[a3
 
 a3i32 a3clipPoolLoadFromFile(a3_ClipPool* clipPool, const char* path) {
 
+	return -1;
 }
 
 //-----------------------------------------------------------------------------
