@@ -30,6 +30,7 @@
 #include "animal3D-A3DM/a3math/a3interpolation.h"
 
 
+
 //-----------------------------------------------------------------------------
 
 #ifdef __cplusplus
@@ -80,17 +81,20 @@ struct a3_Keyframe
 // pool of keyframe descriptors
 struct a3_KeyframePool
 {
-	// array of keyframes
-	a3_Keyframe *keyframe;
+	// array of keyframes, DO NOT STORE POINTERS TO CONTENTS
+	a3_Keyframe *keyframes;
 
 	// number of keyframes
 	a3ui32 count;
+
+	// total number of keyframes
+	a3ui32 capacity;
 };
 
 
 
 // allocate keyframe pool
-a3i32 a3keyframePoolCreate(a3_KeyframePool* keyframePool_out, const a3ui32 count);
+a3i32 a3keyframePoolCreate(a3_KeyframePool* keyframePool_out, const a3ui32 capacity);
 
 // release keyframe pool
 a3i32 a3keyframePoolRelease(a3_KeyframePool* keyframePool);
@@ -98,7 +102,10 @@ a3i32 a3keyframePoolRelease(a3_KeyframePool* keyframePool);
 // initialize keyframe
 a3i32 a3keyframeInit(a3_Keyframe* keyframe_out, const a3real duration, const a3ui32 value_x);
 
-a3_Keyframe* a3keyframePoolGetAtIndex(a3_KeyframePool* pool, a3ui32 keyframeIndex);
+a3_Keyframe* a3keyframePoolGetAtIndex(a3_KeyframePool* pool, const a3ui32 index);
+
+// "allocate" space for count number of frames, retuns the index of the first one
+a3i32 a3keyframePoolNewFrames(a3_KeyframePool* keyframePool, const a3ui32 count);
 
 //-----------------------------------------------------------------------------
 
@@ -135,12 +142,12 @@ struct a3_Clip
 struct a3_ClipPool
 {
 	// array of clips
-	a3_Clip* clip;
+	a3_Clip* clips;
 
 	// number of clips
 	a3ui32 count;
 
-
+	a3ui32 capacity;
 };
 
 
@@ -149,6 +156,9 @@ a3i32 a3clipPoolCreate(a3_ClipPool* clipPool_out, const a3ui32 count);
 
 // release clip pool
 a3i32 a3clipPoolRelease(a3_ClipPool* clipPool);
+
+// "allocates" a new clip within the clip pool, returns index
+a3i32 a3clipPoolNewClip(a3_ClipPool* clipPool);
 
 // initialize clip with first and last indices
 a3i32 a3clipInit(a3_Clip* clip_out, const a3byte clipName[a3keyframeAnimation_nameLenMax], const a3_KeyframePool* keyframePool, const a3ui32 firstKeyframeIndex, const a3ui32 finalKeyframeIndex);
@@ -163,6 +173,7 @@ a3i32 a3clipCalculateDuration(a3_Clip* clip);
 a3i32 a3clipDistributeDuration(a3_Clip* clip, const a3real newClipDuration);
 
 
+a3i32 a3lclipPoolLoadFromFile(a3_ClipPool* clipPool, const char* path);
 //-----------------------------------------------------------------------------
 
 

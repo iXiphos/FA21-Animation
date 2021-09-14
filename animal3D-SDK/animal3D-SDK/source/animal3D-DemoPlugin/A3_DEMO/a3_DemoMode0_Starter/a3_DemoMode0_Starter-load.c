@@ -173,14 +173,14 @@ void a3starter_load(a3_DemoState const* demoState, a3_DemoMode0_Starter* demoMod
 	a3keyframePoolCreate(demoMode->keyframePool, 20);
 
 	for (a3ui32 i = 0; i < 20; i++) {
-		a3keyframeInit(demoMode->keyframePool->keyframe + i, (float)i/20.0f, 45-i);
+		a3keyframeInit(demoMode->keyframePool->keyframes + i, (float)i/20.0f, 45-i);
 	}
 
-	a3clipInit(demoMode->clipPool->clip + 0, " 0 -> 19", demoMode->keyframePool,  0, 19);
-	a3clipInit(demoMode->clipPool->clip + 1, " 0 ->  5", demoMode->keyframePool,  0,  5);
-	a3clipInit(demoMode->clipPool->clip + 2, " 5 -> 10", demoMode->keyframePool,  5, 10);
-	a3clipInit(demoMode->clipPool->clip + 3, "10 -> 19", demoMode->keyframePool, 10, 19);
-	a3clipInit(demoMode->clipPool->clip + 4, " 2 ->  7", demoMode->keyframePool,  2,  7);
+	a3clipInit(demoMode->clipPool->clips + 0, " 0 -> 19", demoMode->keyframePool,  0, 19);
+	a3clipInit(demoMode->clipPool->clips + 1, " 0 ->  5", demoMode->keyframePool,  0,  5);
+	a3clipInit(demoMode->clipPool->clips + 2, " 5 -> 10", demoMode->keyframePool,  5, 10);
+	a3clipInit(demoMode->clipPool->clips + 3, "10 -> 19", demoMode->keyframePool, 10, 19);
+	a3clipInit(demoMode->clipPool->clips + 4, " 2 ->  7", demoMode->keyframePool,  2,  7);
 
 	a3clipControllerInit(demoMode->clipControllers + 0, "first clip ctrl", demoMode->clipPool, 0);
 	a3clipControllerInit(demoMode->clipControllers + 1, "second clip ctrl", demoMode->clipPool, 1);

@@ -47,8 +47,8 @@ inline a3i32 a3clipControllerUpdate(a3_ClipController* clipCtrl, const a3real dt
 	// case paused
 	if (clipCtrl->direction == 0) return 0;
 
-	clip = clipCtrl->clipPool->clip + clipCtrl->clip;
-	last_keyframe = clip->pool->keyframe + clipCtrl->keyframe;
+	clip = clipCtrl->clipPool->clips + clipCtrl->clip;
+	last_keyframe = clip->pool->keyframes + clipCtrl->keyframe;
 	a3ui32 next_frame_index = clipCtrl->keyframe + clipCtrl->direction;
 	if (next_frame_index > clip->lastKeyframe) {
 		next_frame_index = clip->firstKeyframe;
@@ -57,7 +57,7 @@ inline a3i32 a3clipControllerUpdate(a3_ClipController* clipCtrl, const a3real dt
 		next_frame_index = clip->lastKeyframe;
 	}
 
-	next_keyframe = clip->pool->keyframe + next_frame_index;
+	next_keyframe = clip->pool->keyframes + next_frame_index;
 
 	
 	clipCtrl->keyframeTime += dt * (float)clipCtrl->direction;
@@ -94,7 +94,7 @@ inline a3i32 a3clipControllerUpdate(a3_ClipController* clipCtrl, const a3real dt
 
 	// case forward and
 	// case reverse
-	a3_Keyframe* current_keyframe = clip->pool->keyframe + clipCtrl->keyframe;
+	a3_Keyframe* current_keyframe = clip->pool->keyframes + clipCtrl->keyframe;
 	clipCtrl->clipParam = clipCtrl->clipTime * clip->durationInv;
 	clipCtrl->keyframeParam = clipCtrl->keyframeTime * current_keyframe->durationInv;
 

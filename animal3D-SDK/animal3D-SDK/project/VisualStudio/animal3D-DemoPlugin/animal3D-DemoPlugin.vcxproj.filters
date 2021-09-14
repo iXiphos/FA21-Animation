@@ -153,6 +153,9 @@
     <ClCompile Include="..\..\..\source\animal3D-DemoPlugin\A3_DEMO\_animation\_src\a3_SpatialPose.c">
       <Filter>Source Files\common\A3_DEMO\_animation\_src</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\source\animal3D-DemoPlugin\A3_DEMO\_a3_demo_utilities\_src\a3_DemoUtils.c">
+      <Filter>Source Files\common\A3_DEMO\_a3_demo_utilities\_src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\source\animal3D-DemoPlugin\A3_DEMO\a3_DemoState.h">
@@ -196,6 +199,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\source\animal3D-DemoPlugin\A3_DEMO\_animation\a3_SpatialPose.h">
       <Filter>Header Files\A3_DEMO\_animation</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\source\animal3D-DemoPlugin\A3_DEMO\_a3_demo_utilities\a3_DemoUtil.h">
+      <Filter>Header Files\A3_DEMO\_a3_demo_utilities</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

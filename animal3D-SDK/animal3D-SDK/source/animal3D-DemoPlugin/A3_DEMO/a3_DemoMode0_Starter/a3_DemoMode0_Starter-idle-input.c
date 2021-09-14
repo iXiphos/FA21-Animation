@@ -44,7 +44,7 @@ void a3starter_input_keyCharPress(a3_DemoState const* demoState, a3_DemoMode0_St
 {
 
 	a3_ClipController* clipCtrl = demoMode->clipControllers + demoMode->activeClipController;
-	a3_Clip* activeClip = clipCtrl->clipPool->clip + clipCtrl->clip;
+	a3_Clip* activeClip = clipCtrl->clipPool->clips + clipCtrl->clip;
 	switch (asciiKey)
 	{
 		// toggle render program

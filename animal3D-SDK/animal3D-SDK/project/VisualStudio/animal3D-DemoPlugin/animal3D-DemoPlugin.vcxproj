@@ -203,6 +203,7 @@
     <ClCompile Include="..\..\..\source\animal3D-DemoPlugin\A3_DEMO\_a3_demo_callbacks.c" />
     <ClCompile Include="..\..\..\source\animal3D-DemoPlugin\A3_DEMO\_a3_demo_utilities\_src\a3_DemoRenderUtils.c" />
     <ClCompile Include="..\..\..\source\animal3D-DemoPlugin\A3_DEMO\_a3_demo_utilities\_src\a3_DemoSceneObject.c" />
+    <ClCompile Include="..\..\..\source\animal3D-DemoPlugin\A3_DEMO\_a3_demo_utilities\_src\a3_DemoUtils.c" />
     <ClCompile Include="..\..\..\source\animal3D-DemoPlugin\A3_DEMO\_animation\_src\a3_Hierarchy.c" />
     <ClCompile Include="..\..\..\source\animal3D-DemoPlugin\A3_DEMO\_animation\_src\a3_HierarchyState.c" />
     <ClCompile Include="..\..\..\source\animal3D-DemoPlugin\A3_DEMO\_animation\_src\a3_HierarchyStateBlend.c" />
@@ -219,6 +220,7 @@
     <ClInclude Include="..\..\..\source\animal3D-DemoPlugin\A3_DEMO\_a3_demo_utilities\a3_DemoRenderUtils.h" />
     <ClInclude Include="..\..\..\source\animal3D-DemoPlugin\A3_DEMO\_a3_demo_utilities\a3_DemoSceneObject.h" />
     <ClInclude Include="..\..\..\source\animal3D-DemoPlugin\A3_DEMO\_a3_demo_utilities\a3_DemoShaderProgram.h" />
+    <ClInclude Include="..\..\..\source\animal3D-DemoPlugin\A3_DEMO\_a3_demo_utilities\a3_DemoUtil.h" />
     <ClInclude Include="..\..\..\source\animal3D-DemoPlugin\A3_DEMO\_animation\a3_Hierarchy.h" />
     <ClInclude Include="..\..\..\source\animal3D-DemoPlugin\A3_DEMO\_animation\a3_HierarchyState.h" />
     <ClInclude Include="..\..\..\source\animal3D-DemoPlugin\A3_DEMO\_animation\a3_HierarchyStateBlend.h" />
