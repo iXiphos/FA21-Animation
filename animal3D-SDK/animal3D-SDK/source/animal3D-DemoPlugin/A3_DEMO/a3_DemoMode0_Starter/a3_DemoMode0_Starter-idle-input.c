@@ -67,19 +67,15 @@ void a3starter_input_keyCharPress(a3_DemoState const* demoState, a3_DemoMode0_St
 
 
 		// animation
-		// forward
-		case 'i': clipCtrl->direction = 1; break;
-		// backward
-		case 'o': clipCtrl->direction = -1; break;
-		// pause
-		case 'p': clipCtrl->direction = 0; break;
 
 		// first keyframe
 		case 'd': a3clipControllerJumpToFrame(clipCtrl, activeClip->firstKeyframe); break;
 		// last keyframe
 		case 'f': a3clipControllerJumpToFrame(clipCtrl, activeClip->lastKeyframe); break;
 
-		
+		a3demoCtrlCaseToggle(clipCtrl->reverse, 'o');
+		a3demoCtrlCaseToggle(clipCtrl->playing, 'p');
+
 		a3demoCtrlToggle(demoMode->playbackSlowmo);
 
 		a3demoCtrlCasesLoop(demoMode->activeClipController, starterMaxCount_clipControllers, '<', '>');

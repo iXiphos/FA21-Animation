@@ -36,7 +36,7 @@ a3i32 a3clipControllerInit(a3_ClipController* clipCtrl_out, const a3byte ctrlNam
 	clipCtrl_out->clip = clipIndex_pool;
 	clipCtrl_out->clipTime = 0;
 	clipCtrl_out->keyframeTime = 0;
-	clipCtrl_out->direction = 1;
+	clipCtrl_out->reverse = 0;
 	clipCtrl_out->keyframe = clipPool->clips[clipIndex_pool].firstKeyframe;
 	clipCtrl_out->clipPool = clipPool;
 	return 1;
@@ -57,6 +57,29 @@ a3i32 a3clipControllerJumpToFrame(a3_ClipController* clipCtrl, const a3ui32 inde
 	clipCtrl->clipTime = duration;
 	clipCtrl->keyframeTime = 0;
 	return 1;
+}
+
+// cannot skip keyframes
+a3_Keyframe* a3clipControllerGetFrameByOffset(const a3_ClipController* clipCtrl, a3i32 offset) {
+
+
+	a3_Clip* clip = clipCtrl->clipPool->clips + clipCtrl->clip;
+
+	a3i8 dir_offset = clipCtrl->reverse ? -1 : 1;
+	a3ui32 index = clipCtrl->keyframe + offset;
+
+	if (index < clip->firstKeyframe) {
+		a3_Clip* next_clip = clipCtrl->clipPool->clips + clip->transitionBackwards.index;
+		a3i32 offset = clip->firstKeyframe - index;
+
+	}
+	else if (index > clip->lastKeyframe) {
+		a3_Clip* next_clip = clipCtrl->clipPool->clips + clip->transitionForward.index;
+
+
+	}
+
+	return NULL;
 }
 
 //-----------------------------------------------------------------------------

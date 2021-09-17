@@ -106,7 +106,7 @@ void a3starter_render_controls(a3_DemoState const* demoState, a3_DemoMode0_Start
 
 	// display some general data
 	a3textDraw(text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
-		"Stop ( p )  Forward( i )  backwards ( o ) ");
+		"Pause/Play ( p ) Toggle Direction ( o ) ");
 	a3textDraw(text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
 		"Go First Frame ( d )      Go Last Frame ( f )");
 	a3textDraw(text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,

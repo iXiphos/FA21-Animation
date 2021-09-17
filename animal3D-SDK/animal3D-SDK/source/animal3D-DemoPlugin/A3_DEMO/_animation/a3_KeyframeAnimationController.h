@@ -66,8 +66,12 @@ struct a3_ClipController
 	// normalized keyframe time; should always be between 0 and 1.
 	a3f32 keyframeParam;
 
-	// the active behavior of playback; +1 for forward, 0 for pause, and -1 for reverse.
-	a3i8 direction;
+
+	// is it playing reversed?
+	a3i8 reverse;
+
+	// boolean
+	a3i8 playing;
 
 	// the pool of clips that the controller will control
 	const a3_ClipPool* clipPool;
@@ -85,15 +89,16 @@ a3i32 a3clipControllerUpdate(a3_ClipController* clipCtrl, const a3real dt);
 // set clip to play
 a3i32 a3clipControllerSetClip(a3_ClipController* clipCtrl, const a3_ClipPool* clipPool, const a3ui32 clipIndex_pool);
 
+a3i32 a3clipControllerGetClip(a3_ClipController* clipCtrl);
 
 a3i32 a3clipControllerJumpToFrame(a3_ClipController* clipCtrl, const a3ui32 index);
 
-a3i32 a3clipControllerEvaulate(const a3_ClipController* clipCtrl, a3_Sample* sample_out);
+a3real a3clipControllerEvaulate(const a3_ClipController* clipCtrl, a3_Sample* sample_out);
 
 
 // get a frame based on an offset from the current frame
 // will follow termination behavior and play direction
-a3i32 a3clipControllerGetFrameByOffset(const a3_ClipController* clipCtrl, a3i32 offset);
+a3_Keyframe* a3clipControllerGetFrameByOffset(const a3_ClipController* clipCtrl, a3i32 offset);
 
 
 //-----------------------------------------------------------------------------

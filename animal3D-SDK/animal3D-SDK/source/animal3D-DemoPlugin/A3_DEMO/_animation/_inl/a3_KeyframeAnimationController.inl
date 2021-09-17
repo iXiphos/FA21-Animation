@@ -40,28 +40,20 @@ inline a3i32 a3clipControllerUpdate(a3_ClipController* clipCtrl, const a3real dt
 	// case forward skip
 	// case forward terminus
 
-	a3_Clip* clip;
-	a3_Keyframe* last_keyframe;
-	a3_Keyframe* next_keyframe;
 
 	// case paused
-	if (clipCtrl->direction == 0) return 0;
+	if (clipCtrl->playing == 0) return 0;
 
-	clip = clipCtrl->clipPool->clips + clipCtrl->clip;
-	last_keyframe = clip->pool->keyframes + clipCtrl->keyframe;
-	a3ui32 next_frame_index = clipCtrl->keyframe + clipCtrl->direction;
-	if (next_frame_index > clip->lastKeyframe) {
-		next_frame_index = clip->firstKeyframe;
-	}
-	else if (next_frame_index < clip->firstKeyframe) {
-		next_frame_index = clip->lastKeyframe;
-	}
-
-	next_keyframe = clip->pool->keyframes + next_frame_index;
-
+	a3_Clip* clip = clipCtrl->clipPool->clips + clipCtrl->clip;
+	a3_Keyframe* last_keyframe;
 	
-	clipCtrl->keyframeTime += dt * (float)clipCtrl->direction;
-	clipCtrl->clipTime += dt * (float)clipCtrl->direction;
+
+	last_keyframe = clip->pool->keyframes + clipCtrl->keyframe;
+
+	float direction = clipCtrl->reverse ? -1.0F : 1.0F;
+	clipCtrl->keyframeTime += dt * direction;
+	clipCtrl->clipTime += dt * direction;
+
 
 
 	// end of clip forward
@@ -75,11 +67,13 @@ inline a3i32 a3clipControllerUpdate(a3_ClipController* clipCtrl, const a3real dt
 	}
 	// end of clip reversed
 	else if (clipCtrl->clipTime < 0) {
+		a3_Keyframe* next_keyframe = clip->pool->keyframes + clip->lastKeyframe;
 		float extraTime = -clipCtrl->clipTime;
 		clipCtrl->clipTime = clip->duration - extraTime;
 		clipCtrl->keyframeTime = next_keyframe->duration - extraTime;
 		clipCtrl->keyframe = clip->lastKeyframe;
 	}
+	// because of the checks before, we know that the keyframe will be inside the current clip
 	// forward skip
 	else if (clipCtrl->keyframeTime > last_keyframe->duration)
 	{
@@ -88,8 +82,10 @@ inline a3i32 a3clipControllerUpdate(a3_ClipController* clipCtrl, const a3real dt
 	}	
 	// reverse skip
 	else if (clipCtrl->keyframeTime < 0) {
-		clipCtrl->keyframeTime = next_keyframe->duration - -clipCtrl->keyframeTime;
 		clipCtrl->keyframe--;
+		a3_Keyframe* next_keyframe = clip->pool->keyframes + clipCtrl->keyframe;
+		clipCtrl->keyframeTime = next_keyframe->duration - -clipCtrl->keyframeTime;
+		
 	}
 
 	// case forward and
@@ -104,19 +100,31 @@ inline a3i32 a3clipControllerUpdate(a3_ClipController* clipCtrl, const a3real dt
 // set clip to play
 inline a3i32 a3clipControllerSetClip(a3_ClipController* clipCtrl, const a3_ClipPool* clipPool, const a3ui32 clipIndex_pool)
 {
+	a3_Clip* clip = clipPool->clips + clipIndex_pool;
 	clipCtrl->clip = clipIndex_pool;
 	clipCtrl->clipPool = clipPool;
+	// if we are playing reverse: 
+	// start at end of time, set keyframe to last keyframe and set keyframe param to 1
+	clipCtrl->keyframe = clipCtrl->reverse ? clip->lastKeyframe : clip->lastKeyframe;
+	a3_Keyframe* keyframe = clip->pool->keyframes + clipCtrl->keyframe;
+
+	float param = (float)clipCtrl->reverse; // forward: 0, reverse: 1
+	clipCtrl->clipParam = param;
+	clipCtrl->keyframeParam = param;
+	clipCtrl->clipTime = param * clip->duration;
+	clipCtrl->keyframeTime = 0;
+
 	return 1;
 }
 
 
 
-inline a3i32 a3clipControllerEvaulate(const a3_ClipController* clipCtrl, a3_Sample* sample_out) {
+inline a3real a3clipControllerEvaulate(const a3_ClipController* clipCtrl, a3_Sample* sample_out) {
 	if (clipCtrl && clipCtrl->clip != -1 && sample_out) {
-
-		// 0: no imterpolation: step
+		a3_Clip* clip = clipCtrl->clipPool->clips + clipCtrl->clip;
+		// 0: no interpolation: step
 		// return keyframe value
-
+		return clip->pool->keyframes[clipCtrl->keyframe].sample.value;
 		// 1: nearest
 
 		// 2: lerp

@@ -42,6 +42,7 @@ typedef struct a3_Keyframe					a3_Keyframe;
 typedef struct a3_KeyframePool				a3_KeyframePool;
 typedef struct a3_Clip						a3_Clip;
 typedef struct a3_ClipPool					a3_ClipPool;
+typedef struct a3_ClipTransition			a3_ClipTransition;
 #endif	// __cplusplus
 
 
@@ -53,6 +54,29 @@ enum
 	a3keyframeAnimation_nameLenMax = 32,
 };
 
+
+// clip transitions
+struct a3_ClipTransition {
+	
+	struct {
+		// should the clip play reversed? 
+		a3i8 reverse : 1;
+		// should the clip begin playing?
+		a3i8 playing : 1;
+
+		// where the clip should being playing, 0 for start 1 for end 
+		a3i8 clipStart : 1;
+
+		// where in the frame it should start (frame param) 0 or 1
+		a3i8 frameStart : 1;
+	};
+
+	// index of the clip to transition to
+	a3ui32 index;
+
+	// pool where the clip is
+	//a3_ClipPool* pool; // can a clip transition to a clip with a different pool?
+};
 
 // single generic value at time
 struct a3_Sample
@@ -130,6 +154,8 @@ struct a3_Clip
 
 	// index of first keyframe in pool referenced by clip
 	a3ui32 firstKeyframe;
+
+	a3_ClipTransition transitionForward, transitionBackwards;
 	
 	// index of final keyframe in pool referenced by clip
 	a3ui32 lastKeyframe;
@@ -172,6 +198,10 @@ a3i32 a3clipCalculateDuration(a3_Clip* clip);
 // calculate keyframes' durations by distributing clip's duration
 a3i32 a3clipDistributeDuration(a3_Clip* clip, const a3real newClipDuration);
 
+
+// return keyframe from timestamp, only works within 0 to clip duration
+// returns index
+a3i32 a3clipGetKeyframeFromTime(a3_Clip* clip, a3real time, a3real* keyframeTime_out, a3_Keyframe** keyframe_out);
 
 a3i32 a3clipPoolLoadFromFile(a3_ClipPool* clipPool, const char* path);
 //-----------------------------------------------------------------------------
