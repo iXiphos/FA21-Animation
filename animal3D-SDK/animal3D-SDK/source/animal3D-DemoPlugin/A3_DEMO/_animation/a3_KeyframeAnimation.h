@@ -67,7 +67,7 @@ enum a3_clipTransitionType {
 
 	a3_clipTransitionTypeForwardPauseFirstFrame,
 	a3_clipTransitionTypeReversePlayBack,
-	a3_clipTransitionTypeReversePauseFirstFrame,
+	a3_clipTransitionTypeReversePauseLastFrame,
 
 };
 
@@ -89,6 +89,8 @@ struct a3_ClipTransition {
 
 	// index of the clip to transition to
 	a3ui32 index;
+
+	a3_clipTransitionType transition;
 
 	// pool where the clip is
 	//a3_ClipPool* pool; // can a clip transition to a clip with a different pool?
@@ -170,8 +172,6 @@ struct a3_Clip
 
 	// index of first keyframe in pool referenced by clip
 	a3ui32 firstKeyframe;
-
-	a3_clipTransitionType transition;
 
 	a3_ClipTransition transitionForward, transitionBackwards;
 	
