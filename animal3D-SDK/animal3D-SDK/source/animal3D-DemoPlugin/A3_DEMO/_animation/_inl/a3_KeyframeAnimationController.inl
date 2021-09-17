@@ -33,6 +33,13 @@
 inline a3i32 a3clipControllerHandleTransition(a3_ClipController* clipCtrl) {
 	a3_Clip* from_clip = clipCtrl->clipPool->clips + clipCtrl->clip;
 
+	a3_ClipTransition transition = clipCtrl->reverse ? from_clip->transitionBackwards : from_clip->transitionForward;
+
+	a3_Clip* to_clip = transition.index != 0 ? clipCtrl->clipPool->clips + transition.index : from_clip;
+
+	if (transition.index != 0) {
+		clipCtrl->clip = transition.index;
+	}
 	
 	//update keyframe, cliptime, direction, paused, keyframe time
 
@@ -40,7 +47,7 @@ inline a3i32 a3clipControllerHandleTransition(a3_ClipController* clipCtrl) {
 	a3_Keyframe firstKeyFrame = from_clip->pool->keyframes[from_clip->firstKeyframe];
 	a3_Keyframe lastKeyFrame = from_clip->pool->keyframes[from_clip->lastKeyframe];
 
-	a3_ClipTransition transition = clipCtrl->reverse ? from_clip->transitionBackwards : from_clip->transitionForward;
+	
 
 	switch (transition.transition) 
 	{
@@ -54,7 +61,7 @@ inline a3i32 a3clipControllerHandleTransition(a3_ClipController* clipCtrl) {
 		extraTime = clipCtrl->clipTime - from_clip->duration;
 		clipCtrl->clipTime = 0 + extraTime;
 		clipCtrl->keyframeTime = 0 + extraTime;
-		clipCtrl->keyframe = from_clip->firstKeyframe;
+		clipCtrl->keyframe = to_clip->firstKeyframe;
 
 		clipCtrl->playing = true;
 		clipCtrl->reverse = false;
@@ -63,7 +70,7 @@ inline a3i32 a3clipControllerHandleTransition(a3_ClipController* clipCtrl) {
 		extraTime = clipCtrl->clipTime - from_clip->duration;
 		clipCtrl->clipTime = 0 + extraTime;
 		clipCtrl->keyframeTime = 0 + extraTime;
-		clipCtrl->keyframe = from_clip->firstKeyframe;
+		clipCtrl->keyframe = to_clip->firstKeyframe;
 
 		clipCtrl->playing = false;
 		clipCtrl->reverse = false;
@@ -71,9 +78,9 @@ inline a3i32 a3clipControllerHandleTransition(a3_ClipController* clipCtrl) {
 
 	case a3_clipTransitionTypeReverse:
 		extraTime = clipCtrl->clipTime - from_clip->duration;
-		clipCtrl->clipTime = 0 + extraTime;
+		clipCtrl->clipTime = to_clip->duration - extraTime;
 		clipCtrl->keyframeTime = 0 + extraTime;
-		clipCtrl->keyframe = from_clip->lastKeyframe;
+		clipCtrl->keyframe = to_clip->lastKeyframe;
 
 		clipCtrl->playing = false;
 		clipCtrl->reverse = true;

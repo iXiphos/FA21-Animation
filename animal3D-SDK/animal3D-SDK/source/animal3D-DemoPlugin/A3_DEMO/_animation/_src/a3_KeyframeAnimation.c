@@ -111,6 +111,10 @@ a3i32 a3clipInit(a3_Clip* clip_out, const a3byte clipName[a3keyframeAnimation_na
 	clip_out->lastKeyframe = finalKeyframeIndex;
 	clip_out->count = finalKeyframeIndex - firstKeyframeIndex + 1;
 	clip_out->index = 0;
+	clip_out->transitionForward.transition = a3_clipTransitionTypePause;
+	clip_out->transitionBackwards.transition = a3_clipTransitionTypePause;
+	clip_out->transitionForward.index = 0;
+	clip_out->transitionBackwards.index = 0;
 	a3clipCalculateDuration(clip_out);
 	return 1;
 }
@@ -134,12 +138,47 @@ a3i32 a3clipGetIndexInPool(const a3_ClipPool* clipPool, const a3byte clipName[a3
 {
 	for (a3ui32 i = 0; i < clipPool->count; i++) {
 		a3_Clip* clip = clipPool->clips + i;
-		if ( 0 == memcmp(clip->name, clipName, a3keyframeAnimation_nameLenMax))
+		if ( 0 == strcmp(clip->name, clipName))
 			return i;
 	}
 	return -1;
 }
 
+/*
+a3_clipTransitionTypePause,
+a3_clipTransitionTypeForward,
+a3_clipTransitionTypeForwardPause,
+
+a3_clipTransitionTypeReverse,
+a3_clipTransitionTypeReversePause,
+a3_clipTransitionTypeForwardPlayBack,
+
+a3_clipTransitionTypeForwardPauseFirstFrame,
+a3_clipTransitionTypeReversePlayBack,
+a3_clipTransitionTypeReversePauseFirstFrame,
+*/
+
+const char* transitionStrs[9] = {
+	"|",
+	">",
+	">|",
+	"<",
+	"<|",
+	">>",
+	">>|",
+	"<<",
+	"<<|",
+};
+
+a3_clipTransitionType parseTransitionMode(char* transTypeStr) {
+
+
+	for (a3ui32 i = 0; i < 9; i++) {
+		if (strcmp(transitionStrs[i], transTypeStr) == 0) 
+			return a3_clipTransitionTypePause + i;
+	}
+	return -1;
+}
 
 a3i32 a3clipPoolLoadFromFile(a3_ClipPool* clipPool, a3_KeyframePool* keyPool, const char* path) {
 
@@ -160,33 +199,59 @@ a3i32 a3clipPoolLoadFromFile(a3_ClipPool* clipPool, a3_KeyframePool* keyPool, co
 	if ( line_count == -1) printf("unable to open file %s \n", path);
 	printf("line_count = %i \n", line_count);
 
+	a3ui32 clipIndexStart = clipPool->count;
+	char* data_columns[256][7];
+	a3ui32 newClipCount = 0;
 	for (a3i32 i = 0; i < line_count; i++) {
-		if ( *lines[i] != '@' ) continue;
+		if (*lines[i] != '@') continue;
+		a3ui32 column_num = a3SplitString(lines[i] + 2, '\t', data_columns[newClipCount], 10, true);
+		if (column_num > 7 || column_num < 6) printf("error reading file\n");
+		newClipCount++;
+	}
 
-		char* columns[10];
-		a3i32 column_count = a3SplitString(lines[i], '\t', columns, 10, true);
 
-		a3i32 loc = a3clipPoolNewClip(clipPool);
-		a3_Clip* temp = clipPool->clips + loc;
-		for (a3i32 j = 0; j < column_count; j++) {
-			printf("| %s |", columns[j]);
-		}
+	for (a3ui32 i = 0; i < newClipCount; i++) {
+
+		char** columns = data_columns[i];
+
+		a3i32 index = a3clipPoolNewClip(clipPool);
+		a3_Clip* temp = clipPool->clips + index;
+	
+		a3real duration = (a3real)atof(columns[1]);
+		a3ui32 firstFrame = atoi(columns[2]);
+		a3ui32 lastFrame = atoi(columns[3]);
+
+		a3clipInit(temp, columns[0], keyPool, firstFrame, firstFrame);
 		
+		
+
+	}
+
+	// deal with transitions
+	for (a3ui32 i = 0; i < newClipCount; i++) {
+		char** columns = data_columns[i];
+		a3_Clip* clip = clipPool->clips + clipIndexStart + i;
+
+		a3i32 col;
+
+
 		char* rTransition[2];
+		col = a3SplitString(columns[4], ' ', rTransition, 2, true);
+		clip->transitionBackwards.transition = parseTransitionMode(rTransition[0]);
+		if (col == 2) {
+			printf("|%s|\n", rTransition[1]);
+			clip->transitionBackwards.index = a3clipGetIndexInPool(clipPool, rTransition[1]);
+		}
+
+
+		
 		char* fTransition[2];
-		a3real duration = (a3real)atof(columns[2]);
-		a3ui32 firstFrame = atoi(columns[3]);
-		a3ui32 lastFrame = atoi(columns[4]);
-
-		a3clipInit(temp, columns[1], keyPool, firstFrame, firstFrame);
-		
-		a3SplitString(columns[5], ' ', rTransition, 2, true);
-		a3SplitString(columns[6], ' ', fTransition, 2, true);
-
-
-		
-		printf("\n --- \n");
-		//printf("read %32s %f %u %u / %2s / %32s / %2s / %32s\n", name, duration, first_frame, last_frame, reverse_dir, reverse_transition, forward_dir, forward_transition);
+		col = a3SplitString(columns[5], ' ', fTransition, 2, true);
+		clip->transitionForward.transition = parseTransitionMode(fTransition[0]);
+		if (col == 2) {
+			printf("|%s|\n", fTransition[1]);
+			clip->transitionForward.index = a3clipGetIndexInPool(clipPool, fTransition[1]);
+		}
 	}
 
 	free(lines[0]);

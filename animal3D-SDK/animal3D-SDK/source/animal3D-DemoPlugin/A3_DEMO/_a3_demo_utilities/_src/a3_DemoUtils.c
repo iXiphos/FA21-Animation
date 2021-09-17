@@ -44,15 +44,17 @@ void* __a3SafeRealloc(void* array_ptr, size_t count, size_t type_size, const cha
 a3i32 a3SplitString(char* str, char split_char, char** strs_out, a3i32 max_strs, a3boolean skip_empty) {
 	a3i32 count = 0;
 	char* start = str;
-	for (char* itr = str; *itr != 0; itr++) {
-		if (*itr != split_char) continue; // keep walking through column
+	for (char* itr = str; true; itr++) {
+		if (*itr != split_char && *itr != 0) continue; // keep walking through column
 		if (skip_empty && itr == start) { *itr = 0; start++; continue; } // skip repeat skip characters
 		if (count >= max_strs) return -1; // read to many columns
 
-		*itr = 0;
+		
 		strs_out[count] = start;
 		start = itr + 1;
 		count++;
+		if (*itr == 0) break;
+		*itr = 0;
 	}
 	return count;
 }
