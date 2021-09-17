@@ -93,7 +93,7 @@ a3i32 a3clipPoolRelease(a3_ClipPool* clipPool)
 	return 1;
 }
 
-a3i32 a3clipPoolNewClip(a3_ClipPool* clipPool) {
+a3ui32 a3clipPoolNewClip(a3_ClipPool* clipPool) {
 	if ( clipPool->count <= clipPool->capacity ) {
 		clipPool->capacity += 5; // TODO: maybe different growth factor
 		a3ResizeArray(clipPool->clips, clipPool->capacity, a3_Clip);
@@ -166,7 +166,7 @@ a3i32 a3clipPoolLoadFromFile(a3_ClipPool* clipPool, a3_KeyframePool* keyPool, co
 		char* columns[10];
 		a3i32 column_count = a3SplitString(lines[i], '\t', columns, 10, true);
 
-		int loc = a3clipPoolNewClip(clipPool);
+		a3i32 loc = a3clipPoolNewClip(clipPool);
 		a3_Clip* temp = clipPool->clips + loc;
 		for (a3i32 j = 0; j < column_count; j++) {
 			printf("| %s |", columns[j]);
@@ -174,13 +174,14 @@ a3i32 a3clipPoolLoadFromFile(a3_ClipPool* clipPool, a3_KeyframePool* keyPool, co
 		
 		char* rTransition[2];
 		char* fTransition[2];
-		a3real duration = (a3real)atof(columns[1]);
-		a3ui32 firstFrame = atoi(columns[2]);
-		a3ui32 lastFrame = atoi(columns[3]);
+		a3real duration = (a3real)atof(columns[2]);
+		a3ui32 firstFrame = atoi(columns[3]);
+		a3ui32 lastFrame = atoi(columns[4]);
 
-		a3clipInitDuration(temp, columns[0], keyPool, duration, firstFrame, firstFrame);
-		a3SplitString(columns[4], ' ', rTransition, 2, true);
-		a3SplitString(columns[5], ' ', fTransition, 2, true);
+		a3clipInit(temp, columns[1], keyPool, firstFrame, firstFrame);
+		
+		a3SplitString(columns[5], ' ', rTransition, 2, true);
+		a3SplitString(columns[6], ' ', fTransition, 2, true);
 
 
 		

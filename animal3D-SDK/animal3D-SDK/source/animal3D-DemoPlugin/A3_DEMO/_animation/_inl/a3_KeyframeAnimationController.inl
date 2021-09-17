@@ -29,15 +29,26 @@
 
 //-----------------------------------------------------------------------------
 
-// skip 
+
 inline a3i32 a3clipControllerHandleTransition(a3_ClipController* clipCtrl) {
+	a3_Clip* from_clip = clipCtrl->clipPool->clips + clipCtrl->clip;
 
 	if (clipCtrl->reverse == 0) { // forwards
-
+		// TODO "termination behavior"
+		// maintain extra duration from end
+		float extraTime = clipCtrl->clipTime - from_clip->duration;
+		clipCtrl->clipTime = 0 + extraTime;
+		clipCtrl->keyframeTime = 0 + extraTime;
+		clipCtrl->keyframe = from_clip->firstKeyframe;
 	}
 	else { // backwards
-
+		a3_Keyframe* next_keyframe = from_clip->pool->keyframes + from_clip->lastKeyframe;
+		float extraTime = -clipCtrl->clipTime;
+		clipCtrl->clipTime = from_clip->duration - extraTime;
+		clipCtrl->keyframeTime = next_keyframe->duration - extraTime;
+		clipCtrl->keyframe = from_clip->lastKeyframe;
 	}
+	return -1;
 }
 
 // update clip controller
@@ -67,22 +78,10 @@ inline a3i32 a3clipControllerUpdate(a3_ClipController* clipCtrl, const a3real dt
 
 
 
-	// end of clip forward
-	if (clipCtrl->clipTime > clip->duration) {
-		// TODO "termination behavior"
-		// maintain extra duration from end
-		float extraTime = clipCtrl->clipTime - clip->duration;
-		clipCtrl->clipTime = 0 + extraTime;
-		clipCtrl->keyframeTime = 0 + extraTime;
-		clipCtrl->keyframe = clip->firstKeyframe;
-	}
 	// end of clip reversed
-	else if (clipCtrl->clipTime < 0) {
-		a3_Keyframe* next_keyframe = clip->pool->keyframes + clip->lastKeyframe;
-		float extraTime = -clipCtrl->clipTime;
-		clipCtrl->clipTime = clip->duration - extraTime;
-		clipCtrl->keyframeTime = next_keyframe->duration - extraTime;
-		clipCtrl->keyframe = clip->lastKeyframe;
+	if (clipCtrl->clipTime < 0 || clipCtrl->clipTime > clip->duration) {
+
+		a3clipControllerHandleTransition(clipCtrl);
 	}
 	// because of the checks before, we know that the keyframe will be inside the current clip
 	// forward skip
