@@ -221,7 +221,7 @@ a3i32 a3clipPoolLoadFromFile(a3_ClipPool* clipPool, a3_KeyframePool* keyPool, co
 		a3ui32 firstFrame = atoi(columns[2]);
 		a3ui32 lastFrame = atoi(columns[3]);
 
-		a3clipInit(temp, columns[0], keyPool, firstFrame, firstFrame);
+		a3clipInit(temp, columns[0], keyPool, firstFrame, lastFrame);
 		
 		
 
@@ -239,8 +239,10 @@ a3i32 a3clipPoolLoadFromFile(a3_ClipPool* clipPool, a3_KeyframePool* keyPool, co
 		col = a3SplitString(columns[4], ' ', rTransition, 2, true);
 		clip->transitionBackwards.transition = parseTransitionMode(rTransition[0]);
 		if (col == 2) {
-			printf("|%s|\n", rTransition[1]);
-			clip->transitionBackwards.index = a3clipGetIndexInPool(clipPool, rTransition[1]);
+			a3i32 clipIndex = a3clipGetIndexInPool(clipPool, rTransition[1]);
+			if (clipIndex == -1) printf("unable to find clip\n");
+			clip->transitionBackwards.index = clipIndex;
+			
 		}
 
 
@@ -249,8 +251,9 @@ a3i32 a3clipPoolLoadFromFile(a3_ClipPool* clipPool, a3_KeyframePool* keyPool, co
 		col = a3SplitString(columns[5], ' ', fTransition, 2, true);
 		clip->transitionForward.transition = parseTransitionMode(fTransition[0]);
 		if (col == 2) {
-			printf("|%s|\n", fTransition[1]);
-			clip->transitionForward.index = a3clipGetIndexInPool(clipPool, fTransition[1]);
+			a3i32 clipIndex = a3clipGetIndexInPool(clipPool, fTransition[1]);
+			if (clipIndex == -1) printf("unable to find clip\n");
+			clip->transitionForward.index = clipIndex;
 		}
 	}
 
