@@ -33,6 +33,35 @@
 inline a3i32 a3clipControllerHandleTransition(a3_ClipController* clipCtrl) {
 	a3_Clip* from_clip = clipCtrl->clipPool->clips + clipCtrl->clip;
 
+	
+	//update keyframe, cliptime, direction, paused, keyframe time
+
+
+	switch (from_clip->transition) 
+	{
+	case 	a3_clipTransitionTypePause:
+		break;
+	case a3_clipTransitionTypeForward:
+		break;
+	case a3_clipTransitionTypeForwardPause:
+		break;
+
+	case a3_clipTransitionTypeReverse:
+		break;
+	case a3_clipTransitionTypeReversePause:
+		break;
+	case a3_clipTransitionTypeForwardPlayBack:
+		break;
+
+	case a3_clipTransitionTypeForwardPauseFirstFrame:
+		break;
+	case a3_clipTransitionTypeReversePlayBack:
+		break;
+	case a3_clipTransitionTypeReversePauseFirstFrame:
+		break;
+	
+	}
+
 	if (clipCtrl->reverse == 0) { // forwards
 		// TODO "termination behavior"
 		// maintain extra duration from end
@@ -40,6 +69,9 @@ inline a3i32 a3clipControllerHandleTransition(a3_ClipController* clipCtrl) {
 		clipCtrl->clipTime = 0 + extraTime;
 		clipCtrl->keyframeTime = 0 + extraTime;
 		clipCtrl->keyframe = from_clip->firstKeyframe;
+
+		clipCtrl->playing = from_clip->transitionForward.playing;
+		clipCtrl->reverse = from_clip->transitionForward.reverse;
 	}
 	else { // backwards
 		a3_Keyframe* next_keyframe = from_clip->pool->keyframes + from_clip->lastKeyframe;
@@ -47,6 +79,9 @@ inline a3i32 a3clipControllerHandleTransition(a3_ClipController* clipCtrl) {
 		clipCtrl->clipTime = from_clip->duration - extraTime;
 		clipCtrl->keyframeTime = next_keyframe->duration - extraTime;
 		clipCtrl->keyframe = from_clip->lastKeyframe;
+
+		clipCtrl->playing = from_clip->transitionBackwards.playing;
+		clipCtrl->reverse = from_clip->transitionBackwards.reverse;
 	}
 	return -1;
 }
@@ -78,7 +113,7 @@ inline a3i32 a3clipControllerUpdate(a3_ClipController* clipCtrl, const a3real dt
 
 
 
-	// end of clip reversed
+	// end of clip
 	if (clipCtrl->clipTime < 0 || clipCtrl->clipTime > clip->duration) {
 
 		a3clipControllerHandleTransition(clipCtrl);

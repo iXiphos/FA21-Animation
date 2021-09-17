@@ -43,6 +43,7 @@ typedef struct a3_KeyframePool				a3_KeyframePool;
 typedef struct a3_Clip						a3_Clip;
 typedef struct a3_ClipPool					a3_ClipPool;
 typedef struct a3_ClipTransition			a3_ClipTransition;
+typedef enum a3_clipTransitionType         a3_clipTransitionType;
 #endif	// __cplusplus
 
 
@@ -54,6 +55,21 @@ enum
 	a3keyframeAnimation_nameLenMax = 32,
 };
 
+
+enum a3_clipTransitionType {
+	a3_clipTransitionTypePause,
+	a3_clipTransitionTypeForward,
+	a3_clipTransitionTypeForwardPause,
+
+	a3_clipTransitionTypeReverse,
+	a3_clipTransitionTypeReversePause,
+	a3_clipTransitionTypeForwardPlayBack,
+
+	a3_clipTransitionTypeForwardPauseFirstFrame,
+	a3_clipTransitionTypeReversePlayBack,
+	a3_clipTransitionTypeReversePauseFirstFrame,
+
+};
 
 // clip transitions
 struct a3_ClipTransition {
@@ -154,6 +170,8 @@ struct a3_Clip
 
 	// index of first keyframe in pool referenced by clip
 	a3ui32 firstKeyframe;
+
+	a3_clipTransitionType transition;
 
 	a3_ClipTransition transitionForward, transitionBackwards;
 	
