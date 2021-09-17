@@ -173,7 +173,7 @@ a3i32 a3clipCalculateDuration(a3_Clip* clip);
 a3i32 a3clipDistributeDuration(a3_Clip* clip, const a3real newClipDuration);
 
 
-a3i32 a3lclipPoolLoadFromFile(a3_ClipPool* clipPool, const char* path);
+a3i32 a3clipPoolLoadFromFile(a3_ClipPool* clipPool, const char* path);
 //-----------------------------------------------------------------------------
 
 

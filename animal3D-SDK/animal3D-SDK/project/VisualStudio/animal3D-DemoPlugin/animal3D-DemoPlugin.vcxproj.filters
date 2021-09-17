@@ -200,7 +200,7 @@
     <ClInclude Include="..\..\..\source\animal3D-DemoPlugin\A3_DEMO\_animation\a3_SpatialPose.h">
       <Filter>Header Files\A3_DEMO\_animation</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\source\animal3D-DemoPlugin\A3_DEMO\_a3_demo_utilities\a3_DemoUtil.h">
+    <ClInclude Include="..\..\..\source\animal3D-DemoPlugin\A3_DEMO\_a3_demo_utilities\a3_DemoUtils.h">
       <Filter>Header Files\A3_DEMO\_a3_demo_utilities</Filter>
     </ClInclude>
   </ItemGroup>

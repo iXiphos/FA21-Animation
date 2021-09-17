@@ -32,7 +32,7 @@
 
 #include "../a3_DemoState.h"
 
-
+#define A3_DEMO_RES_DIR	"../../../../resource/"
 //-----------------------------------------------------------------------------
 
 void a3starter_input(a3_DemoState* demoState, a3_DemoMode0_Starter* demoMode, a3f64 const dt);
@@ -185,6 +185,8 @@ void a3starter_load(a3_DemoState const* demoState, a3_DemoMode0_Starter* demoMod
 	a3clipControllerInit(demoMode->clipControllers + 0, "first clip ctrl", demoMode->clipPool, 0);
 	a3clipControllerInit(demoMode->clipControllers + 1, "second clip ctrl", demoMode->clipPool, 1);
 	a3clipControllerInit(demoMode->clipControllers + 2, "third clip ctrl", demoMode->clipPool, 2);
+
+	a3clipPoolLoadFromFile(demoMode->clipPool, A3_DEMO_RES_DIR"animdata/sprite_anim.txt");
 		
 }
 

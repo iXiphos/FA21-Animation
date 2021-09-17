@@ -23,11 +23,11 @@
 */
 
 #include "../a3_KeyframeAnimation.h"
-#include "../../_a3_demo_utilities/a3_DemoUtil.h"
+#include "../../_a3_demo_utilities/a3_DemoUtils.h"
 
 #include <stdlib.h>
 #include <string.h>
-
+#include <stdio.h>
 
 // macros to help with names
 #define A3_CLIP_DEFAULTNAME		("unnamed clip")
@@ -39,7 +39,7 @@
 // allocate keyframe pool
 a3i32 a3keyframePoolCreate(a3_KeyframePool* keyframePool_out, const a3ui32 count)
 {
-	keyframePool_out->keyframes = (a3_Keyframe*)malloc(sizeof(a3_Keyframe) * count);
+	a3AllocArray(keyframePool_out->keyframes, count, a3_Keyframe);
 	keyframePool_out->count = count;
 	return 1;
 }
@@ -125,7 +125,42 @@ a3i32 a3clipGetIndexInPool(const a3_ClipPool* clipPool, const a3byte clipName[a3
 	return -1;
 }
 
+
 a3i32 a3clipPoolLoadFromFile(a3_ClipPool* clipPool, const char* path) {
+
+	/*
+	char name[a3keyframeAnimation_nameLenMax + 4];
+	char reverse_transition[a3keyframeAnimation_nameLenMax + 4],
+		 forward_transition[a3keyframeAnimation_nameLenMax + 4];
+	char reverse_dir[2], forward_dir[2];
+	float duration;
+	a3ui32 first_frame, last_frame;
+	*/
+
+	// columns
+	// clip_name	duration_s	first_frame	last_frame	reverse_transition	forward_transition
+
+	char* lines[256];
+	a3i32 line_count = a3ReadLinesFromFile(path, lines, 256);
+	if ( line_count == -1) printf("unable to open file %s \n", path);
+	printf("line_count = %i \n", line_count);
+
+	for (a3i32 i = 0; i < line_count; i++) {
+		if ( *lines[i] != '@' ) continue;
+
+		char* columns[10];
+		a3i32 column_count = a3SplitString(lines[i], '\t', columns, 10, true);
+
+		for (a3i32 j = 0; j < column_count; j++) {
+			printf("| %s |", columns[j]);
+		}
+
+		printf("\n --- \n");
+		//printf("read %32s %f %u %u / %2s / %32s / %2s / %32s\n", name, duration, first_frame, last_frame, reverse_dir, reverse_transition, forward_dir, forward_transition);
+	}
+
+	
+
 
 	return -1;
 }
