@@ -87,6 +87,10 @@ void a3starter_update(a3_DemoState* demoState, a3_DemoMode0_Starter* demoMode, a
 	a3f32 animDelta = (a3real)dt * (0.5f + (a3f32)demoMode->playbackSlowmo / 2.0f );
 	for(i = 0; i < starterMaxCount_clipControllers; i++)
 		a3clipControllerUpdate(demoMode->clipControllers + i, (a3real)dt);
+
+	a3_Sample tempSample = ;
+
+	demoMode->object_scene[3].position.x = a3clipControllerEvaulate(demoMode->clip_controller_main, );
 }
 
 
