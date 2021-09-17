@@ -41,6 +41,7 @@ a3i32 a3keyframePoolCreate(a3_KeyframePool* keyframePool_out, const a3ui32 count
 {
 	a3AllocArray(keyframePool_out->keyframes, count, a3_Keyframe);
 	keyframePool_out->count = count;
+	keyframePool_out->capacity = count;
 	return 1;
 }
 
@@ -114,6 +115,20 @@ a3i32 a3clipInit(a3_Clip* clip_out, const a3byte clipName[a3keyframeAnimation_na
 	return 1;
 }
 
+// initialize clip with first and last indices
+a3i32 a3clipInitDuration(a3_Clip* clip_out, const a3byte clipName[a3keyframeAnimation_nameLenMax], const a3_KeyframePool* keyframePool, const a3real duration, const a3ui32 firstKeyframeIndex, const a3ui32 finalKeyframeIndex)
+{
+	memcpy(clip_out->name, clipName, a3keyframeAnimation_nameLenMax);
+	clip_out->pool = keyframePool;
+	clip_out->firstKeyframe = firstKeyframeIndex;
+	clip_out->lastKeyframe = finalKeyframeIndex;
+	clip_out->count = finalKeyframeIndex - firstKeyframeIndex + 1;
+	clip_out->index = 0;
+	a3clipDistributeDuration(clip_out, duration);
+	return 1;
+}
+
+
 // get clip index from pool
 a3i32 a3clipGetIndexInPool(const a3_ClipPool* clipPool, const a3byte clipName[a3keyframeAnimation_nameLenMax])
 {
@@ -126,7 +141,7 @@ a3i32 a3clipGetIndexInPool(const a3_ClipPool* clipPool, const a3byte clipName[a3
 }
 
 
-a3i32 a3clipPoolLoadFromFile(a3_ClipPool* clipPool, const char* path) {
+a3i32 a3clipPoolLoadFromFile(a3_ClipPool* clipPool, a3_KeyframePool* keyPool, const char* path) {
 
 	/*
 	char name[a3keyframeAnimation_nameLenMax + 4];
@@ -151,17 +166,29 @@ a3i32 a3clipPoolLoadFromFile(a3_ClipPool* clipPool, const char* path) {
 		char* columns[10];
 		a3i32 column_count = a3SplitString(lines[i], '\t', columns, 10, true);
 
+		int loc = a3clipPoolNewClip(clipPool);
+		a3_Clip* temp = clipPool->clips + loc;
 		for (a3i32 j = 0; j < column_count; j++) {
 			printf("| %s |", columns[j]);
 		}
+		
+		char* rTransition[2];
+		char* fTransition[2];
+		a3real duration = (a3real)atof(columns[1]);
+		a3ui32 firstFrame = atoi(columns[2]);
+		a3ui32 lastFrame = atoi(columns[3]);
 
+		a3clipInitDuration(temp, columns[0], keyPool, duration, firstFrame, firstFrame);
+		a3SplitString(columns[4], ' ', rTransition, 2, true);
+		a3SplitString(columns[5], ' ', fTransition, 2, true);
+
+
+		
 		printf("\n --- \n");
 		//printf("read %32s %f %u %u / %2s / %32s / %2s / %32s\n", name, duration, first_frame, last_frame, reverse_dir, reverse_transition, forward_dir, forward_transition);
 	}
 
-	
-
-
+	free(lines[0]);
 	return -1;
 }
 
