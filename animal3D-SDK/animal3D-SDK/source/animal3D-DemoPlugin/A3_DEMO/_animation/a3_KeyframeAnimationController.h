@@ -93,7 +93,7 @@ a3i32 a3clipControllerGetClip(a3_ClipController* clipCtrl);
 
 a3i32 a3clipControllerJumpToFrame(a3_ClipController* clipCtrl, const a3ui32 index);
 
-a3real a3clipControllerEvaulate(const a3_ClipController* clipCtrl, a3_Sample* sample_out);
+a3i32 a3clipControllerEvaulate(const a3_ClipController* clipCtrl, a3_Sample* sample_out);
 
 
 // get a frame based on an offset from the current frame

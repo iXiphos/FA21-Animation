@@ -29,6 +29,17 @@
 
 //-----------------------------------------------------------------------------
 
+// skip 
+inline a3i32 a3clipControllerHandleTransition(a3_ClipController* clipCtrl) {
+
+	if (clipCtrl->reverse == 0) { // forwards
+
+	}
+	else { // backwards
+
+	}
+}
+
 // update clip controller
 inline a3i32 a3clipControllerUpdate(a3_ClipController* clipCtrl, const a3real dt)
 {
@@ -119,12 +130,13 @@ inline a3i32 a3clipControllerSetClip(a3_ClipController* clipCtrl, const a3_ClipP
 
 
 
-inline a3real a3clipControllerEvaulate(const a3_ClipController* clipCtrl, a3_Sample* sample_out) {
+inline a3i32 a3clipControllerEvaulate(const a3_ClipController* clipCtrl, a3_Sample* sample_out) {
 	if (clipCtrl && clipCtrl->clip != -1 && sample_out) {
 		a3_Clip* clip = clipCtrl->clipPool->clips + clipCtrl->clip;
 		// 0: no interpolation: step
 		// return keyframe value
-		return clip->pool->keyframes[clipCtrl->keyframe].sample.value;
+		*sample_out = clip->pool->keyframes[clipCtrl->keyframe].sample;
+		return 1;
 		// 1: nearest
 
 		// 2: lerp
