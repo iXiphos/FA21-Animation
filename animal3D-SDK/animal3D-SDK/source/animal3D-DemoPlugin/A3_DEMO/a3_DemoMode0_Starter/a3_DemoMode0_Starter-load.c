@@ -186,7 +186,7 @@ void a3starter_load(a3_DemoState const* demoState, a3_DemoMode0_Starter* demoMod
 	a3clipControllerInit(demoMode->clipControllers + 1, "second clip ctrl", demoMode->clipPool, 1);
 	a3clipControllerInit(demoMode->clipControllers + 2, "third clip ctrl", demoMode->clipPool, 2);
 
-	a3clipPoolLoadFromFile(demoMode->clipPool, A3_DEMO_RES_DIR"animdata/sprite_anim.txt");
+	a3clipPoolLoadFromFile(demoMode->clipPool, demoMode->keyframePool, A3_DEMO_RES_DIR"animdata/sprite_anim.txt");
 		
 }
 

@@ -88,9 +88,11 @@ void a3starter_update(a3_DemoState* demoState, a3_DemoMode0_Starter* demoMode, a
 	for(i = 0; i < starterMaxCount_clipControllers; i++)
 		a3clipControllerUpdate(demoMode->clipControllers + i, (a3real)dt);
 
-	a3_Sample tempSample = ;
+	a3_Sample tempSample;
 
-	demoMode->object_scene[3].position.x = a3clipControllerEvaulate(demoMode->clip_controller_main, );
+	a3clipControllerEvaulate(demoMode->clip_controller_main, &tempSample);
+
+	demoMode->object_scene[3].position.x = tempSample.value;
 }
 
 

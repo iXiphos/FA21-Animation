@@ -205,7 +205,7 @@ a3i32 a3clipDistributeDuration(a3_Clip* clip, const a3real newClipDuration);
 // returns index
 a3i32 a3clipGetKeyframeFromTime(a3_Clip* clip, a3real time, a3real* keyframeTime_out, a3_Keyframe** keyframe_out);
 
-a3i32 a3clipPoolLoadFromFile(a3_ClipPool* clipPool, const char* path);
+a3i32 a3clipPoolLoadFromFile(a3_ClipPool* clipPool, a3_KeyframePool* keyPool, const char* path);
 //-----------------------------------------------------------------------------
 
 
