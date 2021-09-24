@@ -119,8 +119,8 @@ void a3animation_render_controls(a3_DemoState const* demoState, a3_DemoMode1_Ani
 		"Cycle Clip ( n | m )");
 
 	const a3_ClipController* clipController = demoMode->clipControllers + demoMode->activeClipController;
-	a3_Clip* clip = clipController->clipPool->clip + clipController->clip;
-	a3_Keyframe* keyframe = clip->pool->keyframe + clipController->keyframe;
+	a3_Clip* clip = clipController->clipPool->clips + clipController->clip;
+	a3_Keyframe* keyframe = clip->pool->keyframes + clipController->keyframe;
 
 	a3textDraw(text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
 		"Clip Controller: %s", clipController->name);
@@ -129,7 +129,7 @@ void a3animation_render_controls(a3_DemoState const* demoState, a3_DemoMode1_Ani
 	a3textDraw(text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
 		"Current KeyFrame: %u      Current KeyFrame Time: %f     KeyFrame Param: %f", clipController->keyframe, clipController->keyframeTime, clipController->keyframeParam);
 	a3textDraw(text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
-		"KeyFrame Data: %u      KeyFrame Duration: %f", keyframe->data, keyframe->duration);
+		"KeyFrame Data: %u      KeyFrame Duration: %f", keyframe->sample.value, keyframe->duration);
 	a3textDraw(text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
 		"");
 }
