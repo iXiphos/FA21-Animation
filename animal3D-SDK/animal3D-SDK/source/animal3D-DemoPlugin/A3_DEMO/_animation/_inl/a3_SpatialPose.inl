@@ -92,73 +92,49 @@ inline a3i32 a3spatialPoseConvert(a3mat4* mat_out, const a3_SpatialPose* spatial
 {
 	if (mat_out && spatialPose_in)
 	{
+
+		a3real4x4SetRotateXYZ(mat_out->m,
+			spatialPose_in->rotate.x, spatialPose_in->rotate.y, spatialPose_in->rotate.z);
+		/*
+		// rotation, scale, translate
 		switch (order) 
 		{
+
+
 			//M = Transform * ((rotation order) * Scale) 
 			case a3poseEulerOrder_xyz: 
-				mat_out->v3.xyz = spatialPose_in->translate;
+				
 				a3real4x4SetRotateXYZ(mat_out->m, 
 					spatialPose_in->rotate.x, spatialPose_in->rotate.y, spatialPose_in->rotate.z);
-				a3real3MulS(mat_out->m[0], spatialPose_in->scale.x);
-				a3real3MulS(mat_out->m[1], spatialPose_in->scale.y);
-				a3real3MulS(mat_out->m[2], spatialPose_in->scale.z);
 				break;
 			case a3poseEulerOrder_yzx: 
-				mat_out->v3.xyz = spatialPose_in->translate;
-
-				a3real4x4SetRotateY(mat_out->m, spatialPose_in->rotate.y);
-				a3real4x4SetRotateZ(mat_out->m, spatialPose_in->rotate.z);
-				a3real4x4SetRotateX(mat_out->m, spatialPose_in->rotate.x);
-
-				a3real3MulS(mat_out->m[0], spatialPose_in->scale.x);
-				a3real3MulS(mat_out->m[1], spatialPose_in->scale.y);
-				a3real3MulS(mat_out->m[2], spatialPose_in->scale.z);
+				a3real4x4SetRotateYZX(mat_out->m,
+					spatialPose_in->rotate.y, spatialPose_in->rotate.z, spatialPose_in->rotate.x);
 				break;
 			case a3poseEulerOrder_zxy: 
-				mat_out->v3.xyz = spatialPose_in->translate;
-
-				a3real4x4SetRotateZ(mat_out->m, spatialPose_in->rotate.z);
-				a3real4x4SetRotateX(mat_out->m, spatialPose_in->rotate.x);
-				a3real4x4SetRotateY(mat_out->m, spatialPose_in->rotate.y);
-
-				a3real3MulS(mat_out->m[0], spatialPose_in->scale.x);
-				a3real3MulS(mat_out->m[1], spatialPose_in->scale.y);
-				a3real3MulS(mat_out->m[2], spatialPose_in->scale.z);
+				a3real4x4SetRotateXYZ(mat_out->m,
+					spatialPose_in->rotate.x, spatialPose_in->rotate.y, spatialPose_in->rotate.z);
 				break;
 			case a3poseEulerOrder_yxz:
-				mat_out->v3.xyz = spatialPose_in->translate;
-
-				a3real4x4SetRotateY(mat_out->m, spatialPose_in->rotate.y);
-				a3real4x4SetRotateX(mat_out->m, spatialPose_in->rotate.x);
-				a3real4x4SetRotateZ(mat_out->m, spatialPose_in->rotate.z);
-
-				a3real3MulS(mat_out->m[0], spatialPose_in->scale.x);
-				a3real3MulS(mat_out->m[1], spatialPose_in->scale.y);
-				a3real3MulS(mat_out->m[2], spatialPose_in->scale.z);
+				a3real4x4SetRotateXYZ(mat_out->m,
+					spatialPose_in->rotate.x, spatialPose_in->rotate.y, spatialPose_in->rotate.z);
 				break;
 			case a3poseEulerOrder_xzy: 
-				mat_out->v3.xyz = spatialPose_in->translate;
-
-				a3real4x4SetRotateX(mat_out->m, spatialPose_in->rotate.x);
-				a3real4x4SetRotateZ(mat_out->m, spatialPose_in->rotate.z);
-				a3real4x4SetRotateY(mat_out->m, spatialPose_in->rotate.y);
-
-				a3real3MulS(mat_out->m[0], spatialPose_in->scale.x);
-				a3real3MulS(mat_out->m[1], spatialPose_in->scale.y);
-				a3real3MulS(mat_out->m[2], spatialPose_in->scale.z);
+				a3real4x4SetRotateXYZ(mat_out->m,
+					spatialPose_in->rotate.x, spatialPose_in->rotate.y, spatialPose_in->rotate.z);
 				break;
 			case a3poseEulerOrder_zyx: 
-				mat_out->v3.xyz = spatialPose_in->translate;
-
-				a3real4x4SetRotateZ(mat_out->m, spatialPose_in->rotate.z);
-				a3real4x4SetRotateY(mat_out->m, spatialPose_in->rotate.y);
-				a3real4x4SetRotateX(mat_out->m, spatialPose_in->rotate.x);
-
-				a3real3MulS(mat_out->m[0], spatialPose_in->scale.x);
-				a3real3MulS(mat_out->m[1], spatialPose_in->scale.y);
-				a3real3MulS(mat_out->m[2], spatialPose_in->scale.z);
+				a3real4x4SetRotateXYZ(mat_out->m,
+					spatialPose_in->rotate.x, spatialPose_in->rotate.y, spatialPose_in->rotate.z);
 				break;
 		}
+		*/
+		mat_out->v3.xyz = spatialPose_in->translate;
+		mat_out->m33 = a3real_one;
+
+		a3real3MulS(mat_out->m[0], spatialPose_in->scale.x);
+		a3real3MulS(mat_out->m[1], spatialPose_in->scale.y);
+		a3real3MulS(mat_out->m[2], spatialPose_in->scale.z);
 		return 1;
 	}
 	return -1;

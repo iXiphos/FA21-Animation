@@ -85,29 +85,41 @@ void a3animation_update(a3_DemoState* demoState, a3_DemoMode1_Animation* demoMod
 			demoMode->object_scene[i].modelMat.m, a3mat4_identity.m);
 	}
 
-	
-	a3kinematicsSolveForward(demoMode->hierarchyState_skel);
 
-	// update graphics
-	a3_SpatialPose* poses = demoMode->hierarchyState_skel->objectSpacePose.spatialPose;
-	for (a3ui32 i = 0; i < demoMode->hierarchy_skel->numNodes; i++) {
-		demoMode->skeletonPose_object[i] = poses[i].transform;
-	}
+	a3hierarchyPoseCopy(&demoMode->hierarchyState_skel->localSpacePose, demoMode->hierarchyPoseGroup_skel->posePool, demoMode->hierarchy_skel->numNodes);
+	a3hierarchyPoseConvert(&demoMode->hierarchyState_skel->localSpacePose, demoMode->hierarchy_skel->numNodes, 0, a3poseEulerOrder_xyz);
+	//a3kinematicsSolveForward(demoMode->hierarchyState_skel);
 
 	a3mat4 mvp_skeleton;
 	a3real4x4Product(mvp_skeleton.m, activeCamera->viewProjectionMat.m, demoMode->obj_skeleton->modelMat.m);
 
+	// update graphics
+	a3_SpatialPose* poses = demoMode->hierarchyState_skel->objectSpacePose.spatialPose;
+	for (a3ui32 i = 0; i < demoMode->hierarchy_skel->numNodes; i++) {
+		a3mat4* bone = demoMode->skeletonPose_transformLMVP_bone + i;
+		a3mat4* joint = demoMode->skeletonPose_transformLMVP_joint + i;
+		*bone = poses[i].transform;
+
+
+
+		// for joint axes rendering
+		a3real4x4SetScale(joint->m, 0.25f);
+		a3real4x4Concat(bone->m, joint->m);
+		a3real4x4Concat(mvp_skeleton.m, joint->m);
+	}
+
+
+
+	/*
 	a3animate_updateSkeletonRenderMats(demoMode->hierarchy_skel,
 		demoMode->skeletonPose_render, demoMode->skeletonPose_renderAxes, demoMode->skeletonPose_object,
 		mvp_skeleton);
+*/
 
+	a3bufferRefillOffset(demoState->ubo_transformLMVP_bone, 0, 0, sizeof(demoMode->skeletonPose_transformLMVP_bone), demoMode->skeletonPose_transformLMVP_bone);
+	a3bufferRefillOffset(demoState->ubo_transformLMVP_joint, 0, 0, sizeof(demoMode->skeletonPose_transformLMVP_joint), demoMode->skeletonPose_transformLMVP_joint);
 
-
-	a3bufferRefillOffset(demoState->ubo_mvp, 0, 0, sizeof(demoMode->skeletonPose_render), demoMode->skeletonPose_render);
-	a3bufferRefillOffset(demoState->ubo_mvp, 0, sizeof(demoMode->skeletonPose_render), sizeof(demoMode->hierarchyDepth_skel), demoMode->hierarchyDepth_skel);
-	a3bufferRefillOffset(demoState->ubo_mvp + 1, 0, 0, sizeof(demoMode->skeletonPose_renderAxes), demoMode->skeletonPose_renderAxes);
 }
-
 void animation_updateSkeletonLocalSpace(a3_Hierarchy const* hierarchy,
 	a3mat4* localSpaceArray,
 	a3_SpatialPose const keyPoseArray[animateMaxCount_skeletonPose][animateMaxCount_skeletonJoint]) {
@@ -126,7 +138,7 @@ void animation_updateSkeletonObjectSpace(a3_Hierarchy const* hierarchy,
 	a3mat4* const objectSpaceArray, a3mat4 const* const localSpaceArray) {
 
 }
-
+/*
 a3i32 a3animate_updateSkeletonRenderMats(a3_Hierarchy const* hierarchy,
 	a3mat4* renderArray, a3mat4* renderAxesArray, a3mat4 const* objectSpaceArray, a3mat4 const mvp_obj)
 {
@@ -168,5 +180,5 @@ a3i32 a3animate_updateSkeletonRenderMats(a3_Hierarchy const* hierarchy,
 	}
 	return -1;
 }
-
+*/
 //-----------------------------------------------------------------------------
