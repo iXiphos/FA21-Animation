@@ -114,9 +114,9 @@ void a3animation_render_controls(a3_DemoState const* demoState, a3_DemoMode1_Ani
 	a3textDraw(text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
 		"Play Back Rate ( s )");
 	a3textDraw(text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
-		"Cycle Clip Controller( < | > )");
+		"Cycle Clip Controller( 9 | 0 )");
 	a3textDraw(text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
-		"Cycle Clip ( n | m )");
+		"Cycle Clip ( 7 | 8 )");
 
 	const a3_ClipController* clipController = demoMode->clipController;
 	a3_Clip* clip = clipController->clipPool->clips + clipController->clip;

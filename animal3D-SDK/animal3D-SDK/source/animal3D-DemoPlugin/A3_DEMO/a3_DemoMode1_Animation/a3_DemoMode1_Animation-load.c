@@ -341,14 +341,16 @@ void a3animation_init_animation(a3_DemoState const* demoState, a3_DemoMode1_Anim
 
 
 
-	a3clipPoolCreate(demoMode->clipPool, 5);
-	a3keyframePoolCreate(demoMode->keyframePool, 64);
+	a3clipPoolCreate(demoMode->clipPool, 1);
+	a3keyframePoolCreate(demoMode->keyframePool, 3);
 
 	for (a3ui32 i = 0; i < 3; i++) {
 		a3keyframeInit(demoMode->keyframePool->keyframes + i, 1.0f, (float)i);
 	}
 
-	a3clipInit(demoMode->clipPool->clips + 0, " 0 -> 3", demoMode->keyframePool, 0, 19);
+	a3clipInit(demoMode->clipPool->clips + 0, " 0 -> 3", demoMode->keyframePool, 0, 3);
+	demoMode->clipPool->clips->transitionForward = (a3_ClipTransition){.transition= a3_clipTransitionTypeForward};
+
 
 	a3clipControllerInit(demoMode->clipController, "first clip ctrl", demoMode->clipPool, 0);
 

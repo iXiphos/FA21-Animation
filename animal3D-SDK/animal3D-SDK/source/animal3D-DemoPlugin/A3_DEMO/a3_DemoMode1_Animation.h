@@ -189,6 +189,7 @@ typedef enum a3_DemoMode1_Animation_TargetName				a3_DemoMode1_Animation_TargetN
 		a3_ClipController clipController[1];
 
 		a3ui32 currentPoseIndex;
+		a3ui32 controllerIndex;
 	};
 
 

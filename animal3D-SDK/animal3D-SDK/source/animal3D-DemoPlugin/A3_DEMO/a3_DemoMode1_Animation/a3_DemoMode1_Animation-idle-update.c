@@ -91,15 +91,28 @@ void a3animation_update(a3_DemoState* demoState, a3_DemoMode1_Animation* demoMod
 	a3_HierarchyState* state = demoMode->hierarchyStates + 0;
 
 	a3ui32 currentPoseIndex = 0;
+	if (demoMode->controllerIndex == 1)
+		currentPoseIndex = demoMode->currentPoseIndex;
+	if (demoMode->controllerIndex == 2) {
+		a3_Sample tmpSample;
+		a3clipControllerEvaulate(demoMode->clipController, &tmpSample);
+		currentPoseIndex = (a3ui32)tmpSample.value;
+	}
 
 	a3ui32 nodeCount = demoMode->hierarchy_skel->numNodes;
 	a3_HierarchyPose* basePose = demoMode->hierarchyPoseGroup_skel->posePool;
-	a3_HierarchyPose* framePose = demoMode->hierarchyPoseGroup_skel->posePool + 1 + currentPoseIndex;
+	a3_HierarchyPose* framePose = demoMode->hierarchyPoseGroup_skel->posePool + currentPoseIndex;
 
-	for (a3ui32 i = 0; i < nodeCount; i++) {
-		a3spatialPoseConcat(state->localSpacePose.spatialPose + i, basePose->spatialPose + i, framePose->spatialPose + i);
+	if (currentPoseIndex != 0) {
+		for (a3ui32 i = 0; i < nodeCount; i++) {
+			a3spatialPoseConcat(state->localSpacePose.spatialPose + i, basePose->spatialPose + i, framePose->spatialPose + i);
+		}
 	}
-	
+	else {
+		a3hierarchyPoseCopy(&state->localSpacePose, basePose, nodeCount);
+	}
+
+
 	a3hierarchyPoseConvert(&state->localSpacePose, demoMode->hierarchy_skel->numNodes, 0, a3poseEulerOrder_xyz);
 	a3kinematicsSolveForward(state);
 
