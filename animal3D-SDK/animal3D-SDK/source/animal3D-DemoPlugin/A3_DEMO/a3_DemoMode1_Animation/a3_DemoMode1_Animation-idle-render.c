@@ -108,19 +108,30 @@ void a3animation_render_controls(a3_DemoState const* demoState, a3_DemoMode1_Ani
 
 	// demo modes
 	a3textDraw(text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
-		"    Pipeline (%u / %u) ('[' | ']'): %s", pipeline + 1, animation_pipeline_max, pipelineText[pipeline]);
+		"Stop ( p )  Forward( i )  backwards ( o ) ");
 	a3textDraw(text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
-		"    Display pass (%u / %u) ('(' | ')'): %s", pass + 1, animation_pass_max, passName[pass]);
+		"Go First Frame ( d )      Go Last Frame ( f )");
 	a3textDraw(text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
-		"        Target (%u / %u) ('{' | '}'): %s", targetIndex + 1, targetCount, targetText[pass][targetIndex]);
+		"Play Back Rate ( s )");
+	a3textDraw(text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
+		"Cycle Clip Controller( < | > )");
+	a3textDraw(text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
+		"Cycle Clip ( n | m )");
 
-	// lighting modes
+	const a3_ClipController* clipController = demoMode->clipControllers + demoMode->activeClipController;
+	a3_Clip* clip = clipController->clipPool->clip + clipController->clip;
+	a3_Keyframe* keyframe = clip->pool->keyframe + clipController->keyframe;
+
 	a3textDraw(text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
-		"    Rendering mode (%u / %u) ('j' | 'k'): %s", render + 1, animation_render_max, renderProgramName[render]);
+		"Clip Controller: %s", clipController->name);
 	a3textDraw(text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
-		"    Display mode (%u / %u) ('J' | 'K'): %s", display + 1, animation_display_max, displayProgramName[display]);
+		"Clip: %s", clip->name);
 	a3textDraw(text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
-		"    Active camera (%u / %u) ('c' prev | next 'v'): %s", activeCamera + 1, animation_camera_max, cameraText[activeCamera]);
+		"Current KeyFrame: %u      Current KeyFrame Time: %f     KeyFrame Param: %f", clipController->keyframe, clipController->keyframeTime, clipController->keyframeParam);
+	a3textDraw(text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
+		"KeyFrame Data: %u      KeyFrame Duration: %f", keyframe->data, keyframe->duration);
+	a3textDraw(text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
+		"");
 }
 
 
@@ -536,7 +547,7 @@ void a3animation_render(a3_DemoState const* demoState, a3_DemoMode1_Animation co
 			// set up to draw skeleton
 			currentDemoProgram = demoState->prog_drawColorUnif_instanced;
 			a3shaderProgramActivate(currentDemoProgram->program);
-			currentHierarchyState = demoMode->hierarchyState_skel;
+			currentHierarchyState = demoMode->hierarchyState_base;
 			currentHierarchy = currentHierarchyState->hierarchy;
 
 			// draw skeletal joints
