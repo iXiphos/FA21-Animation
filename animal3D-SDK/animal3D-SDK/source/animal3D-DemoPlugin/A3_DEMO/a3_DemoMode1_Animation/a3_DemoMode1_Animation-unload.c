@@ -39,7 +39,9 @@ void a3animation_unload(a3_DemoState const* demoState, a3_DemoMode1_Animation* d
 {
 	// release skeleton and related assets
 	a3hierarchyRelease(demoMode->hierarchy_skel);
-	a3hierarchyStateRelease(demoMode->hierarchyState_skel);
+	a3hierarchyStateRelease(demoMode->hierarchyStates);
+	a3hierarchyStateRelease(demoMode->hierarchyStates + 1);
+	a3hierarchyStateRelease(demoMode->hierarchyStates + 2);
 	a3hierarchyPoseGroupRelease(demoMode->hierarchyPoseGroup_skel);
 }
 

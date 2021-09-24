@@ -38,6 +38,9 @@
 
 #include "A3_DEMO/_animation/a3_Kinematics.h"
 
+#include "_animation/a3_KeyframeAnimation.h"
+#include "_animation/a3_KeyframeAnimationController.h"
+
 //-----------------------------------------------------------------------------
 
 #ifdef __cplusplus
@@ -178,6 +181,14 @@ typedef enum a3_DemoMode1_Animation_TargetName				a3_DemoMode1_Animation_TargetN
 					proj_camera_main[1];
 			};
 		};
+
+
+
+		a3_KeyframePool keyframePool[1];
+		a3_ClipPool clipPool[1];
+		a3_ClipController clipController[1];
+
+		a3ui32 currentPoseIndex;
 	};
 
 

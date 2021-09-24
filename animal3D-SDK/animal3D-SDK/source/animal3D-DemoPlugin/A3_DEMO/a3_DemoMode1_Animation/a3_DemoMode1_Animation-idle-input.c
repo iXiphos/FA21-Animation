@@ -61,6 +61,7 @@ void a3animation_input_keyCharPress(a3_DemoState const* demoState, a3_DemoMode1_
 
 		// toggle pass to display
 		a3demoCtrlCasesLoop(demoMode->pass, animation_pass_max, ')', '(');
+
 	}
 }
 

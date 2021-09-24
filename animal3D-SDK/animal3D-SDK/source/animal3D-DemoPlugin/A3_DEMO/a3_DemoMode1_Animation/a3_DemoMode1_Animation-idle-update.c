@@ -85,25 +85,31 @@ void a3animation_update(a3_DemoState* demoState, a3_DemoMode1_Animation* demoMod
 			demoMode->object_scene[i].modelMat.m, a3mat4_identity.m);
 	}
 
+	a3clipControllerUpdate(demoMode->clipController, (a3real)dt);
 
-	a3hierarchyPoseCopy(&demoMode->hierarchyState_skel->localSpacePose, demoMode->hierarchyPoseGroup_skel->posePool, demoMode->hierarchy_skel->numNodes);
-	a3hierarchyPoseConvert(&demoMode->hierarchyState_skel->localSpacePose, demoMode->hierarchy_skel->numNodes, 0, a3poseEulerOrder_xyz);
-	a3kinematicsSolveForward(demoMode->hierarchyState_skel);
+	a3_HierarchyState* state = demoMode->hierarchyStates + 0;
+
+	a3ui32 currentPoseIndex = 0;
+
+	a3ui32 nodeCount = demoMode->hierarchy_skel->numNodes;
+	a3_HierarchyPose* basePose = demoMode->hierarchyPoseGroup_skel->posePool;
+	a3_HierarchyPose* framePose = demoMode->hierarchyPoseGroup_skel->posePool + 1 + currentPoseIndex;
+
+	for (a3ui32 i = 0; i < nodeCount; i++) {
+		a3spatialPoseConcat(state->localSpacePose.spatialPose + i, basePose->spatialPose + i, framePose->spatialPose + i);
+	}
+	
+	a3hierarchyPoseConvert(&state->localSpacePose, demoMode->hierarchy_skel->numNodes, 0, a3poseEulerOrder_xyz);
+	a3kinematicsSolveForward(state);
 
 	a3mat4 mvp_skeleton;
 	a3real4x4Product(mvp_skeleton.m, activeCamera->viewProjectionMat.m, demoMode->obj_skeleton->modelMat.m);
 
 	// update graphics
-	a3_SpatialPose* poses = demoMode->hierarchyState_skel->objectSpacePose.spatialPose;
+	a3_SpatialPose* poses = state->objectSpacePose.spatialPose;
 	
-
 	a3animate_updateSkeletonRenderMats(demoMode->hierarchy_skel, demoMode->skeletonPose_transformLMVP_bone, demoMode->skeletonPose_transformLMVP_joint, poses, mvp_skeleton);
 
-	/*
-	a3animate_updateSkeletonRenderMats(demoMode->hierarchy_skel,
-		demoMode->skeletonPose_render, demoMode->skeletonPose_renderAxes, demoMode->skeletonPose_object,
-		mvp_skeleton);
-*/
 
 	a3bufferRefillOffset(demoState->ubo_transformLMVP_bone, 0, 0, sizeof(demoMode->skeletonPose_transformLMVP_bone), demoMode->skeletonPose_transformLMVP_bone);
 	a3bufferRefillOffset(demoState->ubo_transformLMVP_joint, 0, 0, sizeof(demoMode->skeletonPose_transformLMVP_joint), demoMode->skeletonPose_transformLMVP_joint);
