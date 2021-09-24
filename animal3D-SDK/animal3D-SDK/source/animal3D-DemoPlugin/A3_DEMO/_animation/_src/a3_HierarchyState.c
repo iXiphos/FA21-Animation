@@ -79,7 +79,6 @@ a3i32 a3hierarchyPoseGroupRelease(a3_HierarchyPoseGroup *poseGroup)
 	if (poseGroup && poseGroup->hierarchy)
 	{
 		// release everything (one free)
-		//free(???);
 		free(poseGroup->posePool);
 
 		// reset pointers
@@ -106,12 +105,20 @@ a3i32 a3hierarchyStateCreate(a3_HierarchyState *state_out, const a3_Hierarchy *h
 		// determine memory requirements
 
 		// allocate everything (one malloc)
-		//??? = (...)malloc(sz);
+		a3ui32 nodeCount = hierarchy->numNodes;
+		a3ui32 spatialPoseCount = nodeCount * 3;
+		a3_SpatialPose* posesStart = (a3_SpatialPose*)malloc(sizeof(a3_SpatialPose) * spatialPoseCount);
+		state_out->samplePose = (a3_HierarchyPose){ posesStart };
+		state_out->localSpacePose = (a3_HierarchyPose){ posesStart + nodeCount };
+		state_out->objectSpacePose = (a3_HierarchyPose){ posesStart + nodeCount + nodeCount };
 
 		// set pointers
 		state_out->hierarchy = hierarchy;
 
 		// reset all data
+		a3hierarchyPoseReset(&state_out->samplePose, nodeCount);
+		a3hierarchyPoseReset(&state_out->localSpacePose, nodeCount);
+		a3hierarchyPoseReset(&state_out->objectSpacePose, nodeCount);
 
 		// done
 		return 1;

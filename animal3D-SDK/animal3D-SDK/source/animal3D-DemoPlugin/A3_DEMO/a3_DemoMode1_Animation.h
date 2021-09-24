@@ -36,6 +36,7 @@
 
 #include "_animation/a3_HierarchyStateBlend.h"
 
+#include "A3_DEMO/_animation/a3_Kinematics.h"
 
 //-----------------------------------------------------------------------------
 

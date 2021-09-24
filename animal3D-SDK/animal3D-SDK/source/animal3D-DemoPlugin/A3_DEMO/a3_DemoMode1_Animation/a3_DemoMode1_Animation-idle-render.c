@@ -557,7 +557,7 @@ void a3animation_render(a3_DemoState const* demoState, a3_DemoMode1_Animation co
 			{
 				currentDemoProgram = demoState->prog_drawColorAttrib_instanced;
 				a3shaderProgramActivate(currentDemoProgram->program);
-				//a3shaderUniformBufferActivate(demoState->ubo_transformLMVP_joint, 0);
+				a3shaderUniformBufferActivate(demoState->ubo_mvp + 1, 0);
 				currentDrawable = demoState->draw_axes;
 				a3vertexDrawableActivateAndRenderInstanced(currentDrawable, currentHierarchy->numNodes);
 			}
