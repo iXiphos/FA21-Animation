@@ -1,3 +1,4 @@
+#include "..\a3_SpatialPose.h"
 /*
 	Copyright 2011-2020 Daniel S. Buckstein
 
@@ -178,7 +179,7 @@ inline a3i32 a3spatialPoseCopy(a3_SpatialPose* spatialPose_out, const a3_Spatial
 }
 
 
-inline a3i32 a3spatialposeconcat(a3_SpatialPose* out_spatial, const a3_SpatialPose* sp_lh, const a3_SpatialPose* sp_rh) 
+inline a3i32 a3spatialPoseConcat(a3_SpatialPose* out_spatial, const a3_SpatialPose* sp_lh, const a3_SpatialPose* sp_rh) 
 {
 	if (sp_lh && sp_rh) 
 	{
@@ -192,6 +193,19 @@ inline a3i32 a3spatialposeconcat(a3_SpatialPose* out_spatial, const a3_SpatialPo
 	}
 	return -1;
 }
+
+inline a3i32 a3spatialPoseLerp(a3_SpatialPose* out_spatial, const a3_SpatialPose* sp_lh, const a3_SpatialPose* sp_rh, const a3f32 u)
+{
+	a3real3Lerp(out_spatial->rotate.v, sp_lh->rotate.v, sp_rh->rotate.v, u);
+
+	//TO-DO: Swap this over to inverse lerp function
+	a3real3Lerp(out_spatial->scale.v, sp_lh->scale.v, sp_rh->scale.v, u);
+
+	a3real3Lerp(out_spatial->translate.v, sp_lh->translate.v, sp_rh->translate.v, u);
+	return -1;
+}
+
+
 
 //-----------------------------------------------------------------------------
 
