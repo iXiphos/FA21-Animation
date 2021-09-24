@@ -74,9 +74,12 @@ void a3animation_input_keyCharPress(a3_DemoState const* demoState, a3_DemoMode1_
 
 		//a3demoCtrlToggle(demoMode->playbackSlowmo);
 
-		//a3demoCtrlCasesLoop(demoMode->activeClipController, starterMaxCount_clipControllers, '<', '>');
+		a3demoCtrlCasesLoop(demoMode->currentPoseIndex, demoMode->hierarchy_skel->numNodes, 't', 'y');
 
-		//a3demoCtrlCasesLoop(demoMode->clipControllers[demoMode->activeClipController].clip, demoMode->clipPool->count, 'n', 'm');
+		a3demoCtrlCasesLoop(demoMode->hierarchyState_key, demoMode->hierarchyState_key->localSpacePose, '1');
+;
+
+		
 
 	}
 }
