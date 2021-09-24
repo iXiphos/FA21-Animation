@@ -88,7 +88,7 @@ void a3animation_update(a3_DemoState* demoState, a3_DemoMode1_Animation* demoMod
 
 	a3hierarchyPoseCopy(&demoMode->hierarchyState_skel->localSpacePose, demoMode->hierarchyPoseGroup_skel->posePool, demoMode->hierarchy_skel->numNodes);
 	a3hierarchyPoseConvert(&demoMode->hierarchyState_skel->localSpacePose, demoMode->hierarchy_skel->numNodes, 0, a3poseEulerOrder_xyz);
-	//a3kinematicsSolveForward(demoMode->hierarchyState_skel);
+	a3kinematicsSolveForward(demoMode->hierarchyState_skel);
 
 	a3mat4 mvp_skeleton;
 	a3real4x4Product(mvp_skeleton.m, activeCamera->viewProjectionMat.m, demoMode->obj_skeleton->modelMat.m);
