@@ -33,7 +33,8 @@
 //-----------------------------------------------------------------------------
 
 #include "_a3_demo_utilities/a3_DemoSceneObject.h"
-
+#include "_animation/a3_KeyframeAnimation.h"
+#include "_animation/a3_KeyframeAnimationController.h"
 
 //-----------------------------------------------------------------------------
 
@@ -59,6 +60,7 @@ typedef enum a3_DemoMode0_Starter_TargetName				a3_DemoMode0_Starter_TargetName;
 		starterMaxCount_sceneObject = 8,
 		starterMaxCount_cameraObject = 1,
 		starterMaxCount_projector = 1,
+		starterMaxCount_clipControllers = 3,
 	};
 
 	// scene object rendering program names
@@ -124,6 +126,8 @@ typedef enum a3_DemoMode0_Starter_TargetName				a3_DemoMode0_Starter_TargetName;
 		a3_DemoMode0_Starter_DisplayProgramName display;
 		a3_DemoMode0_Starter_ActiveCameraName activeCamera;
 
+
+
 		a3_DemoMode0_Starter_PipelineName pipeline;
 		a3_DemoMode0_Starter_PassName pass;
 		a3_DemoMode0_Starter_TargetName targetIndex[starter_pass_max], targetCount[starter_pass_max];
@@ -159,6 +163,21 @@ typedef enum a3_DemoMode0_Starter_TargetName				a3_DemoMode0_Starter_TargetName;
 					proj_camera_main[1];
 			};
 		};
+
+
+		a3_KeyframePool keyframePool[1];
+		a3_ClipPool clipPool[1];
+
+		union {
+			a3_ClipController clipControllers[starterMaxCount_clipControllers];
+			struct {
+				a3_ClipController clip_controller_main[1];
+			};
+		};
+		a3ui32 activeClipController;
+
+		a3boolean playbackSlowmo;
+		
 	};
 
 

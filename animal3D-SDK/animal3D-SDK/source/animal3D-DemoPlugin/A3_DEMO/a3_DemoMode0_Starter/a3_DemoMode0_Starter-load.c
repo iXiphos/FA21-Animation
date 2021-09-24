@@ -32,7 +32,7 @@
 
 #include "../a3_DemoState.h"
 
-
+#define A3_DEMO_RES_DIR	"../../../../resource/"
 //-----------------------------------------------------------------------------
 
 void a3starter_input(a3_DemoState* demoState, a3_DemoMode0_Starter* demoMode, a3f64 const dt);
@@ -165,6 +165,29 @@ void a3starter_load(a3_DemoState const* demoState, a3_DemoMode0_Starter* demoMod
 
 	demoMode->targetCount[starter_passScene] = starter_target_scene_max;
 	demoMode->targetCount[starter_passComposite] = 1;
+
+
+	// animation
+
+	a3clipPoolCreate(demoMode->clipPool, 5);
+	a3keyframePoolCreate(demoMode->keyframePool, 64);
+
+	for (a3ui32 i = 0; i < 64; i++) {
+		a3keyframeInit(demoMode->keyframePool->keyframes + i, 0.5f, i);
+	}
+
+	a3clipInit(demoMode->clipPool->clips + 0, " 0 -> 19", demoMode->keyframePool,  0, 19);
+	a3clipInit(demoMode->clipPool->clips + 1, " 0 ->  5", demoMode->keyframePool,  0,  5);
+	a3clipInit(demoMode->clipPool->clips + 2, " 5 -> 10", demoMode->keyframePool,  5, 10);
+	a3clipInit(demoMode->clipPool->clips + 3, "10 -> 19", demoMode->keyframePool, 10, 19);
+	a3clipInit(demoMode->clipPool->clips + 4, " 2 ->  7", demoMode->keyframePool,  2,  7);
+
+	a3clipControllerInit(demoMode->clipControllers + 0, "first clip ctrl", demoMode->clipPool, 0);
+	a3clipControllerInit(demoMode->clipControllers + 1, "second clip ctrl", demoMode->clipPool, 1);
+	a3clipControllerInit(demoMode->clipControllers + 2, "third clip ctrl", demoMode->clipPool, 2);
+
+	a3clipPoolLoadFromFile(demoMode->clipPool, demoMode->keyframePool, A3_DEMO_RES_DIR"animdata/sprite_anim.txt");
+		
 }
 
 
