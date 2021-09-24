@@ -289,7 +289,9 @@ struct a3_DemoState
 			a3_UniformBuffer uniformBuffer[demoStateMaxCount_uniformBuffer];
 			struct {
 				a3_UniformBuffer 
-					ubo_mvp[2];
+					ubo_mvp[2],
+					ubo_transformLMVP_bone[2],
+					ubo_transformLMVP_joint[2];
 			};
 	};
 
