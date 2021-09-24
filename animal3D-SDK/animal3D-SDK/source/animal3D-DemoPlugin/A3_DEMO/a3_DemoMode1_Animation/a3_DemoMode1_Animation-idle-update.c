@@ -49,7 +49,7 @@ void a3demo_update_pointLight(a3_DemoSceneObject* obj_camera, a3_DemoPointLight*
 void a3demo_applyScale_internal(a3_DemoSceneObject* sceneObject, a3real4x4p s);
 
 a3i32 a3animate_updateSkeletonRenderMats(a3_Hierarchy const* hierarchy,
-	a3mat4* renderArray, a3mat4* renderAxesArray, a3mat4 const* objectSpaceArray, a3mat4 const mvp_obj);
+	a3mat4* renderArray, a3mat4* renderAxesArray, a3_SpatialPose* poses, a3mat4 const mvp_obj);
 
 void a3animation_update(a3_DemoState* demoState, a3_DemoMode1_Animation* demoMode, a3f64 const dt)
 {
@@ -95,20 +95,9 @@ void a3animation_update(a3_DemoState* demoState, a3_DemoMode1_Animation* demoMod
 
 	// update graphics
 	a3_SpatialPose* poses = demoMode->hierarchyState_skel->objectSpacePose.spatialPose;
-	for (a3ui32 i = 0; i < demoMode->hierarchy_skel->numNodes; i++) {
-		a3mat4* bone = demoMode->skeletonPose_transformLMVP_bone + i;
-		a3mat4* joint = demoMode->skeletonPose_transformLMVP_joint + i;
-		*bone = poses[i].transform;
+	
 
-
-
-		// for joint axes rendering
-		a3real4x4SetScale(joint->m, 0.25f);
-		a3real4x4Concat(bone->m, joint->m);
-		a3real4x4Concat(mvp_skeleton.m, joint->m);
-	}
-
-
+	a3animate_updateSkeletonRenderMats(demoMode->hierarchy_skel, demoMode->skeletonPose_transformLMVP_bone, demoMode->skeletonPose_transformLMVP_joint, poses, mvp_skeleton);
 
 	/*
 	a3animate_updateSkeletonRenderMats(demoMode->hierarchy_skel,
@@ -138,11 +127,11 @@ void animation_updateSkeletonObjectSpace(a3_Hierarchy const* hierarchy,
 	a3mat4* const objectSpaceArray, a3mat4 const* const localSpaceArray) {
 
 }
-/*
+
 a3i32 a3animate_updateSkeletonRenderMats(a3_Hierarchy const* hierarchy,
-	a3mat4* renderArray, a3mat4* renderAxesArray, a3mat4 const* objectSpaceArray, a3mat4 const mvp_obj)
+	a3mat4* renderArray, a3mat4* renderAxesArray, a3_SpatialPose* poses, a3mat4 const mvp_obj)
 {
-	if (hierarchy && renderArray && objectSpaceArray)
+	if (hierarchy && renderArray && poses)
 	{
 		a3real3rk up;
 		a3ui32 j;
@@ -155,23 +144,23 @@ a3i32 a3animate_updateSkeletonRenderMats(a3_Hierarchy const* hierarchy,
 			if (jp >= 0)
 			{
 				renderArray[j] = a3mat4_identity;
-				a3real3Diff(renderArray[j].m[2], objectSpaceArray[j].m[3], objectSpaceArray[jp].m[3]);
+				a3real3Diff(renderArray[j].m[2], poses[j].transform.m[3], poses[jp].transform.m[3]);
 				up = (renderArray[j].m20 * renderArray[j].m21) ? a3vec3_z.v : a3vec3_y.v;
 				a3real3MulS(a3real3CrossUnit(renderArray[j].m[0], up, renderArray[j].m[2]), 0.25f);
 				a3real3MulS(a3real3CrossUnit(renderArray[j].m[1], renderArray[j].m[2], renderArray[j].m[0]), 0.25f);
-				renderArray[j].v3 = objectSpaceArray[jp].v3;
+				renderArray[j].v3 = poses[jp].transform.v3;
 			}
 			else
 			{
 				// zero scale at root position
 				a3real4x4SetScale(renderArray[j].m, 0.0f);
-				renderArray[j].v3 = objectSpaceArray[j].v3;
+				renderArray[j].v3 = poses[j].transform.v3;
 			}
 			a3real4x4Concat(mvp_obj.m, renderArray[j].m);
 
 			// for joint axes rendering
 			a3real4x4SetScale(renderAxesArray[j].m, 0.25f);
-			a3real4x4Concat(objectSpaceArray[j].m, renderAxesArray[j].m);
+			a3real4x4Concat(poses[j].transform.m, renderAxesArray[j].m);
 			a3real4x4Concat(mvp_obj.m, renderAxesArray[j].m);
 		}
 
@@ -180,5 +169,5 @@ a3i32 a3animate_updateSkeletonRenderMats(a3_Hierarchy const* hierarchy,
 	}
 	return -1;
 }
-*/
+
 //-----------------------------------------------------------------------------
