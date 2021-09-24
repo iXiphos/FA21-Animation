@@ -61,8 +61,19 @@ struct a3_HierarchyPoseGroup
 	// pointer to hierarchy
 	const a3_Hierarchy* hierarchy;
 
+	a3_HierarchyPose* posePool;
 	// number of hierarchical poses
 	a3ui32 poseCount;
+
+	//a3_SpatialPoseChannel channels;
+	a3_SpatialPoseEulerOrder eulerOrder;
+
+
+
+	a3_SpatialPose* spatialPosePool;
+	a3ui32 spatialPoseCount;
+
+
 };
 
 
@@ -71,6 +82,11 @@ struct a3_HierarchyState
 {
 	// pointer to hierarcy
 	const a3_Hierarchy* hierarchy;
+
+	a3_HierarchyPose samplePose;
+	a3_HierarchyPose localSpacePose;
+	a3_HierarchyPose objectSpacePose;
+
 };
 	
 

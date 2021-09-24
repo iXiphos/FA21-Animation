@@ -748,6 +748,8 @@ void a3demo_loadShaders(a3_DemoState *demoState)
 		a3demo_setUniformDefaultBlock(currentDemoProg, ubTransformMVPB, 1);
 	}
 
+	a3bufferCreate(demoState->ubo_mvp + 1, "ubo:mvp1", a3buffer_uniform, a3index_countMaxShort, 0);
+
 
 	printf("\n\n---------------- LOAD SHADERS FINISHED ---------------- \n");
 

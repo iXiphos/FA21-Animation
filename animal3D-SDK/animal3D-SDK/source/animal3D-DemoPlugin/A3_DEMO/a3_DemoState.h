@@ -98,6 +98,8 @@ enum a3_DemoState_ObjectMaxCount
 
 	demoStateMaxCount_shaderProgram = 32,
 
+	demoStateMaxCount_uniformBuffer = 2,
+
 	demoStateMaxCount_texture = 8,
 
 	demoStateMaxCount_framebuffer = 2,
@@ -244,6 +246,7 @@ struct a3_DemoState
 			//	draw_character_skin[1],						// can't not have a skinnable character
 				draw_teapot_morph[1],						// can't not have a morphing Utah teapot
 				draw_teapot[1];								// can't not have a Utah teapot
+
 		};
 	};
 
@@ -282,6 +285,13 @@ struct a3_DemoState
 		};
 	};
 
+	union {
+			a3_UniformBuffer uniformBuffer[demoStateMaxCount_uniformBuffer];
+			struct {
+				a3_UniformBuffer 
+					ubo_mvp[2];
+			};
+	};
 
 	// textures
 	union {
