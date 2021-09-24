@@ -61,6 +61,8 @@ typedef enum a3_DemoMode1_Animation_TargetName				a3_DemoMode1_Animation_TargetN
 		animationMaxCount_sceneObject = 8,
 		animationMaxCount_cameraObject = 1,
 		animationMaxCount_projector = 1,
+		animateMaxCount_skeletonJoint = 32,
+		animateMaxCount_skeletonPose = 4
 	};
 
 	// scene object rendering program names
@@ -129,6 +131,11 @@ typedef enum a3_DemoMode1_Animation_TargetName				a3_DemoMode1_Animation_TargetN
 		a3_DemoMode1_Animation_PipelineName pipeline;
 		a3_DemoMode1_Animation_PassName pass;
 		a3_DemoMode1_Animation_TargetName targetIndex[animation_pass_max], targetCount[animation_pass_max];
+
+		a3mat4 skeletonPose_local[animateMaxCount_skeletonJoint], skeletonPose_object[animateMaxCount_skeletonJoint],
+			skeletonPose_render[animateMaxCount_skeletonJoint], skeletonPose_renderAxes[animateMaxCount_skeletonJoint];
+		a3ui32 hierarchyDepth_skel[animateMaxCount_skeletonJoint];
+
 
 		// skeletal animation
 		a3_Hierarchy hierarchy_skel[1];

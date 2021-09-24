@@ -81,7 +81,30 @@ void a3animation_update(a3_DemoState* demoState, a3_DemoMode1_Animation* demoMod
 			activeCamera->projectionMat.m, activeCameraObject->modelMat.m, activeCameraObject->modelMatInv.m,
 			demoMode->object_scene[i].modelMat.m, a3mat4_identity.m);
 	}
+	// update graphics
+
+	a3bufferRefillOffset(demoState->ubo_mvp, 0, 0, sizeof(demoMode->skeletonPose_render), demoMode->skeletonPose_render);
+	a3bufferRefillOffset(demoState->ubo_mvp, 0, sizeof(demoMode->skeletonPose_render), sizeof(demoMode->hierarchyDepth_skel), demoMode->hierarchyDepth_skel);
+	a3bufferRefillOffset(demoState->ubo_mvp + 1, 0, 0, sizeof(demoMode->skeletonPose_renderAxes), demoMode->skeletonPose_renderAxes);
 }
 
+void animation_updateSkeletonLocalSpace(a3_Hierarchy const* hierarchy,
+	a3mat4* localSpaceArray,
+	a3_SpatialPose const keyPoseArray[animateMaxCount_skeletonPose][animateMaxCount_skeletonJoint]) {
+
+	if (hierarchy && localSpaceArray && keyPoseArray)
+	{
+		for (a3ui32 i = 0; i < hierarchy->numNodes; i++) {
+
+			//a3spatialPoseConvert();
+
+		}
+	}
+}
+
+void animation_updateSkeletonObjectSpace(a3_Hierarchy const* hierarchy,
+	a3mat4* const objectSpaceArray, a3mat4 const* const localSpaceArray) {
+
+}
 
 //-----------------------------------------------------------------------------
