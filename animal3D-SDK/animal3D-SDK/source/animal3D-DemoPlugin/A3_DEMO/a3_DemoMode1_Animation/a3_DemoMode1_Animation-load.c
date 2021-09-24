@@ -344,15 +344,11 @@ void a3animation_init_animation(a3_DemoState const* demoState, a3_DemoMode1_Anim
 	a3clipPoolCreate(demoMode->clipPool, 5);
 	a3keyframePoolCreate(demoMode->keyframePool, 64);
 
-	for (a3ui32 i = 0; i < 64; i++) {
-		a3keyframeInit(demoMode->keyframePool->keyframes + i, 0.5f, i);
+	for (a3ui32 i = 0; i < 3; i++) {
+		a3keyframeInit(demoMode->keyframePool->keyframes + i, 1.0f, (float)i);
 	}
 
-	a3clipInit(demoMode->clipPool->clips + 0, " 0 -> 19", demoMode->keyframePool, 0, 19);
-	a3clipInit(demoMode->clipPool->clips + 1, " 0 ->  5", demoMode->keyframePool, 0, 5);
-	a3clipInit(demoMode->clipPool->clips + 2, " 5 -> 10", demoMode->keyframePool, 5, 10);
-	a3clipInit(demoMode->clipPool->clips + 3, "10 -> 19", demoMode->keyframePool, 10, 19);
-	a3clipInit(demoMode->clipPool->clips + 4, " 2 ->  7", demoMode->keyframePool, 2, 7);
+	a3clipInit(demoMode->clipPool->clips + 0, " 0 -> 3", demoMode->keyframePool, 0, 19);
 
 	a3clipControllerInit(demoMode->clipController, "first clip ctrl", demoMode->clipPool, 0);
 

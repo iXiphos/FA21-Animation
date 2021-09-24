@@ -87,6 +87,7 @@ void a3animation_update(a3_DemoState* demoState, a3_DemoMode1_Animation* demoMod
 
 	a3clipControllerUpdate(demoMode->clipController, (a3real)dt);
 
+
 	a3_HierarchyState* state = demoMode->hierarchyStates + 0;
 
 	a3ui32 currentPoseIndex = 0;
