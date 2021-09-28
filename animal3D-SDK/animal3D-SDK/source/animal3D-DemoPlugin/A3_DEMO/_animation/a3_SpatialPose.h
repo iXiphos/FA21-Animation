@@ -69,6 +69,7 @@ enum a3_SpatialPoseChannel
 	a3poseChannel_orient_x = 0x0001,
 	a3poseChannel_orient_y = 0x0002,
 	a3poseChannel_orient_z = 0x0004,
+	a3poseChannel_orient_w = 0x0008,
 	a3poseChannel_orient_xy = a3poseChannel_orient_x | a3poseChannel_orient_y,
 	a3poseChannel_orient_yz = a3poseChannel_orient_y | a3poseChannel_orient_z,
 	a3poseChannel_orient_zx = a3poseChannel_orient_z | a3poseChannel_orient_x,
