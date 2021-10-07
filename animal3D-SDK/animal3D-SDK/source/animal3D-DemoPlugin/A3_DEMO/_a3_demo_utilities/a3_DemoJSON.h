@@ -16,36 +16,36 @@ typedef struct a3_JSONObject		 a3_JSONObject;
 
 
 struct a3_JSONValue {
-	uint8 type;
+	a3ui8 type;
 
 	union {
-		Object* obj;
-		Array* array;
+		a3_JSONObject* obj;
+		//Array* array;
 		long i_num;
 		double f_num;
 	};
 
-}
+};
 
 
 struct a3_JSONArray {
 
-	uint32 length;
-	JSONValue* items; // maybe should be pool
+	a3ui32 length;
+	a3_JSONValue* items; // maybe should be pool
 
-}
+};
 
 
 struct a3_JSONObject {
-	uint32 items;
+	a3ui32 item_count;
 	char* keys;
-	JSONValue* values;
-}
+	a3_JSONValue* values;
+};
 
 
 
-
-
+a3i32 a3readJSONFromString(const char* buffer);
+a3i32 a3readJSONFromFile(const char* path);
 
 
 #endif

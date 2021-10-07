@@ -1,4 +1,5 @@
 #include "../a3_DemoJSON.h"
+#include "../a3_DemoUtils.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -7,6 +8,7 @@
 typedef struct a3_JSONToken a3_JSONToken;
 typedef enum a3_JSONTokenType a3_JSONTokenType;
 typedef struct a3_JSONLexResult a3_JSONLexResult;
+typedef struct a3_JSONLexState a3_JSONLexState;
 
 enum a3_JSONTokenType {
     A3_JSONTOK_NONE,
@@ -38,21 +40,36 @@ struct a3_JSONLexState {
     a3ui32 capacity;
     a3_JSONToken* tokens;
     const char* ptr;
-}
+};
 
+
+/*
+Reads json in from file
+*/
 a3i32 a3readJSONFromFile(const char* path)
 {
-    return -1;
+    char* buf;
+    a3ReadFileIntoMemory(path, &buf);
+
+    return a3readJSONFromString(buf);
 }
 
-
+void json_lex_next(a3_JSONLexState* state);
+void json_lex_append(a3_JSONLexState* state, a3_JSONToken token);
 
 a3i32 a3readJSONFromString(const char* buffer)
 {
-    a3_JSONLexState state;
+    a3_JSONLexState state[1];
+    state->ptr = buffer;
 
-    while (*state.ptr != 0) {
+    a3AllocArray(state->tokens, 10, a3_JSONToken);
+    state->capacity = 10;
+    state->count = 0;
+    
 
+    // while not eof
+    while (*state->ptr != 0) {
+        json_lex_next(state);
     }
 
     return -1;
@@ -66,27 +83,21 @@ break the string input into the parts
 
 static char tmp_string[1024 * 1024];
 
-#define JSON_LEX_PARAMS \
-  const char* ptr, a3_JSONToken* tokens, a3ui32 count, a3ui32 capacity
 
 
-#define JSON_LEX_ARGS \
-  ptr, tokens, count, capacity
 
-a3_JSONLexResult json_lex_next(JSON_LEX_PARAMS);
-a3_JSONLexResult json_lex_string(JSON_LEX_PARAMS);
-a3_JSONLexResult json_lex_num(JSON_LEX_PARAMS);
-a3_JSONLexResult json_lex_char(JSON_LEX_PARAMS);
-a3_JSONLexResult json_lex_append(JSON_LEX_PARAMS, a3_JSONToken tok);
+void json_lex_string(a3_JSONLexState* state);
+void json_lex_num(a3_JSONLexState* state);
+void json_lex_char(a3_JSONLexState* state);
 
-a3_JSONLexResult json_lex_next(JSON_LEX_PARAMS) {
+void json_lex_next(a3_JSONLexState* state) {
 
     //printf("|%c|\n", *ptr);
-    switch (*ptr) {
+    switch (*state->ptr) {
     case 0: // EOF
-        return (a3_JSONLexResult) { .count = count, .capacity = capacity, .tokens = tokens };
+        break;
     case '"':
-        return json_lex_string(JSON_LEX_ARGS);
+        json_lex_string(state); break;
     case '0':
     case '1':
     case '2':
@@ -99,17 +110,16 @@ a3_JSONLexResult json_lex_next(JSON_LEX_PARAMS) {
     case '9':
     case '-':
     case '.':
-        return json_lex_num(JSON_LEX_ARGS);
+        json_lex_num(state); break;
     case ',':
     case '[':
     case ']':
     case '{':
     case '}':
     case ':':
-        return json_lex_char(JSON_LEX_ARGS);
+       json_lex_char(state); break;
     default:
-        ptr++;
-        return json_lex_next(JSON_LEX_ARGS);
+        state->ptr++; break;
     }
 }
 
@@ -137,52 +147,54 @@ void json_lex_print_tok(a3_JSONToken tok) {
     }
 }
 
-a3_JSONLexResult json_lex_append(JSON_LEX_PARAMS, a3_JSONToken tok) {
-    if (count >= capacity) {
+
+void json_lex_append_str(a3_JSONLexState* state, char* str) {
+    //todo: realocate strings into big buffer?
+    json_lex_append(state, (a3_JSONToken) { .type = A3_JSONTOK_STRING, .token_string = str });
+}
+
+void json_lex_append_float(a3_JSONLexState* state, double f) {
+    json_lex_append(state, (a3_JSONToken) { .type = A3_JSONTOK_FLOAT, .token_float = f });
+}
+
+void json_lex_append_int(a3_JSONLexState* state, a3i64 i) {
+    json_lex_append(state, (a3_JSONToken) { .type = A3_JSONTOK_INT, .token_int = i });
+}
+
+
+void json_lex_append(a3_JSONLexState* state, a3_JSONToken tok) {
+    if (state->count >= state->capacity) {
         // TOOD: better growth 
-        capacity += 10;
-        tokens = (a3_JSONToken*)realloc(tokens, sizeof(a3_JSONToken) * capacity);
-        printf("realloc\n");
+        state->capacity += 10;
+        a3ResizeArray(state->tokens, state->capacity, a3_JSONToken);
     }
     json_lex_print_tok(tok);
-    tokens[count] = tok;
+    state->tokens[state->count] = tok;
 
-    count++;
-    return json_lex_next(JSON_LEX_ARGS);
-
+    state->count++;
 }
 
-a3_JSONLexResult json_lex_append_str(JSON_LEX_PARAMS, char* str) {
-    return json_lex_append(JSON_LEX_ARGS, (a3_JSONToken) { .type = A3_JSONTOK_STRING, .token_string = str });
+void json_lex_char(a3_JSONLexState* state) {
+    char c = *(state->ptr++);
+    json_lex_append(state, (a3_JSONToken) { .type = A3_JSONTOK_CHAR, .token_char = c });
 }
 
-a3_JSONLexResult json_lex_append_float(JSON_LEX_PARAMS, double f) {
-    return json_lex_append(JSON_LEX_ARGS, (a3_JSONToken) { .type = A3_JSONTOK_FLOAT, .token_float = f });
-}
-
-a3_JSONLexResult json_lex_append_int(JSON_LEX_PARAMS, a3i64 i) {
-    return json_lex_append(JSON_LEX_ARGS, (a3_JSONToken) { .type = A3_JSONTOK_INT, .token_int = i });
-}
-a3_JSONLexResult json_lex_append_char(JSON_LEX_PARAMS, char c) {
-    return json_lex_append(JSON_LEX_ARGS, (a3_JSONToken) { .type = A3_JSONTOK_CHAR, .token_char = c });
-}
-
-a3_JSONLexResult json_lex_string(JSON_LEX_PARAMS) {
+void json_lex_string(a3_JSONLexState* state) {
 
 
-    ptr++;
+    state->ptr++;
 
     a3ui32 size = 0;
 
     char* write = tmp_string;
     do {
-        char c = *ptr;
+        char c = *state->ptr;
         // string too big
         if (size > 1024 * 1024) { puts("ERROR: json string was too big"); exit(1); }
         if (c == '"') c = 0;
         // escape characters
         if (c == '\\') {
-            ptr++;
+            state->ptr++;
             /*
                     %x22 /          ; "    quotation mark  U+0022
                     %x5C /          ; \    reverse solidus U+005C
@@ -194,11 +206,11 @@ a3_JSONLexResult json_lex_string(JSON_LEX_PARAMS) {
                     %x74 /          ; t    tab             U+0009
                     %x75 4HEXDIG )  ; uXXXX                U+XXXX
             */
-            switch (*ptr) {
+            switch (*state->ptr) {
             case '"':
             case '\\':
             case '/':
-                c = *ptr; break;
+                c = *state->ptr; break;
             case 'b':
                 c = '\b'; break;
             case 'f':
@@ -218,38 +230,37 @@ a3_JSONLexResult json_lex_string(JSON_LEX_PARAMS) {
         *write = c;
         // eof or quotation mark will be eof
         if (c == 0) break;
-    } while (size++, write++, ptr++);
+    } while (size++, write++, state->ptr++);
 
 
     char* str = malloc(size);
     memcpy(str, tmp_string, size);
 
     // step over the end quotation mark
-    if (*ptr == '"') ptr++;
+    if (*state->ptr == '"') state->ptr++;
 
-    return json_lex_append_str(JSON_LEX_ARGS, str);
+   json_lex_append_str(state, str);
 }
 
-
-a3_JSONLexResult json_lex_num(JSON_LEX_PARAMS) {
-    const char* start = ptr;
+void json_lex_num(a3_JSONLexState* state) {
+    const char* start = state->ptr;
 
     signed char sign = 1;
-    a3ui32 part_frac;
-    a3ui32 part_int;
-    a3ui32 part_exp;
-    a3ui32 frac_div;
+    a3ui32 part_frac = 0;
+    a3ui32 part_int = 0;
+    a3ui32 part_exp = 0;
+    a3ui32 frac_div = 0;
 
     // take care of negation first so we can treat any space as end of number later
-    if (*ptr == '-') {
+    if (*state->ptr == '-') {
         sign = -1;
         do {
-            ptr++;
-        } while (*ptr == ' ');
+           state->ptr++;
+        } while (*state->ptr == ' ');
     }
 
     do {
-        char c = *ptr;
+        char c = *state->ptr;
 
         if (c >= '0' && c <= '9') {
             a3ui32 i = '0' - c;
@@ -262,56 +273,17 @@ a3_JSONLexResult json_lex_num(JSON_LEX_PARAMS) {
         }
         else if (c == '.') frac_div = 10;
         else break;
-    } while (*ptr++ != 0);
+    } while (*state->ptr++ != 0);
 
     // no tractional digits == int
     if (frac_div == 0)
-        return json_lex_append_int(JSON_LEX_ARGS, (a3i64)sign * (a3i64)part_int);
-
-
-
-    double f = (double)sign * ((double)part_int + ((double)part_frac * (double)frac_div));
-    return json_lex_append_float(JSON_LEX_ARGS, f);
-}
-
-
-a3_JSONLexResult json_lex_char(JSON_LEX_PARAMS) {
-    char c = *(ptr++);
-    return json_lex_append(JSON_LEX_ARGS, (a3_JSONToken) { .type = A3_JSONTOK_CHAR, .token_char = c });
-}
-
-
-
-int main() {
-    const char* DATA = "{"
-        "\"glossary\": {"
-        "    \"title\": \"example glossary\","
-        "\"GlossDiv\": {"
-        "        \"title\": \"S\","
-        "	\"GlossList\": {"
-        "            \"GlossEntry\": {"
-        "                \"ID\": \"SGML\","
-        "			\"SortAs\": \"SGML\","
-        "			\"GlossTerm\": \"Standard Generalized Markup Language\","
-        "			\"Acronym\": \"SGML\","
-        "			\"Abbrev\": \"ISO 8879:1986\","
-        "			\"GlossDef\": {"
-        "                    \"para\": \"A meta-markup language, used to create markup languages such as \\\"DocBook.\","
-        "				\"GlossSeeAlso\": [\"GML\", \"XML\"]"
-        "                },"
-        "			\"GlossSee\": \"markup\""
-        "            }"
-        "        }"
-        " \"number\":13.4,"
-        " \"int\": 16, "
-        "    }"
-        "}"
-        "}";
-    puts(DATA);
-    json_lex_next(DATA, NULL, 0, 0);
-
-
-
-
-    return 0;
+    {
+        a3i64 i = (a3i64)sign * (a3i64)part_int;
+        json_lex_append_int(state, i);
+    } 
+    else
+    {
+        double f = (double)sign * ((double)part_int + ((double)part_frac * (double)frac_div));
+        json_lex_append_float(state, f);
+    }
 }

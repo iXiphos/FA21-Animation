@@ -61,6 +61,12 @@ a3i32 a3SplitString(char* str, char split_char, char** strs_out, a3i32 max_strs,
 
 
 a3i32 a3ReadLinesFromFile(const char* path, char** lines_out, a3i32 max_lines) {
+	char* buf;
+	a3ReadFileIntoMemory(path, &buf);
+	return a3SplitString(buf, '\n', lines_out, max_lines, a3false);
+}
+
+a3i32 a3ReadFileIntoMemory(const char* path, char** buf_out) {
 	FILE* fp = fopen(path, "r");
 	if (fp == NULL) {
 		printf("Couldn't open %s\n", path);
@@ -69,16 +75,17 @@ a3i32 a3ReadLinesFromFile(const char* path, char** lines_out, a3i32 max_lines) {
 
 	// get the length of the file
 	fseek(fp, 0L, SEEK_END);
-	a3ui64 size = ftell(fp);
+	a3i32 size = ftell(fp);
 	fseek(fp, 0, SEEK_SET);
 
 
 	// read the whole file into memory
 	char* buf;
-	a3AllocArray(buf, size+1, char);
+	a3AllocArray(buf, size + 1, char);
 	fread(buf, 1, size, fp);
 	buf[size] = 0;
 	fclose(fp);
 
-	return a3SplitString(buf, '\n', lines_out, max_lines, a3false);
+	*buf_out = buf;
+	return size;
 }

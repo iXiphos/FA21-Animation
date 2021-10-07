@@ -42,6 +42,10 @@ a3i32 a3SplitString(char* str, char split_char, char** strs_out, a3i32 max_strs,
 	the lines are put in the same buffer so lines_out[0] must be freed
  */
 a3i32 a3ReadLinesFromFile(const char* path, char** lines_out, a3i32 max_lines);
+
+
+a3i32 a3ReadFileIntoMemory(const char* path, char** buf_out);
+
 //-----------------------------------------------------------------------------
 
 
