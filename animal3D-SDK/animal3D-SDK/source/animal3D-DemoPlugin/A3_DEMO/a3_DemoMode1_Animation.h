@@ -36,6 +36,10 @@
 
 #include "_animation/a3_HierarchyStateBlend.h"
 
+#include "A3_DEMO/_animation/a3_Kinematics.h"
+
+#include "_animation/a3_KeyframeAnimation.h"
+#include "_animation/a3_KeyframeAnimationController.h"
 
 //-----------------------------------------------------------------------------
 
@@ -61,6 +65,8 @@ typedef enum a3_DemoMode1_Animation_TargetName				a3_DemoMode1_Animation_TargetN
 		animationMaxCount_sceneObject = 8,
 		animationMaxCount_cameraObject = 1,
 		animationMaxCount_projector = 1,
+		animateMaxCount_skeletonJoint = 32,
+		animateMaxCount_skeletonPose = 4
 	};
 
 	// scene object rendering program names
@@ -130,10 +136,26 @@ typedef enum a3_DemoMode1_Animation_TargetName				a3_DemoMode1_Animation_TargetN
 		a3_DemoMode1_Animation_PassName pass;
 		a3_DemoMode1_Animation_TargetName targetIndex[animation_pass_max], targetCount[animation_pass_max];
 
+		a3mat4 skeletonPose_transformLMVP_bone[animateMaxCount_skeletonJoint], skeletonPose_transformLMVP_joint[animateMaxCount_skeletonJoint];
+			
+
+
 		// skeletal animation
 		a3_Hierarchy hierarchy_skel[1];
-		a3_HierarchyState hierarchyState_skel[1];
 		a3_HierarchyPoseGroup hierarchyPoseGroup_skel[1];
+
+		union
+		{
+			a3_HierarchyState hierarchyStates[3];
+			struct {
+				a3_HierarchyState
+					hierarchyState_base[1],
+					hierarchyState_key[1],
+					hierarchyState_anim[1];
+
+			};
+		};
+
 
 		// objects
 		union {
@@ -159,6 +181,15 @@ typedef enum a3_DemoMode1_Animation_TargetName				a3_DemoMode1_Animation_TargetN
 					proj_camera_main[1];
 			};
 		};
+
+
+
+		a3_KeyframePool keyframePool[1];
+		a3_ClipPool clipPool[1];
+		a3_ClipController clipController[1];
+
+		a3ui32 currentPoseIndex;
+		a3ui32 controllerIndex;
 	};
 
 

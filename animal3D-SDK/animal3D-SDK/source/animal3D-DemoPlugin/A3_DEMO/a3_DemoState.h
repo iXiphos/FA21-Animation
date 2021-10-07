@@ -79,6 +79,7 @@ enum a3_DemoState_TextDisplayName
 	demoState_textControls,			// display controls
 	demoState_textControls_gen,		// display general controls
 	demoState_textData,				// display data
+	demoState_animationData,        // display Animation Data
 
 	demoState_text_max
 };
@@ -97,6 +98,8 @@ enum a3_DemoState_ObjectMaxCount
 	demoStateMaxCount_drawable = 16,
 
 	demoStateMaxCount_shaderProgram = 32,
+
+	demoStateMaxCount_uniformBuffer = 2,
 
 	demoStateMaxCount_texture = 8,
 
@@ -244,6 +247,7 @@ struct a3_DemoState
 			//	draw_character_skin[1],						// can't not have a skinnable character
 				draw_teapot_morph[1],						// can't not have a morphing Utah teapot
 				draw_teapot[1];								// can't not have a Utah teapot
+
 		};
 	};
 
@@ -282,6 +286,14 @@ struct a3_DemoState
 		};
 	};
 
+	union {
+			a3_UniformBuffer uniformBuffer[demoStateMaxCount_uniformBuffer];
+			struct {
+				a3_UniformBuffer
+					ubo_transformLMVP_bone[2],
+					ubo_transformLMVP_joint[2];
+			};
+	};
 
 	// textures
 	union {

@@ -129,6 +129,10 @@ a3i32 a3spatialPoseConvert(a3mat4* mat_out, const a3_SpatialPose* spatialPose_in
 // copy operation for single node pose
 a3i32 a3spatialPoseCopy(a3_SpatialPose* spatialPose_out, const a3_SpatialPose* spatialPose_in);
 
+//Concatination operation for two spatial poses
+a3i32 a3spatialPoseConcat(a3_SpatialPose* out_spatial, const a3_SpatialPose* sp_lh, const a3_SpatialPose* sp_rh);
+
+a3i32 a3spatialPoseLerp(a3_SpatialPose* out_spatial, const a3_SpatialPose* sp_lh, const a3_SpatialPose* sp_rh, const a3real u);
 
 //-----------------------------------------------------------------------------
 

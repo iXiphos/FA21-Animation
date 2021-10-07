@@ -106,21 +106,34 @@ void a3starter_render_controls(a3_DemoState const* demoState, a3_DemoMode0_Start
 	a3_DemoMode0_Starter_TargetName const targetIndex = demoMode->targetIndex[pass];
 	a3_DemoMode0_Starter_TargetName const targetCount = demoMode->targetCount[pass];
 
-	// demo modes
+	// display some general data
 	a3textDraw(text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
-		"    Pipeline (%u / %u) ('[' | ']'): %s", pipeline + 1, starter_pipeline_max, pipelineText[pipeline]);
+		"Pause/Play ( p ) Toggle Direction ( o ) ");
 	a3textDraw(text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
-		"    Display pass (%u / %u) ('(' | ')'): %s", pass + 1, starter_pass_max, passName[pass]);
+		"Go First Frame ( d )      Go Last Frame ( f )");
 	a3textDraw(text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
-		"        Target (%u / %u) ('{' | '}'): %s", targetIndex + 1, targetCount, targetText[pass][targetIndex]);
+		"Play Back Rate ( s )");
+	a3textDraw(text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
+		"Cycle Curret Poses( t | y )");
+	a3textDraw(text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
+		"Cycle Clip ( n | m )");
+	
+		const a3_ClipController* clipController = demoMode->clipControllers + demoMode->activeClipController;
+		a3_Clip* clip = clipController->clipPool->clips + clipController->clip;
+		a3_Keyframe* keyframe = clip->pool->keyframes + clipController->keyframe;
 
-	// lighting modes
-	a3textDraw(text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
-		"    Rendering mode (%u / %u) ('j' | 'k'): %s", render + 1, starter_render_max, renderProgramName[render]);
-	a3textDraw(text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
-		"    Display mode (%u / %u) ('J' | 'K'): %s", display + 1, starter_display_max, displayProgramName[display]);
-	a3textDraw(text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
-		"    Active camera (%u / %u) ('c' prev | next 'v'): %s", activeCamera + 1, starter_camera_max, cameraText[activeCamera]);
+		a3textDraw(text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
+			"Clip Controller: %s", clipController->name);
+		a3textDraw(text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
+			"Clip: %s", clip->name);
+		a3textDraw(text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
+			"Current KeyFrame: %u      Current KeyFrame Time: %f     KeyFrame Param: %f", clipController->keyframe, clipController->keyframeTime, clipController->keyframeParam);
+		a3textDraw(text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
+			"KeyFrame Data: %u      KeyFrame Duration: %f", keyframe->sample.value, keyframe->duration);
+		a3textDraw(text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
+			"");
+
+
 }
 
 
