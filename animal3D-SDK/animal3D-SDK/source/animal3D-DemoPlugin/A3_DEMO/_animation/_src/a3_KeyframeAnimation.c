@@ -72,7 +72,7 @@ a3i32 a3samplerInit(a3_Sampler* sampler_out, const a3real value_start, const a3r
 
 a3i32 a3accessorsInitFloat(a3_Accessors* accessors_out, const a3ui32 bufferView, const a3ui32 byteOffset, const a3ui32 componentType, const a3ui32 count, const a3f32 min, const a3f32 max)
 {
-	accessors_out->accessorType = scalar;
+	accessors_out->accessorType = a3_scalarAccessor;
 	accessors_out->bufferView = bufferView;
 	accessors_out->byteOffset = byteOffset;
 	accessors_out->componentType = componentType;
@@ -84,7 +84,7 @@ a3i32 a3accessorsInitFloat(a3_Accessors* accessors_out, const a3ui32 bufferView,
 
 a3i32 a3accessorsInitVec3(a3_Accessors* accessors_out, const a3ui32 bufferView, const a3ui32 byteOffset, const a3ui32 componentType, const a3ui32 count, const a3vec3 min, a3vec3 max)
 {
-	accessors_out->accessorType = vec3;
+	accessors_out->accessorType = a3_vec3Accessor;
 	accessors_out->bufferView = bufferView;
 	accessors_out->byteOffset = byteOffset;
 	accessors_out->componentType = componentType;
@@ -96,7 +96,7 @@ a3i32 a3accessorsInitVec3(a3_Accessors* accessors_out, const a3ui32 bufferView, 
 
 a3i32 a3accessorsInitVec4(a3_Accessors* accessors_out, const a3ui32 bufferView, const a3ui32 byteOffset, const a3ui32 componentType, const a3ui32 count, const a3vec4 min, a3vec4 max)
 {
-	accessors_out->accessorType = vec4;
+	accessors_out->accessorType = a3_vec4Accessor;
 	accessors_out->bufferView = bufferView;
 	accessors_out->byteOffset = byteOffset;
 	accessors_out->componentType = componentType;
