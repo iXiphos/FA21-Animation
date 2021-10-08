@@ -43,10 +43,19 @@ struct a3_GLFT_Skin {
 };
 
 struct a3_GLFT_Node {
-	a3mat4 matrix;
 	char name[GLFT_NAME_MAX_SIZE];
 	a3ui32* children;
 	a3ui32 children_count;
+
+	a3ui8 usesMatrix;
+	union {
+		a3mat4 matrix;
+		struct {
+			a3vec4 rotation;
+			a3vec3 translation;
+			a3vec3 scale;
+		};
+	};
 };
 
 a3i32 a3GLFTRead(a3_GLFTFile* out_glft, const char* directory, const char* filename);
