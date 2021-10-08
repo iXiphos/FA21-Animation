@@ -357,7 +357,7 @@ void a3animation_init_animation(a3_DemoState const* demoState, a3_DemoMode1_Anim
 	a3clipControllerInit(demoMode->clipController, "first clip ctrl", demoMode->clipPool, 0);
 
 
-	a3readJSONFromFile(A3_DEMO_ANIM_DIR"SimpleSkin.gltf");
+	a3readJSONFromFile(A3_DEMO_ANIM_DIR"RiggedFigure.gltf");
 }
 
 

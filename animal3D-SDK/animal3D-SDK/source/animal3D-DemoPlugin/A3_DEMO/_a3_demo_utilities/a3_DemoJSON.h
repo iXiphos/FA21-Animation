@@ -55,8 +55,8 @@ struct a3_JSONValue {
 
 
 
-a3i32 a3readJSONFromString(const char* buffer);
-a3i32 a3readJSONFromFile(const char* path);
+a3_JSONValue a3readJSONFromString(const char* buffer);
+a3_JSONValue a3readJSONFromFile(const char* path);
 
 
 a3boolean a3JSONFindObjValue(a3_JSONValue obj, const char* key, a3_JSONValue* obj_out);

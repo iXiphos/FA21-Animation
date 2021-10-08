@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
+#include  <math.h>
 
 typedef struct a3_JSONToken a3_JSONToken;
 typedef enum a3_JSONTokenType a3_JSONTokenType;
@@ -65,7 +66,7 @@ struct a3_JSONLexState {
 /*
 Reads json in from file
 */
-a3i32 a3readJSONFromFile(const char* path)
+a3_JSONValue a3readJSONFromFile(const char* path)
 {
     char* buf;
     a3ReadFileIntoMemory(path, &buf);
@@ -77,7 +78,7 @@ void json_lex_next(a3_JSONLexState* state);
 a3_JSONValue json_parse(a3_JSONLexState* lex_state);
 void print_json_structure(a3_JSONValue val, a3ui8 depth, a3boolean isobjval);
 
-a3i32 a3readJSONFromString(const char* buffer)
+a3_JSONValue a3readJSONFromString(const char* buffer)
 {
     a3_JSONLexState state[1];
     state->ptr = buffer;
@@ -95,7 +96,7 @@ a3i32 a3readJSONFromString(const char* buffer)
     a3_JSONValue val = json_parse(state);
 
     print_json_structure(val, 0, false);
-    return -1;
+    return val;
 }
 
 
@@ -177,7 +178,7 @@ a3_JSONValue json_parse_object(a3_JSONParseState* state) {
 
 a3_JSONValue json_parse_array(a3_JSONParseState* state) {
 
-    a3_JSONValue tmp_arr[50];
+    a3_JSONValue tmp_arr[200];
     a3ui32 index = 0;
 
     // empty array
@@ -201,7 +202,9 @@ a3_JSONValue json_parse_array(a3_JSONParseState* state) {
         
         if (next != ',') 
             printf("error: unexpected character in array\n");
-  
+        if (index >= 200) {
+            printf("error: too many items in array");
+        }
     }
 
     
@@ -443,7 +446,7 @@ void json_lex_append(a3_JSONLexState* state, a3_JSONToken tok) {
         state->capacity += 10;
         a3ResizeArray(state->tokens, state->capacity, a3_JSONToken);
     }
-    json_lex_print_tok(tok);
+    
     state->tokens[state->count] = tok;
 
     state->count++;
@@ -523,18 +526,12 @@ void json_lex_num(a3_JSONLexState* state) {
     const char* start = state->ptr;
 
     double sign = 1.0;
+    double exp_sign = 0;
     a3ui32 part_frac = 0;
     a3ui32 part_int = 0;
     a3ui32 part_exp = 0;
     a3ui32 frac_div = 0;
 
-    // take care of negation first so we can treat any space as end of number later
-    if (*state->ptr == '-') {
-        sign = -1.0;
-        do {
-           state->ptr++;
-        } while (*state->ptr == ' ');
-    }
 
     do {
         char c = *state->ptr;
@@ -543,19 +540,41 @@ void json_lex_num(a3_JSONLexState* state) {
             a3ui32 i = c - '0';
             if (frac_div == 0)
                 part_int = (part_int * 10) + i;
-            else {
+            else if (exp_sign == 0) {
                 part_frac = (part_frac * 10) + i;
                 frac_div *= 10;
             }
+            else {
+                part_exp = (part_exp * 10) + i;
+            }
         }
-        else if (c == '.') frac_div = 10;
+        else if (c == '-') sign = -1.0;
+        else if (c == '.') frac_div = 1;
+        else if (c == 'e' || c == 'E') {
+
+            char char_sign = *++state->ptr;
+            if (char_sign == '-')
+                exp_sign = -1.0f;
+            else if (char_sign == '+')
+                exp_sign = 1.0f;
+            else
+                printf("error: unable to parse number\n");
+                // error
+        }
         else break;
     } while (*state->ptr++ != 0);
 
 
+    double num = (double)part_int;
+    if (frac_div != 0)
+        num += (double)part_frac / (double)frac_div;
 
+    num *= sign;
 
-    double num = sign * ((double)part_int + ((double)part_frac * (double)frac_div));
+    if (exp_sign != 0) {
+        double exp = pow(10, exp_sign * (double)part_exp);
+        num *= exp;
+    }
     json_lex_append_num(state, num);
     
 }
