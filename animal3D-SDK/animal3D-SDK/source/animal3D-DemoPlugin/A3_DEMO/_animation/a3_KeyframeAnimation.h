@@ -269,9 +269,9 @@ struct a3_channel
 
 enum a3_accessorTypes 
 {
-	vec3,
-	vec4,
-	scalar,
+	a3_vec3Accessor,
+	a3_vec4Accessor,
+	a3_scalarAccessor,
 };
 
 struct a3_Accessors 
