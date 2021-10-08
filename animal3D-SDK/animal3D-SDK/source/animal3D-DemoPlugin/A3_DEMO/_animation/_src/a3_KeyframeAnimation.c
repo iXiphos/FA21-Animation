@@ -70,6 +70,42 @@ a3i32 a3samplerInit(a3_Sampler* sampler_out, const a3real value_start, const a3r
 	return 1;
 }
 
+a3i32 a3accessorsInitFloat(a3_Accessors* accessors_out, const a3ui32 bufferView, const a3ui32 byteOffset, const a3ui32 componentType, const a3ui32 count, const a3f32 min, const a3f32 max)
+{
+	accessors_out->accessorType = scalar;
+	accessors_out->bufferView = bufferView;
+	accessors_out->byteOffset = byteOffset;
+	accessors_out->componentType = componentType;
+	accessors_out->count = count;
+	accessors_out->fmin = min;
+	accessors_out->fmax = max;
+	return 1;
+}
+
+a3i32 a3accessorsInitVec3(a3_Accessors* accessors_out, const a3ui32 bufferView, const a3ui32 byteOffset, const a3ui32 componentType, const a3ui32 count, const a3vec3 min, a3vec3 max)
+{
+	accessors_out->accessorType = vec3;
+	accessors_out->bufferView = bufferView;
+	accessors_out->byteOffset = byteOffset;
+	accessors_out->componentType = componentType;
+	accessors_out->count = count;
+	accessors_out->vec3min = min;
+	accessors_out->vec3max = max;
+	return 1;
+}
+
+a3i32 a3accessorsInitVec4(a3_Accessors* accessors_out, const a3ui32 bufferView, const a3ui32 byteOffset, const a3ui32 componentType, const a3ui32 count, const a3vec4 min, a3vec4 max)
+{
+	accessors_out->accessorType = vec4;
+	accessors_out->bufferView = bufferView;
+	accessors_out->byteOffset = byteOffset;
+	accessors_out->componentType = componentType;
+	accessors_out->count = count;
+	accessors_out->vec4min = min;
+	accessors_out->vec4max = max;
+	return 1;
+}
+
 // allocate keyframe pool
 a3i32 a3keyframePoolCreate(a3_KeyframePool* keyframePool_out, const a3ui32 count)
 {
@@ -105,6 +141,7 @@ a3i32 a3keyFramePoolFromChannelPool(a3_KeyframePool* keyframePool_out, const a3_
 	{
 		duration = tempSamp[tempChannel[i].samplerIndex].output.time - tempSamp[tempChannel[i].samplerIndex].input.time;
 		a3keyframeInit(keyframePool_out->keyframes + i, duration, (float)tempSamp[tempChannel[i].samplerIndex].output.value);
+		keyframePool_out->accessors = channelPool_in->accessors;
 	}
 
 	return 1;
