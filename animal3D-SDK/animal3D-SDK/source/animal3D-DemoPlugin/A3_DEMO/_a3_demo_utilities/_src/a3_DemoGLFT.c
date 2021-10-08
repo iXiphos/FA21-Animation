@@ -35,10 +35,49 @@ a3i32 a3GLFTRead(a3_GLFTFile* out_glft, const char* dirname, const char* filenam
 			node->children_count = json_children.length;
 		}
 
-
-
-	
 	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	// start anim loading
+
+
+
+
+
+
+
+
+
+
 }
 
 
