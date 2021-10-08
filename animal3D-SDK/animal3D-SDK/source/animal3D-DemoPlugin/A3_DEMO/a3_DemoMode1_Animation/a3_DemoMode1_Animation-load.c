@@ -31,8 +31,10 @@
 #include "../a3_DemoMode1_Animation.h"
 
 #include "../a3_DemoState.h"
+#include "../animal3D-DemoPlugin/A3_DEMO/_a3_demo_utilities/a3_DemoJSON.h"
 
 
+#define A3_DEMO_ANIM_DIR	"../../../../resource/animdata/"
 //-----------------------------------------------------------------------------
 
 // utility to load animation
@@ -354,6 +356,8 @@ void a3animation_init_animation(a3_DemoState const* demoState, a3_DemoMode1_Anim
 
 	a3clipControllerInit(demoMode->clipController, "first clip ctrl", demoMode->clipPool, 0);
 
+
+	a3readJSONFromFile(A3_DEMO_ANIM_DIR"SimpleSkin.gltf");
 }
 
 

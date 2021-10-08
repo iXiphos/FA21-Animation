@@ -75,14 +75,13 @@ a3i32 a3ReadFileIntoMemory(const char* path, char** buf_out) {
 
 	// get the length of the file
 	fseek(fp, 0L, SEEK_END);
-	a3i32 size = ftell(fp);
-	fseek(fp, 0, SEEK_SET);
+	long size = ftell(fp);
+	fseek(fp, 0L, SEEK_SET);
 
 
 	// read the whole file into memory
-	char* buf;
-	a3AllocArray(buf, size + 1, char);
-	fread(buf, 1, size, fp);
+	char* buf = (char*)calloc(size+1, sizeof(char));
+	fread(buf, sizeof(char), size, fp);
 	buf[size] = 0;
 	fclose(fp);
 

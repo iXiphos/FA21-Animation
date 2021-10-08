@@ -6,46 +6,64 @@
 #include "animal3D/animal3D.h"
 
 
-typedef struct a3_JSONType           a3_JSONType;
+typedef enum a3_JSONType           a3_JSONType;
 typedef struct a3_JSONValue			 a3_JSONValue;
 typedef struct a3_JSONArray			 a3_JSONArray;
 typedef struct a3_JSONObject		 a3_JSONObject;
 
 
-
-
-
-struct a3_JSONValue {
-	a3ui8 type;
-
-	union {
-		a3_JSONObject* obj;
-		//Array* array;
-		long i_num;
-		double f_num;
-	};
-
+enum a3_JSONType {
+	JSONTYPE_NONE,
+	JSONTYPE_OBJ,
+	JSONTYPE_ARRAY,
+	JSONTYPE_STR,
+	JSONTYPE_NUM,
+	JSONTYPE_NULL,
+	JSONTYPE_FALSE,
+	JSONTYPE_TRUE,
+	
 };
 
 
 struct a3_JSONArray {
 
 	a3ui32 length;
-	a3_JSONValue* items; // maybe should be pool
+	a3_JSONValue* values;
 
 };
 
 
 struct a3_JSONObject {
-	a3ui32 item_count;
-	char* keys;
+	a3ui32 length;
+	char** keys;
 	a3_JSONValue* values;
 };
+
+
+struct a3_JSONValue {
+	a3_JSONType type;
+
+	union {
+		a3_JSONObject obj;
+		a3_JSONArray arr;
+		double num;
+		const char* str;
+	};
+};
+
+
 
 
 
 a3i32 a3readJSONFromString(const char* buffer);
 a3i32 a3readJSONFromFile(const char* path);
+
+
+a3boolean a3JSONFindObjValue(a3_JSONValue obj, const char* key, a3_JSONValue* obj_out);
+a3boolean a3JSONGetNum(a3_JSONValue value, double* num_out);
+a3boolean a3JSONGetStr(a3_JSONValue value, const char** str_out);
+a3boolean a3JSONGetBoolean(a3_JSONValue value, a3boolean* bool_out);
+
 
 
 #endif

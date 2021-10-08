@@ -7,32 +7,51 @@
 
 typedef struct a3_JSONToken a3_JSONToken;
 typedef enum a3_JSONTokenType a3_JSONTokenType;
-typedef struct a3_JSONLexResult a3_JSONLexResult;
+typedef struct a3_JSONParseState a3_JSONParseState;
 typedef struct a3_JSONLexState a3_JSONLexState;
+typedef struct a3_JSONOutput a3_JSONOutput;
 
 enum a3_JSONTokenType {
     A3_JSONTOK_NONE,
     A3_JSONTOK_CHAR,
-    A3_JSONTOK_INT,
-    A3_JSONTOK_FLOAT,
+    A3_JSONTOK_NUM,
     A3_JSONTOK_STRING,
+    A3_JSONTOK_TRUE,
+    A3_JSONTOK_FALSE,
+    A3_JSONTOK_NULL,
 };
 
 struct a3_JSONToken {
     a3_JSONTokenType type;
 
     union {
-        a3i64 token_int;
-        double token_float;
+        double token_num;
         const char* token_string;
         char token_char;
     };
 };
 
-struct a3_JSONLexResult {
-    a3ui32 count;
-    a3ui32 capacity;
+struct a3_JSONParseState {
+    a3ui32 token_count;
     a3_JSONToken* tokens;
+    a3_JSONToken* tokens_cur;
+    a3_JSONToken* tokens_end;
+
+
+    char** keys;
+    a3ui32 keys_count;
+    a3ui32 key_capacity;
+
+    a3_JSONValue* values;
+    a3ui32 values_count;
+    a3ui32 values_capacity;
+
+
+};
+
+
+struct a3_JSONParse {
+    a3_JSONValue top_value;
 };
 
 struct a3_JSONLexState {
@@ -55,7 +74,8 @@ a3i32 a3readJSONFromFile(const char* path)
 }
 
 void json_lex_next(a3_JSONLexState* state);
-void json_lex_append(a3_JSONLexState* state, a3_JSONToken token);
+a3_JSONValue json_parse(a3_JSONLexState* lex_state);
+void print_json_structure(a3_JSONValue val, a3ui8 depth, a3boolean isobjval);
 
 a3i32 a3readJSONFromString(const char* buffer)
 {
@@ -72,7 +92,242 @@ a3i32 a3readJSONFromString(const char* buffer)
         json_lex_next(state);
     }
 
+    a3_JSONValue val = json_parse(state);
+
+    print_json_structure(val, 0, false);
     return -1;
+}
+
+
+/*
+Parser
+
+this sucks cause its recursive
+*/
+
+a3_JSONValue json_parse_value(a3_JSONParseState* state);
+
+a3_JSONValue json_parse_object(a3_JSONParseState* state) {
+
+    a3_JSONToken* last_tok = state->tokens_cur - 1;
+    if (last_tok->type != A3_JSONTOK_CHAR || last_tok->token_char != '{')
+        printf("error: object did not start with {");
+
+    // empty object
+    if (state->tokens_cur->type == A3_JSONTOK_CHAR && state->tokens_cur->token_char == '}') {
+        state->tokens_cur++;
+        return (a3_JSONValue) { .type = JSONTYPE_OBJ };
+    }
+
+    a3_JSONValue tmp_values[50];
+    const char* tmp_keys[50];
+    a3ui32 index = 0;
+    
+    while (state->tokens_cur->type != A3_JSONTOK_NONE ) {
+
+        if (state->tokens_cur->type != A3_JSONTOK_STRING)
+            printf("error: expected key\n");
+
+        tmp_keys[index] = state->tokens_cur->token_string;
+
+        state->tokens_cur++;
+
+        if (state->tokens_cur->type != A3_JSONTOK_CHAR || state->tokens_cur->token_char != ':')
+            printf("error: expected colon \n");
+
+        state->tokens_cur++;
+
+        tmp_values[index] = json_parse_value(state);
+
+        index++;
+
+        if (state->tokens_cur->type != A3_JSONTOK_CHAR) 
+            printf("error: expected character\n");
+
+        if (state->tokens_cur->token_char == '}') {
+            state->tokens_cur++;
+            break;
+        }
+        else if (state->tokens_cur->token_char != ',') {
+            printf("error: expected end of object or comma\n");
+        }
+
+       
+       
+        state->tokens_cur++;
+        if (index >= 50) {
+            printf("error: too many items in object");
+        }
+    }
+
+    
+    a3ui32 keys_size = index * sizeof(char*);
+    a3ui32 values_size = index * sizeof(a3_JSONValue);
+    a3ui8* buf = (a3ui8*)malloc(keys_size + values_size);
+    char** keys = (char** )buf;
+    a3_JSONValue* values = (a3_JSONValue*)(buf + keys_size);
+
+    memcpy(keys, tmp_keys, keys_size);
+    memcpy(values, tmp_values, values_size);
+
+    a3_JSONObject obj = (a3_JSONObject) { .length=index, .keys=keys, .values=values};
+
+    return (a3_JSONValue) { .type = JSONTYPE_OBJ, .obj=obj };
+}
+
+a3_JSONValue json_parse_array(a3_JSONParseState* state) {
+
+    a3_JSONValue tmp_arr[50];
+    a3ui32 index = 0;
+
+    // empty array
+    if (state->tokens_cur->type == A3_JSONTOK_CHAR && state->tokens_cur->token_char == ']') {
+        state->tokens_cur++;
+        return (a3_JSONValue) { .type = JSONTYPE_ARRAY };
+    }
+
+    while (state->tokens_cur->type != A3_JSONTOK_NONE) {
+        tmp_arr[index] = json_parse_value(state);
+        index++;
+
+        if (state->tokens_cur->type != A3_JSONTOK_CHAR) {
+            printf("error: unexpected token in array\n");
+        }
+
+        char next = state->tokens_cur->token_char;
+        state->tokens_cur++;
+        if (next == ']') 
+            break;
+        
+        if (next != ',') 
+            printf("error: unexpected character in array\n");
+  
+    }
+
+    
+
+    a3_JSONValue* buf = (a3_JSONValue*)malloc(index * sizeof(a3_JSONValue));
+    memcpy(buf, tmp_arr, index * sizeof(a3_JSONValue));
+
+    a3_JSONArray arr = (a3_JSONArray) {.values = buf, .length=index };
+    return (a3_JSONValue) { .type = JSONTYPE_ARRAY, .arr=arr };
+}
+
+a3_JSONValue json_parse_value(a3_JSONParseState* state) {
+
+    a3_JSONToken tok = *state->tokens_cur;
+    state->tokens_cur++;
+    if (tok.type == A3_JSONTOK_CHAR) {
+
+        if (tok.token_char == '{')
+            return json_parse_object(state);
+
+        if (tok.token_char == '[')
+            return json_parse_array(state);
+        
+        
+        printf("error: wrong upper level character\n");
+
+        return (a3_JSONValue) { .type=JSONTYPE_NONE };
+    }
+    
+    if (tok.type == A3_JSONTOK_NUM)
+        return (a3_JSONValue) { .type=JSONTYPE_NUM, .num=tok.token_num };
+    
+    if (tok.type == A3_JSONTOK_NULL)
+        return (a3_JSONValue) { .type = JSONTYPE_NULL };
+
+    if (tok.type == A3_JSONTOK_TRUE)
+        return (a3_JSONValue) { .type = JSONTYPE_TRUE };
+
+    if (tok.type == A3_JSONTOK_FALSE)
+        return (a3_JSONValue) { .type = JSONTYPE_FALSE };
+
+    if (tok.type == A3_JSONTOK_STRING)
+        return (a3_JSONValue) { .type = JSONTYPE_STR, .str= tok.token_string };
+   
+    // error 
+    return (a3_JSONValue) { .type = JSONTYPE_NONE };
+}
+
+a3_JSONValue json_parse(a3_JSONLexState* lex_state) {
+
+    a3_JSONParseState state[1];
+    state->tokens = lex_state->tokens;
+    state->token_count = lex_state->count;
+    state->tokens_cur = lex_state->tokens;
+    state->tokens_end = state->tokens + state->token_count;
+    
+    a3_JSONValue value = json_parse_value(state);
+
+    return value;
+}
+
+
+void print_padding(a3ui8 pad) {
+    for (a3ui8 i = 0; i < pad; i++) printf("    ");
+}
+
+void print_json_structure(a3_JSONValue val, a3ui8 depth, a3boolean isobjval) {
+    if (!isobjval)
+        print_padding(depth);
+    if (val.type == JSONTYPE_ARRAY) {
+        
+        printf("[\n");
+
+        for (a3ui32 i = 0; i < val.arr.length; i++) {
+            print_json_structure(val.arr.values[i], depth+1, false);
+        }
+        print_padding(depth);
+        printf("]\n");
+
+        return;
+    }
+
+    if (val.type == JSONTYPE_OBJ) {
+
+        printf("{\n");
+
+        for (a3ui32 i = 0; i < val.obj.length; i++) {
+            print_padding(depth+1);
+            printf("%s: ", val.obj.keys[i]);
+            print_json_structure(val.obj.values[i], depth+1, true);
+        }
+        print_padding(depth);
+        printf("}\n");
+        
+        return;
+    }
+    
+    if (val.type == JSONTYPE_STR) {
+       printf("%s\n", val.str);
+
+        return;
+    }
+
+    if (val.type == JSONTYPE_NUM) {
+        printf("%lf\n", val.num);
+
+        return;
+    }
+
+    if (val.type == JSONTYPE_FALSE) {
+        printf("false\n");
+
+        return;
+    }
+
+    if (val.type == JSONTYPE_TRUE) {
+        printf("true\n");
+
+        return;
+    }
+
+    if (val.type == JSONTYPE_NULL) {
+        printf("null\n");
+
+        return;
+    }
 }
 
 
@@ -89,6 +344,8 @@ static char tmp_string[1024 * 1024];
 void json_lex_string(a3_JSONLexState* state);
 void json_lex_num(a3_JSONLexState* state);
 void json_lex_char(a3_JSONLexState* state);
+void json_lex_append(a3_JSONLexState* state, a3_JSONToken token);
+void json_lex_literal(a3_JSONLexState* state, a3_JSONTokenType type, const char* text);
 
 void json_lex_next(a3_JSONLexState* state) {
 
@@ -118,8 +375,21 @@ void json_lex_next(a3_JSONLexState* state) {
     case '}':
     case ':':
        json_lex_char(state); break;
-    default:
+    case '\t':
+    case '\n':
+    case '\r':
+    case ' ':
         state->ptr++; break;
+    case 't':
+        json_lex_literal(state, A3_JSONTOK_TRUE, "true"); break;
+    case 'n':
+        json_lex_literal(state, A3_JSONTOK_NULL, "null"); break;
+    case 'f':
+        json_lex_literal(state, A3_JSONTOK_FALSE, "false"); break;
+    default:
+        printf("unexpected character: %c \n", *state->ptr);
+       // error
+        break;
     }
 }
 
@@ -127,16 +397,13 @@ void json_lex_next(a3_JSONLexState* state) {
 void json_lex_print_tok(a3_JSONToken tok) {
     switch (tok.type) {
     case A3_JSONTOK_STRING:
-        puts(tok.token_string);
-        break;
-    case A3_JSONTOK_INT:
-        printf("%lli\n", tok.token_int);
+        printf("STRING: \"%s\" \n", tok.token_string);
         break;
     case A3_JSONTOK_CHAR:
-        printf("%c\n", tok.token_char);
+        printf("CHAR: %c\n", tok.token_char);
         break;
-    case A3_JSONTOK_FLOAT:
-        printf("%lf\n", tok.token_float);
+    case A3_JSONTOK_NUM:
+        printf("NUM: %lf\n", tok.token_num);
         break;
     case A3_JSONTOK_NONE:
         puts("EMPTY_TOKEN");
@@ -148,19 +415,27 @@ void json_lex_print_tok(a3_JSONToken tok) {
 }
 
 
-void json_lex_append_str(a3_JSONLexState* state, char* str) {
-    //todo: realocate strings into big buffer?
+void json_lex_append_str(a3_JSONLexState* state, char* str_start, a3ui32 size) {
+    // TODO: page based allocator
+    char* str = malloc(size);
+    memcpy(str, str_start, size);
+
     json_lex_append(state, (a3_JSONToken) { .type = A3_JSONTOK_STRING, .token_string = str });
 }
 
-void json_lex_append_float(a3_JSONLexState* state, double f) {
-    json_lex_append(state, (a3_JSONToken) { .type = A3_JSONTOK_FLOAT, .token_float = f });
+void json_lex_append_num(a3_JSONLexState* state, double num) {
+    json_lex_append(state, (a3_JSONToken) { .type = A3_JSONTOK_NUM, .token_num = num });
 }
 
-void json_lex_append_int(a3_JSONLexState* state, a3i64 i) {
-    json_lex_append(state, (a3_JSONToken) { .type = A3_JSONTOK_INT, .token_int = i });
-}
+void json_lex_literal(a3_JSONLexState* state, a3_JSONTokenType type, const char* text) {
+    while (*state->ptr && *text) {
+        if (*state->ptr++ != *text++) {
+            printf("error reading literal \"%s\"\n", text);
+        }
+    }
 
+    json_lex_append(state, (a3_JSONToken) { .type=type });
+}
 
 void json_lex_append(a3_JSONLexState* state, a3_JSONToken tok) {
     if (state->count >= state->capacity) {
@@ -187,8 +462,9 @@ void json_lex_string(a3_JSONLexState* state) {
     a3ui32 size = 0;
 
     char* write = tmp_string;
+    char c;
     do {
-        char c = *state->ptr;
+        c = *state->ptr;
         // string too big
         if (size > 1024 * 1024) { puts("ERROR: json string was too big"); exit(1); }
         if (c == '"') c = 0;
@@ -228,24 +504,25 @@ void json_lex_string(a3_JSONLexState* state) {
         }
 
         *write = c;
+       
+
+        size++;
+        write++;
+        state->ptr++;
+
         // eof or quotation mark will be eof
-        if (c == 0) break;
-    } while (size++, write++, state->ptr++);
+    } while (c);
+
+  
 
 
-    char* str = malloc(size);
-    memcpy(str, tmp_string, size);
-
-    // step over the end quotation mark
-    if (*state->ptr == '"') state->ptr++;
-
-   json_lex_append_str(state, str);
+   json_lex_append_str(state, tmp_string, size);
 }
 
 void json_lex_num(a3_JSONLexState* state) {
     const char* start = state->ptr;
 
-    signed char sign = 1;
+    double sign = 1.0;
     a3ui32 part_frac = 0;
     a3ui32 part_int = 0;
     a3ui32 part_exp = 0;
@@ -253,7 +530,7 @@ void json_lex_num(a3_JSONLexState* state) {
 
     // take care of negation first so we can treat any space as end of number later
     if (*state->ptr == '-') {
-        sign = -1;
+        sign = -1.0;
         do {
            state->ptr++;
         } while (*state->ptr == ' ');
@@ -263,7 +540,7 @@ void json_lex_num(a3_JSONLexState* state) {
         char c = *state->ptr;
 
         if (c >= '0' && c <= '9') {
-            a3ui32 i = '0' - c;
+            a3ui32 i = c - '0';
             if (frac_div == 0)
                 part_int = (part_int * 10) + i;
             else {
@@ -275,15 +552,10 @@ void json_lex_num(a3_JSONLexState* state) {
         else break;
     } while (*state->ptr++ != 0);
 
-    // no tractional digits == int
-    if (frac_div == 0)
-    {
-        a3i64 i = (a3i64)sign * (a3i64)part_int;
-        json_lex_append_int(state, i);
-    } 
-    else
-    {
-        double f = (double)sign * ((double)part_int + ((double)part_frac * (double)frac_div));
-        json_lex_append_float(state, f);
-    }
+
+
+
+    double num = sign * ((double)part_int + ((double)part_frac * (double)frac_div));
+    json_lex_append_num(state, num);
+    
 }
