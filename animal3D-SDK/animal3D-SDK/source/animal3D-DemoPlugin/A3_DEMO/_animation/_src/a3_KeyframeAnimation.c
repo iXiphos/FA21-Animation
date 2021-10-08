@@ -36,6 +36,33 @@
 
 //-----------------------------------------------------------------------------
 
+a3i32 a3channelPoolCreate(a3_ChannelPool* channelPool_out, const a3ui32 capacity)
+{
+	a3AllocArray(channelPool_out->channels, capacity, a3_channel);
+	a3AllocArray(channelPool_out->samples, capacity, a3_Sampler);
+	channelPool_out->count = capacity;
+	channelPool_out->capacity = capacity;
+
+	return 1;
+}
+
+a3i32 a3channelPoolRelease(a3_ChannelPool* channelPool)
+{
+	free(channelPool->channels);
+	free(channelPool->samples);
+	return 1;
+}
+
+a3i32 a3channelInit(a3_channel* channel_out, const a3real value_start, const a3real time_start, const a3real value_end, const a3real time_end, const a3_path path, const a3_interpolationType interType)
+{
+	channel_out->sampler->input.value = value_start;
+	channel_out->sampler->input.time = time_start;
+	channel_out->sampler->output.value = value_end;
+	channel_out->sampler->output.time = time_end;
+	channel_out->targetPath = path;
+	return 1;
+}
+
 // allocate keyframe pool
 a3i32 a3keyframePoolCreate(a3_KeyframePool* keyframePool_out, const a3ui32 count)
 {
