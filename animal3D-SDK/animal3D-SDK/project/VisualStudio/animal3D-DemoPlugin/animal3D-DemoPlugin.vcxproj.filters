@@ -230,6 +230,12 @@
     <ClInclude Include="..\..\..\source\animal3D-DemoPlugin\A3_DEMO\_a3_demo_utilities\a3_DemoUtils.h">
       <Filter>Header Files\A3_DEMO\_a3_demo_utilities</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\source\animal3D-DemoPlugin\A3_DEMO\_a3_demo_utilities\a3_DemoGLFT.h">
+      <Filter>Header Files\A3_DEMO\_a3_demo_utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\source\animal3D-DemoPlugin\A3_DEMO\_a3_demo_utilities\_src\a3_DemoGLFT.h">
+      <Filter>Source Files\common\A3_DEMO\_animation\_src</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\resource\glsl\4x\fs\drawColorAttrib_fs4x.glsl">

@@ -6,6 +6,66 @@
 #include <stdbool.h>
 #include  <math.h>
 
+
+
+
+a3boolean a3JSONFindObjValue(a3_JSONValue obj, const char* key, a3_JSONValue* val_out) {
+    if (obj.type != JSONTYPE_OBJ) {
+        return false;
+    }
+    for (a3ui32 i = 0; i < obj.obj.length; i++) {
+        if (strcmp(key, obj.obj.keys[i]) == 0) {
+            *val_out = obj.obj.values[i];
+            return true;
+        }
+    }
+
+    return false;
+}
+
+a3boolean a3JSONGetNum(a3_JSONValue value, double* num_out) {
+    if (value.type == JSONTYPE_NUM) {
+        *num_out = value.num;
+        return true;
+    }
+    return false;
+}
+
+a3boolean a3JSONGetStr(a3_JSONValue value, const char** str_out) {
+    if (value.type == JSONTYPE_STR) {
+        *str_out = value.str;
+        return true;
+    }
+    return false;
+}
+
+a3boolean a3JSONGetBoolean(a3_JSONValue value, a3boolean* bool_out) {
+    if (value.type == JSONTYPE_TRUE) {
+        *bool_out = 1;
+        return true;
+    }
+    if (value.type == JSONTYPE_FALSE) {
+        *bool_out = 0;
+        return true;
+    }
+    return false;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 typedef struct a3_JSONToken a3_JSONToken;
 typedef enum a3_JSONTokenType a3_JSONTokenType;
 typedef struct a3_JSONParseState a3_JSONParseState;
@@ -51,6 +111,8 @@ struct a3_JSONParseState {
 };
 
 
+
+
 struct a3_JSONParse {
     a3_JSONValue top_value;
 };
@@ -63,6 +125,10 @@ struct a3_JSONLexState {
 };
 
 
+
+
+
+
 /*
 Reads json in from file
 */
@@ -71,7 +137,10 @@ a3_JSONValue a3readJSONFromFile(const char* path)
     char* buf;
     a3ReadFileIntoMemory(path, &buf);
 
-    return a3readJSONFromString(buf);
+
+    a3_JSONValue val = a3readJSONFromString(buf);
+    free(buf);
+    return val;
 }
 
 void json_lex_next(a3_JSONLexState* state);
