@@ -39,6 +39,29 @@
 #define A3_DEMO_ANIM_DIR	"../../../../resource/animdata/"
 //-----------------------------------------------------------------------------
 
+void load_hierarchy(a3_DemoMode1_Animation* demoMode, a3_Hierarchy* hierarchy, a3_GLFTFile *glft, a3ui32 src_index, a3ui32* dst_index, a3i32 parentIndex) {
+
+	a3_GLFT_Node node = glft->nodes[src_index];
+	a3hierarchySetNode(hierarchy, *dst_index, parentIndex, node.name);
+	a3ui32 index = *dst_index;
+	a3_SpatialPose* spatialPose = 0;
+
+	spatialPose = demoMode->hierarchyPoseGroup_skel->posePool[0].spatialPose + index;
+	a3vec3 translation = node.translation;
+	//a3vec4 rotation = node.rotation;
+	a3vec3 scale = node.scale;
+	a3spatialPoseReset(spatialPose);
+	a3spatialPoseSetTranslation(spatialPose, translation.x, translation.y, translation.z);
+
+	a3spatialPoseSetRotation(spatialPose, 0, 0, 0);
+	a3spatialPoseSetScale(spatialPose, scale.x, scale.y, scale.z);
+
+	for (a3ui32 i = 0; i < node.children_count; i++) {
+		*dst_index += 1;
+		load_hierarchy(demoMode, hierarchy, glft, node.children[i], dst_index, index);
+	}
+
+}
 
 // utility to load animation
 void a3animation_init_animation(a3_DemoState const* demoState, a3_DemoMode1_Animation* demoMode)
@@ -71,12 +94,17 @@ void a3animation_init_animation(a3_DemoState const* demoState, a3_DemoMode1_Anim
 	{
 		// manually set up a skeleton
 		// first is the hierarchy: the general non-spatial relationship between bones
-		const a3ui32 jointCount = 32;
+		//const a3ui32 jointCount = 32;
 
 		// indices of joints, their parents and branching joints
 		a3ui32 jointIndex = 0;
 		a3i32 jointParentIndex = -1;
 		a3i32 rootJointIndex, upperSpineJointIndex, clavicleJointIndex, pelvisJointIndex;
+
+
+		a3_GLFTFile glft;
+		a3GLFTRead(&glft, A3_DEMO_ANIM_DIR, "RiggedFigure.gltf");
+		const a3ui32 jointCount = glft.nodes_count;
 
 		// initialize hierarchy
 		hierarchy = demoMode->hierarchy_skel;
@@ -143,49 +171,9 @@ void a3animation_init_animation(a3_DemoState const* demoState, a3_DemoMode1_Anim
     p = 0;
 	// this is terrible
 	// go through the list, if there is a node with a parent lower on the list, swap them then fix the indices on the whole list
+	a3ui32 dst_index = 0;
+	load_hierarchy(demoMode, hierarchy, &glft, 2, &dst_index, -1);
 
-	for (a3ui32 i = 0; i < glft.nodes_count; i++) {
-		a3ui32 childIndex = i;
-		a3_GLFT_Node* child = glft.nodes + i;
-		a3i32 parentIndex = child->parent;
-
-		if (parentIndex != -1 && (a3ui32)parentIndex > childIndex) {
-			a3_GLFT_Node tmp = *child;
-			tmp.index = parentIndex;
-
-			*child = glft.nodes[parentIndex];
-			child->index = childIndex;
-
-			glft.nodes[parentIndex] = tmp;
-
-			for (a3ui32 j = 0; j < hierarchy->numNodes; j++) {
-				if (glft.nodes[j].parent == childIndex) {
-					glft.nodes[j].parent = parentIndex;
-				}
-				else if (glft.nodes[j].parent == parentIndex) {
-					glft.nodes[j].parent = childIndex;
-				}
-			}
-			i = 0;
-		}
-	}
-
-	for (a3ui32 i = 0; i < glft.nodes_count; i++) {
-		a3_GLFT_Node node = glft.nodes[i];
-
-		a3hierarchySetNode(hierarchy, i, node.parent, node.name);
-
-		spatialPose = hierarchyPoseGroup->posePool[p].spatialPose + i;
-
-		a3vec3 translation = node.translation;
-		//a3vec4 rotation = node.rotation;
-		a3vec3 scale = node.scale;
-		a3spatialPoseReset(spatialPose);
-		a3spatialPoseSetTranslation(spatialPose, translation.x, translation.y, translation.z);
-		
-		a3spatialPoseSetRotation(spatialPose, 0, 0, 0);
-		a3spatialPoseSetScale(spatialPose, scale.x, scale.y, scale.z);
-	}
 	/*
 	a3i32 joint_index_map[32];
 	for (a3ui32 i = 0; i < glft.nodes_count; i++) joint_index_map[i] = -1;

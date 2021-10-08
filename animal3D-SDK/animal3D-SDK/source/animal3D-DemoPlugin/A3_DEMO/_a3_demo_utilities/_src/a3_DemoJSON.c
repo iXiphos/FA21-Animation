@@ -252,7 +252,7 @@ a3_JSONValue json_parse_object(a3_JSONParseState* state) {
 
 a3_JSONValue json_parse_array(a3_JSONParseState* state) {
 
-    a3_JSONValue tmp_arr[200];
+    a3_JSONValue tmp_arr[500];
     a3ui32 index = 0;
 
     // empty array
@@ -276,7 +276,7 @@ a3_JSONValue json_parse_array(a3_JSONParseState* state) {
         
         if (next != ',') 
             printf("error: unexpected character in array\n");
-        if (index >= 200) {
+        if (index >= 500) {
             printf("error: too many items in array");
         }
     }
