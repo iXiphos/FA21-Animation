@@ -24,6 +24,7 @@ a3i32 a3GLFTRead(a3_GLFTFile* out_glft, const char* dirname, const char* filenam
 		printf("file missing nodes\n");
 	}
 
+
 	glft.nodes_count = json_nodes.length;
 	a3AllocArray(glft.nodes, glft.nodes_count, a3_GLFT_Node);
 
@@ -68,13 +69,33 @@ a3i32 a3GLFTRead(a3_GLFTFile* out_glft, const char* dirname, const char* filenam
 
 
 	// start anim loading
+	a3ui32 filename_size = strlen(filename);
+	const char* uri;
+	a3ui32 byteLength;
 
+	a3_JSONValue json_buffer;
+	if (a3JSONFindObjValue(value, "buffers", &json_buffer) && json_nodes.type == JSONTYPE_ARRAY) 
+	{
+		a3_JSONValue json_uri;
+		for (a3ui32 j = 0; j < json_buffer.length; j++)
+		{
+			if (a3JSONFindObjValue(json_buffer.values[j], "byteLength", &json_uri) && json_nodes.type == JSONTYPE_NUM)
+			{
+				byteLength = json_uri.num;
+			}
+			if (a3JSONFindObjValue(json_buffer.values[j], "uri", &json_uri) && json_nodes.type == JSONTYPE_ARRAY) 
+			{
+				uri = json_uri.str;
+			}
+		}
+	}
+	char* buffer_path = (char*)malloc(dirname_size + strlen(uri) + 1);
+	memcpy(buffer_path, dirname, dirname_size);
+	memcpy(buffer_path + dirname_size, filename, filename_size);
+	buffer_path[dirname_size + filename_size] = 0;
 
-
-
-
-
-
+	char** tempBuffer;
+	a3ReadFileIntoMemory(buffer_path, tempBuffer);
 
 
 
