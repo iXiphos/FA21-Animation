@@ -25,27 +25,16 @@ enum a3_JSONType {
 };
 
 
-struct a3_JSONArray {
-
-	a3ui32 length;
-	a3_JSONValue* values;
-
-};
-
-
-struct a3_JSONObject {
-	a3ui32 length;
-	char** keys;
-	a3_JSONValue* values;
-};
-
 
 struct a3_JSONValue {
 	a3_JSONType type;
 
+	a3ui32 length;
 	union {
-		a3_JSONObject obj;
-		a3_JSONArray arr;
+		struct {
+			a3_JSONValue* values; // arrays have values
+			char** keys; // objects have values and keys
+		};
 		double num;
 		const char* str;
 	};

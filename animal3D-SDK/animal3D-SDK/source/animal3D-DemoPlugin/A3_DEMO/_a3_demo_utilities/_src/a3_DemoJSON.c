@@ -13,9 +13,9 @@ a3boolean a3JSONFindObjValue(a3_JSONValue obj, const char* key, a3_JSONValue* va
     if (obj.type != JSONTYPE_OBJ) {
         return false;
     }
-    for (a3ui32 i = 0; i < obj.obj.length; i++) {
-        if (strcmp(key, obj.obj.keys[i]) == 0) {
-            *val_out = obj.obj.values[i];
+    for (a3ui32 i = 0; i < obj.length; i++) {
+        if (strcmp(key, obj.keys[i]) == 0) {
+            *val_out = obj.values[i];
             return true;
         }
     }
@@ -240,9 +240,7 @@ a3_JSONValue json_parse_object(a3_JSONParseState* state) {
     memcpy(keys, tmp_keys, keys_size);
     memcpy(values, tmp_values, values_size);
 
-    a3_JSONObject obj = (a3_JSONObject) { .length=index, .keys=keys, .values=values};
-
-    return (a3_JSONValue) { .type = JSONTYPE_OBJ, .obj=obj };
+    return (a3_JSONValue) { .type = JSONTYPE_OBJ, .length = index, .values=values, .keys=keys };
 }
 
 a3_JSONValue json_parse_array(a3_JSONParseState* state) {
@@ -278,11 +276,11 @@ a3_JSONValue json_parse_array(a3_JSONParseState* state) {
 
     
 
-    a3_JSONValue* buf = (a3_JSONValue*)malloc(index * sizeof(a3_JSONValue));
-    memcpy(buf, tmp_arr, index * sizeof(a3_JSONValue));
+    a3_JSONValue* values = (a3_JSONValue*)malloc(index * sizeof(a3_JSONValue));
+    memcpy(values, tmp_arr, index * sizeof(a3_JSONValue));
 
-    a3_JSONArray arr = (a3_JSONArray) {.values = buf, .length=index };
-    return (a3_JSONValue) { .type = JSONTYPE_ARRAY, .arr=arr };
+
+    return (a3_JSONValue) { .type = JSONTYPE_ARRAY, .length = index, .values=values };
 }
 
 a3_JSONValue json_parse_value(a3_JSONParseState* state) {
@@ -347,8 +345,8 @@ void print_json_structure(a3_JSONValue val, a3ui8 depth, a3boolean isobjval) {
         
         printf("[\n");
 
-        for (a3ui32 i = 0; i < val.arr.length; i++) {
-            print_json_structure(val.arr.values[i], depth+1, false);
+        for (a3ui32 i = 0; i < val.length; i++) {
+            print_json_structure(val.values[i], depth+1, false);
         }
         print_padding(depth);
         printf("]\n");
@@ -360,10 +358,10 @@ void print_json_structure(a3_JSONValue val, a3ui8 depth, a3boolean isobjval) {
 
         printf("{\n");
 
-        for (a3ui32 i = 0; i < val.obj.length; i++) {
+        for (a3ui32 i = 0; i < val.length; i++) {
             print_padding(depth+1);
-            printf("%s: ", val.obj.keys[i]);
-            print_json_structure(val.obj.values[i], depth+1, true);
+            printf("%s: ", val.keys[i]);
+            print_json_structure(val.values[i], depth+1, true);
         }
         print_padding(depth);
         printf("}\n");
