@@ -32,17 +32,19 @@
 
 #include "../a3_DemoState.h"
 #include "../animal3D-DemoPlugin/A3_DEMO/_a3_demo_utilities/a3_DemoGLFT.h"
+#include "../animal3D-DemoPlugin/A3_DEMO/_a3_demo_utilities/a3_DemoUtils.h"
 
 #include <stdio.h>
 
 #define A3_DEMO_ANIM_DIR	"../../../../resource/animdata/"
 //-----------------------------------------------------------------------------
 
+
 // utility to load animation
 void a3animation_init_animation(a3_DemoState const* demoState, a3_DemoMode1_Animation* demoMode)
 {
 	// general counters
-	a3ui32 j, p;
+	a3ui32  p;
 
 	// object pointers
 	a3_Hierarchy* hierarchy = 0;
@@ -132,9 +134,72 @@ void a3animation_init_animation(a3_DemoState const* demoState, a3_DemoMode1_Anim
 	hierarchyPoseGroup->hierarchy = 0;
 	a3hierarchyPoseGroupCreate(hierarchyPoseGroup, hierarchy, 4);
 
+
+
+
+	a3_GLFTFile glft;
+	a3GLFTRead(&glft, A3_DEMO_ANIM_DIR, "RiggedFigure.gltf");
+
+    p = 0;
+	// this is terrible
+	// go through the list, if there is a node with a parent lower on the list, swap them then fix the indices on the whole list
+
+	for (a3ui32 i = 0; i < glft.nodes_count; i++) {
+		a3ui32 childIndex = i;
+		a3_GLFT_Node* child = glft.nodes + i;
+		a3i32 parentIndex = child->parent;
+
+		if (parentIndex != -1 && (a3ui32)parentIndex > childIndex) {
+			a3_GLFT_Node tmp = *child;
+			tmp.index = parentIndex;
+
+			*child = glft.nodes[parentIndex];
+			child->index = childIndex;
+
+			glft.nodes[parentIndex] = tmp;
+
+			for (a3ui32 j = 0; j < hierarchy->numNodes; j++) {
+				if (glft.nodes[j].parent == childIndex) {
+					glft.nodes[j].parent = parentIndex;
+				}
+				else if (glft.nodes[j].parent == parentIndex) {
+					glft.nodes[j].parent = childIndex;
+				}
+			}
+			i = 0;
+		}
+	}
+
+	for (a3ui32 i = 0; i < glft.nodes_count; i++) {
+		a3_GLFT_Node node = glft.nodes[i];
+
+		a3hierarchySetNode(hierarchy, i, node.parent, node.name);
+
+		spatialPose = hierarchyPoseGroup->posePool[p].spatialPose + i;
+
+		a3vec3 translation = node.translation;
+		//a3vec4 rotation = node.rotation;
+		a3vec3 scale = node.scale;
+		a3spatialPoseReset(spatialPose);
+		a3spatialPoseSetTranslation(spatialPose, translation.x, translation.y, translation.z);
+		
+		a3spatialPoseSetRotation(spatialPose, 0, 0, 0);
+		a3spatialPoseSetScale(spatialPose, scale.x, scale.y, scale.z);
+	}
+	/*
+	a3i32 joint_index_map[32];
+	for (a3ui32 i = 0; i < glft.nodes_count; i++) joint_index_map[i] = -1;
+
+	a3_HierarchyNode sorted_nodes;
+	*/
+
+	
+
+
 	// define "bind pose" or "base pose" or the initial transformation 
 	//	description for each joint (not a literal transform)
 	p = 0;
+	/*
 	j = a3hierarchyGetNodeIndex(hierarchy, "skel:root");
 	spatialPose = hierarchyPoseGroup->posePool[p].spatialPose + j;
 	a3spatialPoseSetTranslation(spatialPose, 0.0f, 0.0f, +3.6f);
@@ -326,7 +391,7 @@ void a3animation_init_animation(a3_DemoState const* demoState, a3_DemoMode1_Anim
 	j = a3hierarchyGetNodeIndex(hierarchy, "skel:root");
 	spatialPose = hierarchyPoseGroup->posePool[p].spatialPose + j;
 	a3spatialPoseSetTranslation(spatialPose, +0.3f, +0.4f, -0.5f);	// shift whole figure by some vector
-
+	*/
 
 	// finally set up hierarchy states
 	hierarchyState = demoMode->hierarchyState_base;
@@ -357,16 +422,7 @@ void a3animation_init_animation(a3_DemoState const* demoState, a3_DemoMode1_Anim
 
 	a3clipControllerInit(demoMode->clipController, "first clip ctrl", demoMode->clipPool, 0);
 
-
-	a3_GLFTFile glft; 
-	a3GLFTRead(&glft, A3_DEMO_ANIM_DIR, "RiggedFigure.gltf");
-
-
-	//a3ui32 joint_count;
-	//a3ui32 joint_indices[50];
 	
-
-
 }
 
 

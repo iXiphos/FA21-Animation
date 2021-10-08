@@ -20,21 +20,37 @@ a3i32 a3GLFTRead(a3_GLFTFile* out_glft, const char* dirname, const char* filenam
 	a3_GLFTFile glft;
 
 	a3_JSONValue json_nodes;
-	if (a3JSONFindObjValue(value, "nodes", &json_nodes) && json_nodes.type == JSONTYPE_ARRAY) {
+	if (!a3JSONFindObjValue(value, "nodes", &json_nodes) || json_nodes.type != JSONTYPE_ARRAY) {
 		printf("file missing nodes\n");
 	}
 
-
+	/*
+	LOAD NODES
+	*/
 	glft.nodes_count = json_nodes.length;
 	a3AllocArray(glft.nodes, glft.nodes_count, a3_GLFT_Node);
+	memset(glft.nodes, 0, glft.nodes_count * sizeof(a3_GLFT_Node));
+
+	for (a3ui32 i = 0; i < glft.nodes_count; i++) {
+		glft.nodes[i].parent = -1;
+	}
 
 	for (a3ui32 i = 0; i < glft.nodes_count; i++) {
 		a3_GLFT_Node* node = glft.nodes + i;
 		a3_JSONValue json_node = json_nodes.values[i];
 		a3_JSONValue json_val;
+
+		node->index = i;
+
 		if (a3JSONFindObjValue(json_node, "children", &json_val) && json_val.type == JSONTYPE_ARRAY) {
 			a3AllocArray(node->children, json_val.length, a3ui32);
 			node->children_count = json_val.length;
+
+			for (a3ui32 j = 0; j < json_val.length; j++) {
+				a3ui32 childIndex = (a3ui32)json_val.values[j].num;
+				node->children[j] = childIndex;
+				glft.nodes[childIndex].parent = node->index;
+			}
 		}
 
 
@@ -45,8 +61,8 @@ a3i32 a3GLFTRead(a3_GLFTFile* out_glft, const char* dirname, const char* filenam
 			node->name[len] = 0;
 		}
 
-		node->matrix = a3mat4_identity;
-
+		//node->matrix = a3mat4_identity;
+		
 		if (a3JSONFindObjValue(json_node, "matrix", &json_val)) {
 			node->usesMatrix = 1;
 			for (a3ui8 i = 0; i < 16; i++) {
@@ -54,6 +70,11 @@ a3i32 a3GLFTRead(a3_GLFTFile* out_glft, const char* dirname, const char* filenam
 			}
 
 		}
+
+		node->translation = a3vec3_zero;
+		node->rotation = a3vec4_w;
+		node->scale = a3vec3_one;
+
 		
 		if (a3JSONFindObjValue(json_node, "translation", &json_val)) {
 			for (a3ui8 i = 0; i < 3; i++) {
@@ -61,6 +82,7 @@ a3i32 a3GLFTRead(a3_GLFTFile* out_glft, const char* dirname, const char* filenam
 			}
 		}
 
+		
 		if (a3JSONFindObjValue(json_node, "rotation", &json_val)) {
 			for (a3ui8 i = 0; i < 4; i++) {
 				(&node->rotation.x)[i] = (float)json_val.values[i].num;
@@ -72,13 +94,51 @@ a3i32 a3GLFTRead(a3_GLFTFile* out_glft, const char* dirname, const char* filenam
 				(&node->scale.x)[i] = (float)json_val.values[i].num;
 			}
 		}
-
-
-
 	}
 
 
+	/*
+		LOAD SKINS
+	*/
 
+	a3_JSONValue json_skins;
+	if (a3JSONFindObjValue(value, "skins", &json_skins) && json_skins.type == JSONTYPE_ARRAY) {
+		
+		glft.skins_count = json_skins.length;
+		a3AllocArray(glft.skins, glft.skins_count, a3_GLFT_Skin);
+
+		for (a3ui32 i = 0; i < glft.skins_count; i++) {
+
+			a3_JSONValue json_val;
+			a3_GLFT_Skin* skin = glft.skins + i;
+
+			if (a3JSONFindObjValue(json_skins.values[i], "name", &json_val)) {
+				a3ui32 len = json_val.length;
+				if (len > 100) len = 100;
+				memcpy(skin->name, json_val.str, len);
+			}
+
+			if (a3JSONFindObjValue(json_skins.values[i], "joints", &json_val)) {
+				skin->joints_count = json_val.length;
+				a3AllocArray(skin->joints, skin->joints_count, a3ui32);
+
+				for (a3ui32 j = 0; j < skin->joints_count; j++) {
+					skin->joints[j] = (a3ui32)json_val.values[i].num;
+				}
+
+			}
+			
+			if (a3JSONFindObjValue(json_skins.values[i], "skeleton", &json_val)) {
+				skin->skeleton = (a3ui32)json_val.num;
+			}
+
+		}
+
+
+	}
+	else {
+		printf("couldnt find skins\n");
+	}
 
 
 
@@ -106,7 +166,7 @@ a3i32 a3GLFTRead(a3_GLFTFile* out_glft, const char* dirname, const char* filenam
 
 
 	// start anim loading
-	a3ui32 filename_size = strlen(filename);
+
 	const char* uri;
 	a3ui32 byteLength;
 
@@ -118,7 +178,7 @@ a3i32 a3GLFTRead(a3_GLFTFile* out_glft, const char* dirname, const char* filenam
 		{
 			if (a3JSONFindObjValue(json_buffer.values[j], "byteLength", &json_uri) && json_nodes.type == JSONTYPE_NUM)
 			{
-				byteLength = json_uri.num;
+				byteLength = (a3ui32)json_uri.num;
 			}
 			if (a3JSONFindObjValue(json_buffer.values[j], "uri", &json_uri) && json_nodes.type == JSONTYPE_ARRAY) 
 			{
@@ -131,8 +191,8 @@ a3i32 a3GLFTRead(a3_GLFTFile* out_glft, const char* dirname, const char* filenam
 	memcpy(buffer_path + dirname_size, filename, filename_size);
 	buffer_path[dirname_size + filename_size] = 0;
 
-	char** tempBuffer;
-	a3ReadFileIntoMemory(buffer_path, tempBuffer);
+	char* tempBuffer;
+	a3ReadFileIntoMemory(buffer_path, &tempBuffer);
 
 
 	*out_glft = glft;

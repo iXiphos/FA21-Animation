@@ -36,9 +36,9 @@ struct a3_GLFT_Accessor {
 struct a3_GLFT_Skin {
 	
 	a3ui32 joints_count;
-	a3ui32* joint_indices;
-	a3ui32 invBindMat_index;
-	a3ui32 skeleton_index;
+	a3ui32* joints;
+	a3ui32 invBindMat;
+	a3ui32 skeleton;
 	char name[GLFT_NAME_MAX_SIZE];
 };
 
@@ -46,6 +46,9 @@ struct a3_GLFT_Node {
 	char name[GLFT_NAME_MAX_SIZE];
 	a3ui32* children;
 	a3ui32 children_count;
+	a3ui32 index;
+	a3ui32 depth;
+	a3ui32 parent;
 
 	a3ui8 usesMatrix;
 	union {
