@@ -245,6 +245,7 @@ a3i32 a3clipGetKeyframeFromTime(a3_Clip* clip, a3real time, a3real* keyframeTime
 a3i32 a3clipPoolLoadFromFile(a3_ClipPool* clipPool, a3_KeyframePool* keyPool, const char* path);
 //-----------------------------------------------------------------------------
 
+
 struct a3_Sampler
 {
 	a3_Sample input; // time accessor for start
@@ -254,7 +255,7 @@ struct a3_Sampler
 
 struct a3_channel
 {
-	a3_Sampler* sampler; // Pointer to get sample
+	a3ui32 samplerIndex; // Pointer to get sample
 	a3ui32 index; // Node to move
 	a3_path targetPath; // Properity to change in node
 };
@@ -270,15 +271,17 @@ struct a3_ChannelPool
 	a3ui32 capacity;
 };
 
-// allocate keyframe pool
+// allocate channel pool
 a3i32 a3channelPoolCreate(a3_ChannelPool* channelPool_out, const a3ui32 capacity);
 
-// release keyframe pool
+// release channel pool
 a3i32 a3channelPoolRelease(a3_ChannelPool* channelPool);
 
-// initialize keyframe
-a3i32 a3channelInit(a3_channel* channel_out, const a3real value_start, const a3real time_start, const a3real value_end, const a3real time_end, const a3_path path, const a3_interpolationType interType);
+// initialize channel
+a3i32 a3channelInit(a3_channel* channel_out, const a3ui32 sampleIndex, const a3_path path);
 
+// initialize sampler
+a3i32 a3samplerInit(a3_Sampler* sampler_out, const a3real value_start, const a3real time_start, const a3real value_end, const a3real time_end, const a3_interpolationType interType);
 
 
 #ifdef __cplusplus

@@ -53,13 +53,20 @@ a3i32 a3channelPoolRelease(a3_ChannelPool* channelPool)
 	return 1;
 }
 
-a3i32 a3channelInit(a3_channel* channel_out, const a3real value_start, const a3real time_start, const a3real value_end, const a3real time_end, const a3_path path, const a3_interpolationType interType)
+a3i32 a3channelInit(a3_channel* channel_out, const a3ui32 sampleIndex, const a3_path path)
 {
-	channel_out->sampler->input.value = value_start;
-	channel_out->sampler->input.time = time_start;
-	channel_out->sampler->output.value = value_end;
-	channel_out->sampler->output.time = time_end;
+	channel_out->samplerIndex = sampleIndex;
 	channel_out->targetPath = path;
+	return 1;
+}
+
+a3i32 a3samplerInit(a3_Sampler* sampler_out, const a3real value_start, const a3real time_start, const a3real value_end, const a3real time_end, const a3_interpolationType interType)
+{
+	sampler_out->input.value = value_start;
+	sampler_out->input.time = time_start;
+	sampler_out->output.value = value_end;
+	sampler_out->output.time = time_end;
+	sampler_out->interpType = interType;
 	return 1;
 }
 
