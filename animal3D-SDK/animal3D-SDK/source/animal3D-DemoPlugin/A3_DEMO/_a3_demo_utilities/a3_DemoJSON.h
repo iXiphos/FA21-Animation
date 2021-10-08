@@ -28,7 +28,8 @@ enum a3_JSONType {
 
 struct a3_JSONValue {
 	a3_JSONType type;
-
+	
+	// str, objects and arrays have lengths
 	a3ui32 length;
 	union {
 		struct {
@@ -50,7 +51,7 @@ a3_JSONValue a3readJSONFromFile(const char* path);
 
 a3boolean a3JSONFindObjValue(a3_JSONValue obj, const char* key, a3_JSONValue* obj_out);
 a3boolean a3JSONGetNum(a3_JSONValue value, double* num_out);
-a3boolean a3JSONGetStr(a3_JSONValue value, const char** str_out);
+a3boolean a3JSONGetStr(a3_JSONValue value, const char** str_out, a3ui32* strlen_out);
 a3boolean a3JSONGetBoolean(a3_JSONValue value, a3boolean* bool_out);
 
 

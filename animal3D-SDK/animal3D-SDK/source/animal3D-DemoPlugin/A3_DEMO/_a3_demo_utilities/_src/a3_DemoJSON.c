@@ -31,9 +31,11 @@ a3boolean a3JSONGetNum(a3_JSONValue value, double* num_out) {
     return false;
 }
 
-a3boolean a3JSONGetStr(a3_JSONValue value, const char** str_out) {
+a3boolean a3JSONGetStr(a3_JSONValue value, const char** str_out, a3ui32* strlen_out) {
     if (value.type == JSONTYPE_STR) {
         *str_out = value.str;
+        if (strlen_out != NULL)
+            *strlen_out = value.length;
         return true;
     }
     return false;
@@ -71,6 +73,7 @@ typedef enum a3_JSONTokenType a3_JSONTokenType;
 typedef struct a3_JSONParseState a3_JSONParseState;
 typedef struct a3_JSONLexState a3_JSONLexState;
 typedef struct a3_JSONOutput a3_JSONOutput;
+typedef struct a3_JSONTokenStr a3_JSONTokenStr;
 
 enum a3_JSONTokenType {
     A3_JSONTOK_NONE,
@@ -85,9 +88,13 @@ enum a3_JSONTokenType {
 struct a3_JSONToken {
     a3_JSONTokenType type;
 
+   
     union {
         double token_num;
-        const char* token_string;
+        struct {
+            const char* token_string;
+            a3ui32 string_len;
+        };
         char token_char;
     };
 };
@@ -314,7 +321,7 @@ a3_JSONValue json_parse_value(a3_JSONParseState* state) {
         return (a3_JSONValue) { .type = JSONTYPE_FALSE };
 
     if (tok.type == A3_JSONTOK_STRING)
-        return (a3_JSONValue) { .type = JSONTYPE_STR, .str= tok.token_string };
+        return (a3_JSONValue) { .type = JSONTYPE_STR, .str= tok.token_string, .length=tok.string_len };
    
     // error 
     return (a3_JSONValue) { .type = JSONTYPE_NONE };
@@ -490,7 +497,7 @@ void json_lex_append_str(a3_JSONLexState* state, char* str_start, a3ui32 size) {
     char* str = malloc(size);
     memcpy(str, str_start, size);
 
-    json_lex_append(state, (a3_JSONToken) { .type = A3_JSONTOK_STRING, .token_string = str });
+    json_lex_append(state, (a3_JSONToken) { .type = A3_JSONTOK_STRING, .token_string = str, .string_len=size });
 }
 
 void json_lex_append_num(a3_JSONLexState* state, double num) {
