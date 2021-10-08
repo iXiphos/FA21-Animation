@@ -39,6 +39,7 @@ extern "C"
 #else	// !__cplusplus
 typedef struct a3_Sample					a3_Sample;
 typedef struct a3_Sampler					a3_Sampler;
+typedef struct a3_Accessors					a3_Accessors;
 typedef struct a3_channel					a3_channel;
 typedef struct a3_Keyframe					a3_Keyframe;
 typedef struct a3_KeyframePool				a3_KeyframePool;
@@ -49,6 +50,7 @@ typedef struct a3_ClipTransition			a3_ClipTransition;
 typedef enum a3_clipTransitionType         a3_clipTransitionType;
 typedef enum a3_interpolationType			a3_interpolationType;
 typedef enum a3_path						a3_path;
+typedef enum a3_accessorTypes				a3_accessorTypes;
 #endif	// __cplusplus
 
 
@@ -146,6 +148,9 @@ struct a3_KeyframePool
 {
 	// array of keyframes, DO NOT STORE POINTERS TO CONTENTS
 	a3_Keyframe *keyframes;
+
+	// array of accessors
+	a3_Accessors* accessors;
 
 	// number of keyframes
 	a3ui32 count;
@@ -262,11 +267,42 @@ struct a3_channel
 	a3_path targetPath; // Properity to change in node
 };
 
+enum a3_accessorTypes 
+{
+	vec3,
+	vec4,
+	scalar,
+};
+
+struct a3_Accessors 
+{
+	a3ui32 bufferView;
+	a3ui32 byteOffset;
+
+	a3ui32 componentType;
+	a3ui32 count;
+
+	enum a3_accessorTypes accessorType;
+	union {
+		float fmin;
+		float fmax;
+
+		a3vec3 vec3min;
+		a3vec3 vec3max;
+
+		a3vec4 vec4min;
+		a3vec4 vec4max;
+	};
+
+};
+
 struct a3_ChannelPool
 {
 	a3_channel* channels;
 
 	a3_Sampler* samples;
+
+	a3_Accessors* accessors;
 
 	a3ui32 count;
 
@@ -285,6 +321,10 @@ a3i32 a3channelInit(a3_channel* channel_out, const a3ui32 sampleIndex, const a3_
 // initialize sampler
 a3i32 a3samplerInit(a3_Sampler* sampler_out, const a3real value_start, const a3real time_start, const a3real value_end, const a3real time_end, const a3_interpolationType interType);
 
+// initialize accessors
+a3i32 a3accessorsInitFloat(a3_Accessors* accessors_out, const a3ui32 bufferView, const a3ui32 byteOffset, const a3ui32 componentType, const a3ui32 count, const a3f32 min, const a3f32 max);
+a3i32 a3accessorsInitVec3(a3_Accessors* accessors_out, const a3ui32 bufferView, const a3ui32 byteOffset, const a3ui32 componentType, const a3ui32 count, const a3vec3 min, a3vec3 max);
+a3i32 a3accessorsInitVec4(a3_Accessors* accessors_out, const a3ui32 bufferView, const a3ui32 byteOffset, const a3ui32 componentType, const a3ui32 count, const a3vec4 min, a3vec4 max);
 
 #ifdef __cplusplus
 }
