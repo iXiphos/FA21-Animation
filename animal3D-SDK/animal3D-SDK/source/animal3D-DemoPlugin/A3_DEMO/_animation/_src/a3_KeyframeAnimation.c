@@ -95,6 +95,21 @@ a3i32 a3keyframeInit(a3_Keyframe* keyframe_out, const a3real duration, const a3r
 	return 1;
 }
 
+a3i32 a3keyFramePoolFromChannelPool(a3_KeyframePool* keyframePool_out, const a3_ChannelPool* channelPool_in)
+{
+	a3keyframePoolCreate(keyframePool_out, channelPool_in->capacity);
+	a3f32 duration;
+	a3_Sampler* tempSamp = channelPool_in->samples;
+	a3_channel* tempChannel = channelPool_in->channels;
+	for (a3ui32 i = 0; i < channelPool_in->capacity; i++) 
+	{
+		duration = tempSamp[tempChannel[i].samplerIndex].output.time - tempSamp[tempChannel[i].samplerIndex].input.time;
+		a3keyframeInit(keyframePool_out->keyframes + i, duration, (float)tempSamp[tempChannel[i].samplerIndex].output.value);
+	}
+
+	return 1;
+}
+
 
 a3i32 a3keyframePoolNewFrames(a3_KeyframePool* keyframePool, const a3ui32 count) {
 	// if there is not enough room in the pool
