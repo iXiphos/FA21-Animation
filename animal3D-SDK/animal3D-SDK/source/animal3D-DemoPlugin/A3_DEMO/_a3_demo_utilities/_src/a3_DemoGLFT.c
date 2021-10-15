@@ -5,6 +5,27 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+void a3GLTF_ReadName(a3_JSONValue object, char dst[100]) {
+	a3_JSONValue json_name;
+	if (a3JSONFindObjValue(object, "name", &json_name) != 1) {
+		printf("error: name missing"); return;
+	}
+
+	char* src;
+	a3ui32 len;
+	if (a3JSONGetStr(json_name, &src, &len) != 1) {
+		printf("error: name was not of type string"); return;
+	}
+
+	if (len > 100) {
+		len = 100;
+		printf("warning: name %s was truncated\n", src);
+	}
+	memcpy(dst, src, len);
+	dst[len] = 0;
+	
+}
+
 a3i32 a3GLFTRead(a3_GLFTFile* out_glft, const char* dirname, const char* filename) {
 
 	a3ui32 dirname_size = (a3ui32)strlen(dirname);
@@ -53,13 +74,7 @@ a3i32 a3GLFTRead(a3_GLFTFile* out_glft, const char* dirname, const char* filenam
 			}
 		}
 
-
-		if (a3JSONFindObjValue(json_node, "name", &json_val)) {
-			a3ui32 len = json_val.length;
-			if (len > 100) len = 100;
-			memcpy(node->name, json_val.str, len);
-			node->name[len] = 0;
-		}
+		a3GLTF_ReadName(json_node, node->name);
 
 		//node->matrix = a3mat4_identity;
 		
@@ -112,11 +127,8 @@ a3i32 a3GLFTRead(a3_GLFTFile* out_glft, const char* dirname, const char* filenam
 			a3_JSONValue json_val;
 			a3_GLFT_Skin* skin = glft.skins + i;
 
-			if (a3JSONFindObjValue(json_skins.values[i], "name", &json_val)) {
-				a3ui32 len = json_val.length;
-				if (len > 100) len = 100;
-				memcpy(skin->name, json_val.str, len);
-			}
+
+			a3GLTF_ReadName(json_skins.values[i], skin->name);
 
 			if (a3JSONFindObjValue(json_skins.values[i], "joints", &json_val)) {
 				skin->joints_count = json_val.length;
@@ -166,7 +178,7 @@ a3i32 a3GLFTRead(a3_GLFTFile* out_glft, const char* dirname, const char* filenam
 
 
 	// start anim loading
-
+	/*
 	const char* uri;
 	a3ui32 byteLength;
 
@@ -193,7 +205,7 @@ a3i32 a3GLFTRead(a3_GLFTFile* out_glft, const char* dirname, const char* filenam
 
 	char* tempBuffer;
 	a3ReadFileIntoMemory(buffer_path, &tempBuffer);
-
+	*/
 
 	*out_glft = glft;
 	return -1;

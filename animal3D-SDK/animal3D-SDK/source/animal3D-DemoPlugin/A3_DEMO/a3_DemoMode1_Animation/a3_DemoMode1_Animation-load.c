@@ -101,11 +101,12 @@ void a3animation_init_animation(a3_DemoState const* demoState, a3_DemoMode1_Anim
 		a3i32 jointParentIndex = -1;
 		a3i32 rootJointIndex, upperSpineJointIndex, clavicleJointIndex, pelvisJointIndex;
 
-
+		/*
 		a3_GLFTFile glft;
-		a3GLFTRead(&glft, A3_DEMO_ANIM_DIR, "RiggedFigure.gltf");
-		const a3ui32 jointCount = glft.nodes_count;
-
+		a3GLFTRead(&glft, A3_DEMO_ANIM_DIR, "test.gltf");
+		*/
+		const a3ui32 jointCount = 3;
+		
 		// initialize hierarchy
 		hierarchy = demoMode->hierarchy_skel;
 		a3hierarchyCreate(hierarchy, jointCount, 0);
@@ -164,10 +165,10 @@ void a3animation_init_animation(a3_DemoState const* demoState, a3_DemoMode1_Anim
 
 
 
-
+	
 	a3_GLFTFile glft;
-	a3GLFTRead(&glft, A3_DEMO_ANIM_DIR, "RiggedFigure.gltf");
-
+	a3GLFTRead(&glft, A3_DEMO_ANIM_DIR, "test.gltf");
+	
     p = 0;
 	// this is terrible
 	// go through the list, if there is a node with a parent lower on the list, swap them then fix the indices on the whole list
