@@ -37,7 +37,39 @@ extern "C"
 #else	// !__cplusplus
 
 #endif	// __cplusplus
-	
+
+//Blend operation function
+/*
+All blendable values in spatial pose is a a4vec4
+example in load:
+a3_SpatialPoseBlendOpLerp testLerp;
+testLerp.opOrientation = a3vec4Nlerp;
+
+resultAngles = testLerp.opOrientation(args)
+
+*/
+
+typedef a3vec4 (*a3_BlendOpLerp)(a3vec4 const v0, a3vec4 const v1, a3real const u);
+typedef struct a3SpatialposeBlendOpLerp {
+	a3_BlendOpLerp opOrientation, opAngles, opScale, opTranslation;
+} a3SpatialposeBlendOpLerp;
+
+inline a3vec4 a3vec4Lerp(a3vec4 const v0, a3vec4 const v1, a3real const u) {
+	//implement linear interpolation 
+	return v0;
+}
+inline a3vec4 a3vec4SLerp(a3vec4 const v0, a3vec4 const v1, a3real const u) {
+	//implement spherical interpolation 
+	return v0;
+}
+inline a3vec4 a3vec4NLerp(a3vec4 const v0, a3vec4 const v1, a3real const u) {
+	//implement normal interpolation 
+	return v0;
+}
+inline a3vec4 a3vec4LogLerp(a3vec4 const v0, a3vec4 const v1, a3real const u) {
+	//implement log interpolation 
+	return v0;
+}
 
 //-----------------------------------------------------------------------------
 
