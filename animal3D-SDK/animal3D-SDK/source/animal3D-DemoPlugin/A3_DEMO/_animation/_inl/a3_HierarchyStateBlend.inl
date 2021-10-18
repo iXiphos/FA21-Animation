@@ -1,3 +1,4 @@
+#include "..\a3_HierarchyStateBlend.h"
 /*
 	Copyright 2011-2020 Daniel S. Buckstein
 
@@ -34,8 +35,10 @@
 inline a3_SpatialPose* a3spatialPoseOpIdentity(a3_SpatialPose* pose_out)
 {
 	pose_out->transform = a3mat4_identity;
-	// ...
-
+	pose_out->translation = a3vec4_zero;
+	pose_out->angles = a3vec4_zero;
+	pose_out->orientation = a3vec4_zero;
+	pose_out->scale = a3vec4_one;
 	// done
 	return pose_out;
 }
@@ -43,8 +46,74 @@ inline a3_SpatialPose* a3spatialPoseOpIdentity(a3_SpatialPose* pose_out)
 // pointer-based LERP operation for single spatial pose
 inline a3_SpatialPose* a3spatialPoseOpLERP(a3_SpatialPose* pose_out, a3_SpatialPose const* pose0, a3_SpatialPose const* pose1, a3real const u)
 {
+	/* TO-DO: Make sure these are all the correct calculations*/
+	if (pose0 && pose1)
+	{
+		a3real3NLerp(pose_out->angles.v, pose0->angles.v, pose1->angles.v, u);
 
+		/**** TO-DO: Update this to be exponential lerp instead of regular lerp   ****/
+		a3real3Lerp(pose_out->scale.v, pose0->scale.v, pose1->scale.v, u);
+
+		a3real3Lerp(pose_out->translation.v, pose0->translation.v, pose1->translation.v, u);
+
+		a3real3Lerp(pose_out->transform.v, pose0->transform.v, pose1->transform.v, u);
+
+		return 1;
+	}
 	// done
+	return pose_out;
+}
+
+
+/*Equivalent to a constructor, this operation returns/sets a pose constructed using the components provided.
+Formats: constructr,s,t( ); poser,s,t( ).
+Return: new pose with validated control values as components.
+Controls (3): vectors representing rotation angles, scale and translation.*/
+inline a3_SpatialPose* a3spatialPoseOpConstruct(a3_SpatialPose* pose_out, a3mat4 transform, a3vec4 orientation, a3vec4 angles, a3vec4 scale, a3vec4 translation)
+{
+	pose_out->angles = angles;
+	pose_out->orientation = orientation;
+	pose_out->scale = scale;
+	pose_out->transform = transform;
+	pose_out->translation = translation;
+	return pose_out;
+}
+
+/*Equivalent to unary plus/positive (constant) or the assignment operator (copy), this operation simply returns/sets the unchanged control pose.  Note: These can be the same operation or broken into two, depending on the language (C/C++) and/or how you arrange the function parameters.
+Formats: constantP( ); copyP( ); plusP( ).
+Return: control pose.
+Controls (1): spatial pose.
+Kinda Confused on how this one works
+*/
+inline a3_SpatialPose* a3spatialPoseOpCopy(a3_SpatialPose* pose_out, a3_SpatialPose const* pose)
+{
+	a3spatialPoseCopy(pose_out, pose);
+	return pose_out;
+}
+
+
+/*Equivalent to unary minus/negative, this operation calculates the opposite/inverse pose description that "undoes" the control pose.  Note that this may not be a literal negation as each component may follow different rules for inversion.
+Formats: negateP( ); invertP( ); minusP( ).
+Return: inverted/negated control pose.
+Controls (1): spatial pose.*/
+inline a3_SpatialPose* a3spatialPoseOpInvert(a3_SpatialPose* pose_out, a3_SpatialPose const* pose)
+{
+	//I think this is right but I could be wrong
+	a3real4MulS(pose->angles.v, -1);
+	pose_out->angles = pose->angles;
+
+	a3real4MulS(pose->scale.v, -1);
+	pose_out->scale = pose->scale;
+
+	a3real4x4MulS(pose->transform.v, -1);
+	pose_out->transform = pose->transform;
+
+	return pose_out;
+}
+
+inline a3_SpatialPose* a3spatialPoseOpConcat(a3_SpatialPose* pose_out, a3_SpatialPose const* pose0, a3_SpatialPose const* pose1)
+{
+	a3spatialPoseConcat(pose_out, pose0, pose1);
 	return pose_out;
 }
 
@@ -52,9 +121,16 @@ inline a3_SpatialPose* a3spatialPoseOpLERP(a3_SpatialPose* pose_out, a3_SpatialP
 //-----------------------------------------------------------------------------
 
 // data-based reset/identity
+/*
+	a3mat4 transform;
+	a3vec4 orientation;
+	a3vec4 angles;
+	a3vec4 scale;
+	a3vec4 translation;
+*/
 inline a3_SpatialPose a3spatialPoseDOpIdentity()
 {
-	a3_SpatialPose const result = { a3mat4_identity /*, ...*/ };
+	a3_SpatialPose const result = { a3mat4_identity, a3vec4_zero, a3vec4_zero, a3vec4_one, a3vec4_zero};
 	return result;
 }
 
@@ -74,7 +150,10 @@ inline a3_SpatialPose a3spatialPoseDOpLERP(a3_SpatialPose const pose0, a3_Spatia
 // pointer-based reset/identity operation for hierarchical pose
 inline a3_HierarchyPose* a3hierarchyPoseOpIdentity(a3_HierarchyPose* pose_out)
 {
-
+	pose_out->pose->orientation = a3vec4_w;
+	pose_out->pose->angles = a3vec4_zero;
+	pose_out->pose->scale = a3vec4_one;
+	pose_out->pose->translation = a3vec4_w;
 	// done
 	return pose_out;
 }
@@ -82,7 +161,7 @@ inline a3_HierarchyPose* a3hierarchyPoseOpIdentity(a3_HierarchyPose* pose_out)
 // pointer-based LERP operation for hierarchical pose
 inline a3_HierarchyPose* a3hierarchyPoseOpLERP(a3_HierarchyPose* pose_out, a3_HierarchyPose const* pose0, a3_HierarchyPose const* pose1, a3real const u)
 {
-
+	
 	// done
 	return pose_out;
 }
