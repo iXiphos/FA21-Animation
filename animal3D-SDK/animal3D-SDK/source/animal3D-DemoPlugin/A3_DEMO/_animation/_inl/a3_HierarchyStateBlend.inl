@@ -117,6 +117,38 @@ inline a3_SpatialPose* a3spatialPoseOpConcat(a3_SpatialPose* pose_out, a3_Spatia
 	return pose_out;
 }
 
+inline a3_SpatialPose* a3spatialPoseOpNearest(a3_SpatialPose* pose_out, a3_SpatialPose const* pose0, a3_SpatialPose const* pose1, a3real const u)
+{
+
+	if (u < 0.5f) 
+	{
+		pose_out = pose0;
+	}
+	else if (u >= 0.5f) 
+	{
+		pose_out = pose1;
+	}
+
+	return pose_out;
+}
+
+inline a3_SpatialPose* a3spatialPoseOpCubic(a3_SpatialPose* pose_out, a3_SpatialPose const* pose0, a3_SpatialPose const* pose1, a3_SpatialPose const* pose2, a3_SpatialPose const* pose3, a3real const u)
+{
+	a3real mu2 = u * u;
+
+	//This is the formula, unsure if I have to do each part individually or if there is a better wa, I know for addition I can concat
+	//But unsure about subtraction
+	a3_SpatialPose* a0 = y3 - y2 - y0 + y1;
+	a3_SpatialPose* a1 = y0 - y1 - a0;
+	a3_SpatialPose* a2 = y2 - y0;
+	a3_SpatialPose* a3 = y1;
+
+	pose_out = (a0 * u * mu2 + a1 * mu2 + a2 * u + a3);
+
+
+	return pose_out;
+}
+
 
 //-----------------------------------------------------------------------------
 
