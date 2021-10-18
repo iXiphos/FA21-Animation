@@ -56,6 +56,9 @@ typedef struct a3SpatialposeBlendOpLerp {
 
 inline a3vec4 a3vec4Lerp(a3vec4 const v0, a3vec4 const v1, a3real const u) {
 	//implement linear interpolation 
+	a3real3Sub(v1, v0);
+	a3real3MulS(v1, u);
+	a3real3Add(v0, v1);
 	return v0;
 }
 inline a3vec4 a3vec4SLerp(a3vec4 const v0, a3vec4 const v1, a3real const u) {
@@ -64,6 +67,10 @@ inline a3vec4 a3vec4SLerp(a3vec4 const v0, a3vec4 const v1, a3real const u) {
 }
 inline a3vec4 a3vec4NLerp(a3vec4 const v0, a3vec4 const v1, a3real const u) {
 	//implement normal interpolation 
+	a3real3Sub(v1, v0);
+	a3real3MulS(v1, u);
+	a3real3Add(v0, v1);
+	a3real3Normalize(v0);
 	return v0;
 }
 inline a3vec4 a3vec4LogLerp(a3vec4 const v0, a3vec4 const v1, a3real const u) {
