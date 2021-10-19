@@ -181,8 +181,14 @@ inline a3_SpatialPose* a3spatialPoseOpScale(a3_SpatialPose* pose_out, a3_Spatial
 
 inline a3_SpatialPose* a3spatialPoseOpTriangular(a3_SpatialPose* pose_out, a3_SpatialPose const* pose0, a3_SpatialPose const* pose1, a3_SpatialPose const* pose2, a3real const u1, a3real const u2)
 {
-	a3spatialPoseOpLERP(pose_out, pose0, pose1, u1);
-	a3spatialPoseOpLERP(pose_out, pose_out, pose2, u2);
+	a3real u0 = 1 - u1 - u2;
+	a3spatialPoseOpScale(pose0, pose0, u0);
+	a3spatialPoseOpScale(pose1, pose1, u1);
+	a3spatialPoseOpScale(pose2, pose2, u2);
+
+	a3spatialPoseOpConcat(pose_out, pose0, pose1);
+	a3spatialPoseOpConcat(pose_out, pose_out, pose2);
+
 	return pose_out;
 }
 
