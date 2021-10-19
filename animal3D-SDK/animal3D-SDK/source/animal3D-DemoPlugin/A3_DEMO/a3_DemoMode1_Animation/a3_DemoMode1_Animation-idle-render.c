@@ -97,6 +97,23 @@ void a3animation_render_controls(a3_DemoState const* demoState, a3_DemoMode1_Ani
 		targetText_composite,
 	};
 
+	a3byte const* blendOpNames[animation_blendop_max] = {
+		"identity",
+		"construct",
+		"copy",
+		"negate",
+		"concat",
+		"nearest",
+		"lerp",
+		"cubic",
+		"split",
+		"scale",
+		"triangular",
+		"bi-nearest",
+		"bi-linear",
+		"bi-cubic"
+	};
+
 	// pipeline and target
 	a3_DemoMode1_Animation_RenderProgramName const render = demoMode->render;
 	a3_DemoMode1_Animation_DisplayProgramName const display = demoMode->display;
@@ -122,7 +139,7 @@ void a3animation_render_controls(a3_DemoState const* demoState, a3_DemoMode1_Ani
 	a3textDraw(text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
 		"    Active camera (%u / %u) ('c' prev | next 'v'): %s", activeCamera + 1, animation_camera_max, cameraText[activeCamera]);
 
-	const char* blend_mode_name = "blend mode name";
+	const char* blend_mode_name = blendOpNames[demoMode->blendOpIndex];
 	a3textDraw(text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
 		"    Active blend mode (%u / %u) ('u' prev | next 'y'): %s", demoMode->blendOpIndex, animation_blendop_max, blend_mode_name);
 

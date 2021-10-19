@@ -117,7 +117,7 @@ typedef enum a3_DemoMode1_Animation_TargetName				a3_DemoMode1_Animation_TargetN
 	};
 
 	// changeme
-	#define animation_blendop_max 10
+	#define animation_blendop_max 14
 
 //-----------------------------------------------------------------------------
 
