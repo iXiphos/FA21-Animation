@@ -175,7 +175,7 @@ a3_HierarchyPose* a3hierarchyPoseOpBiNearest(a3_HierarchyPose* pose_out, a3_Hier
 
 a3_HierarchyPose* a3hierarchyPoseOpBiLinear(a3_HierarchyPose* pose_out, a3_HierarchyPose const* pose0, a3_HierarchyPose const* pose1, a3_HierarchyPose const* pose2, a3_HierarchyPose const* pose3, a3real const u1, a3real const u2, a3real const u3, a3ui32 num_nodes);
 
-a3_HierarchyPose* a3hierarchyPoseOpBiCubic(a3_HierarchyPose* pose_out, a3_SpatialPose const* poses0[4], a3_HierarchyPose const* poses1[4], a3_HierarchyPose const* poses2[4], a3_HierarchyPose const* poses3[4], a3real const u[5], a3ui32 num_nodes);
+a3_HierarchyPose* a3hierarchyPoseOpBiCubic(a3_HierarchyPose* pose_out, a3_HierarchyPose const* poses0[4], a3_HierarchyPose const* poses1[4], a3_HierarchyPose const* poses2[4], a3_HierarchyPose const* poses3[4], a3real const u[5], a3ui32 num_nodes);
 
 //-----------------------------------------------------------------------------
 

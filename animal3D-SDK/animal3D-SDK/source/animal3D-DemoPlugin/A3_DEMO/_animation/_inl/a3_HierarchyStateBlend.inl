@@ -382,8 +382,36 @@ inline a3_HierarchyPose* a3hierarchyPoseOpBiLinear(a3_HierarchyPose* pose_out, a
 	return pose_out;
 }
 
-inline a3_HierarchyPose* a3hierarchyPoseOpBiLinear(a3_HierarchyPose* pose_out, a3_SpatialPose const* poses0[4], a3_HierarchyPose const* poses1[4], a3_HierarchyPose const* poses2[4], a3_HierarchyPose const* poses3[4], a3real const u[5], a3ui32 num_nodes)
+inline a3_HierarchyPose* a3hierarchyPoseOpBiCubic(a3_HierarchyPose* pose_out, a3_HierarchyPose const* poses0[4], a3_HierarchyPose const* poses1[4], a3_HierarchyPose const* poses2[4], a3_HierarchyPose const* poses3[4], a3real const u[5], a3ui32 num_nodes)
 {
+	a3_SpatialPose* spose_out = pose_out->pose;
+	a3_SpatialPose* spose0[4];
+	spose0[0] = poses0[0]->pose;
+	spose0[1] = poses0[1]->pose;
+	spose0[2] = poses0[2]->pose;
+	spose0[3] = poses0[3]->pose;
+
+	a3_SpatialPose* spose1[4];
+	spose1[0] = poses1[0]->pose;
+	spose1[1] = poses1[1]->pose;
+	spose1[2] = poses1[2]->pose;
+	spose1[3] = poses1[3]->pose;
+
+	a3_SpatialPose* spose2[4];
+	spose2[0] = poses2[0]->pose;
+	spose2[1] = poses2[1]->pose;
+	spose2[2] = poses2[2]->pose;
+	spose2[3] = poses2[3]->pose;
+
+	a3_SpatialPose* spose3[4];
+	spose3[0] = poses3[0]->pose;
+	spose3[1] = poses3[1]->pose;
+	spose3[2] = poses3[2]->pose;
+	spose3[3] = poses3[3]->pose;
+
+	for (a3ui32 i = 0; i < num_nodes; i++, spose_out++) {
+		a3spatialPoseOpBiCubic(spose_out, spose0, spose1, spose2, spose3, u);
+	}
 	return pose_out;
 }
 
