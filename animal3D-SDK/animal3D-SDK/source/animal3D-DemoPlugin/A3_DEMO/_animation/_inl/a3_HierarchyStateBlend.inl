@@ -134,15 +134,21 @@ inline a3_SpatialPose* a3spatialPoseOpCubic(a3_SpatialPose* pose_out, a3_Spatial
 {
 	a3real mu2 = u * u;
 
-	//This is the formula, unsure if I have to do each part individually or if there is a better wa, I know for addition I can concat
-	//But unsure about subtraction
-	//a3_SpatialPose* a0 = y3 - y2 - y0 + y1;
-	//a3_SpatialPose* a1 = y0 - y1 - a0;
-	//a3_SpatialPose* a2 = y2 - y0;
-	//a3_SpatialPose* a3 = y1;
+	a3_SpatialPose* a0;
+	a3spatialPoseOpDeconcat(a0, pose3, pose2);
+	a3spatialPoseOpDeconcat(a0, a0, pose0);
+	a3spatialPoseOpConcat(a0, a0, pose1);
 
-	//pose_out = (a0 * u * mu2 + a1 * mu2 + a2 * u + a3);
+	a3_SpatialPose* a1;
+	a3spatialPoseOpDeconcat(a1, pose0, pose1);
+	a3spatialPoseOpDeconcat(a1, a1, a0);
 
+	a3_SpatialPose* a2;
+	a3spatialPoseOpDeconcat(a2, pose2, pose0);
+	
+	a3_SpatialPose* a3 = pose1;
+
+	a3spatialPoseOpTriangular(pose_out, a0, a1, a2, u, mu2);
 
 	return pose_out;
 }
@@ -175,11 +181,22 @@ inline a3_SpatialPose* a3spatialPoseOpScale(a3_SpatialPose* pose_out, a3_Spatial
 
 inline a3_SpatialPose* a3spatialPoseOpTriangular(a3_SpatialPose* pose_out, a3_SpatialPose const* pose0, a3_SpatialPose const* pose1, a3_SpatialPose const* pose2, a3real const u1, a3real const u2)
 {
+	a3real u0 = 1 - u1 - u2;
+	a3spatialPoseOpScale(pose0, pose0, u0);
+	a3spatialPoseOpScale(pose1, pose1, u1);
+	a3spatialPoseOpScale(pose2, pose2, u2);
+
+	a3spatialPoseOpConcat(pose_out, pose0, pose1);
+	a3spatialPoseOpConcat(pose_out, pose_out, pose2);
+
 	return pose_out;
 }
 
 inline a3_SpatialPose* a3spatialPoseOpBiNearest(a3_SpatialPose* pose_out, a3_SpatialPose const* pose0, a3_SpatialPose const* pose1, a3_SpatialPose const* pose2, a3_SpatialPose const* pose3, a3real const u1, a3real const u2, a3real const u3)
 {
+	a3spatialPoseOpNearest(pose0, pose0, pose1, u1);
+	a3spatialPoseOpNearest(pose2, pose2, pose3, u2);
+	a3spatialPoseOpNearest(pose_out, pose0, pose2, u3);
 	return pose_out;
 }
 
@@ -196,6 +213,16 @@ inline a3_SpatialPose* a3spatialPoseOpBiLinear(a3_SpatialPose* pose_out, a3_Spat
 
 inline a3_SpatialPose* a3spatialPoseOpBiCubic(a3_SpatialPose* pose_out, a3_SpatialPose const* poses0[4], a3_SpatialPose const* poses1[4], a3_SpatialPose const* poses2[4], a3_SpatialPose const* poses3[4], a3real const u[5])
 {
+	a3_SpatialPose* pose1;
+	a3_SpatialPose* pose2;
+	a3_SpatialPose* pose3;
+	a3_SpatialPose* pose4;
+	a3spatialPoseOpCubic(pose1, poses0[0], poses0[1], poses0[2], poses0[3], u[0]);
+	a3spatialPoseOpCubic(pose2, poses1[0], poses1[1], poses1[2], poses1[3], u[1]);
+	a3spatialPoseOpCubic(pose3, poses2[0], poses2[1], poses2[2], poses2[3], u[2]);
+	a3spatialPoseOpCubic(pose4, poses3[0], poses3[1], poses3[2], poses3[3], u[3]);
+
+	a3spatialPoseOpCubic(pose_out, pose1, pose2, pose3, pose4, u[4]);
 	return pose_out;
 }
 
