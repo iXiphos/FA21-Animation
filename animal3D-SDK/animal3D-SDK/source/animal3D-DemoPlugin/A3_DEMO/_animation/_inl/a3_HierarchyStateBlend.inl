@@ -134,15 +134,21 @@ inline a3_SpatialPose* a3spatialPoseOpCubic(a3_SpatialPose* pose_out, a3_Spatial
 {
 	a3real mu2 = u * u;
 
-	//This is the formula, unsure if I have to do each part individually or if there is a better wa, I know for addition I can concat
-	//But unsure about subtraction
-	//a3_SpatialPose* a0 = y3 - y2 - y0 + y1;
-	//a3_SpatialPose* a1 = y0 - y1 - a0;
-	//a3_SpatialPose* a2 = y2 - y0;
-	//a3_SpatialPose* a3 = y1;
+	a3_SpatialPose* a0;
+	a3spatialPoseOpDeconcat(a0, pose3, pose2);
+	a3spatialPoseOpDeconcat(a0, a0, pose0);
+	a3spatialPoseOpConcat(a0, a0, pose1);
 
-	//pose_out = (a0 * u * mu2 + a1 * mu2 + a2 * u + a3);
+	a3_SpatialPose* a1;
+	a3spatialPoseOpDeconcat(a1, pose0, pose1);
+	a3spatialPoseOpDeconcat(a1, a1, a0);
 
+	a3_SpatialPose* a2;
+	a3spatialPoseOpDeconcat(a2, pose2, pose0);
+	
+	a3_SpatialPose* a3 = pose1;
+
+	a3spatialPoseOpTriangular(pose_out, a0, a1, a2, u, mu2);
 
 	return pose_out;
 }
@@ -175,6 +181,8 @@ inline a3_SpatialPose* a3spatialPoseOpScale(a3_SpatialPose* pose_out, a3_Spatial
 
 inline a3_SpatialPose* a3spatialPoseOpTriangular(a3_SpatialPose* pose_out, a3_SpatialPose const* pose0, a3_SpatialPose const* pose1, a3_SpatialPose const* pose2, a3real const u1, a3real const u2)
 {
+	a3spatialPoseOpLERP(pose_out, pose0, pose1, u1);
+	a3spatialPoseOpLERP(pose_out, pose_out, pose2, u2);
 	return pose_out;
 }
 
