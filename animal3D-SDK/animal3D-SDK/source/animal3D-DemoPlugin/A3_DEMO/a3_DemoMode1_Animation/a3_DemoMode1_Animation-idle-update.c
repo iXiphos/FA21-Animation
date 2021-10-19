@@ -114,7 +114,7 @@ void a3animation_update(a3_DemoState* demoState, a3_DemoMode1_Animation* demoMod
 			demoMode->hierarchyKeyPose_display[j] =  index;
 		}
 
-		demoMode->hierarchyKeyPose_param = (a3real)(demoMode->animationTime - (a3f64)i * demoMode->playbackDirection);
+		demoMode->hierarchyKeyPose_param = (a3real)(demoMode->animationTime - ((a3f64)i * demoMode->playbackDirection));
 	}
 
 	for (a3ui32 j = 0; j < 16; j++) {

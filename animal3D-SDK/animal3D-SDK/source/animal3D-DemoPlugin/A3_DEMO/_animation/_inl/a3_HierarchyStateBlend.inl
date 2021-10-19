@@ -34,11 +34,7 @@
 // pointer-based reset/identity operation for single spatial pose
 inline a3_SpatialPose* a3spatialPoseOpIdentity(a3_SpatialPose* pose_out)
 {
-	pose_out->transform = a3mat4_identity;
-	pose_out->scale = a3vec4_one;
-	pose_out->translation = a3vec4_w;
-	pose_out->angles = a3vec4_zero;
-	pose_out->orientation = a3vec4_w;
+	a3spatialPoseReset(pose_out);
 
 	// done
 	return pose_out;
@@ -50,7 +46,7 @@ inline a3_SpatialPose* a3spatialPoseOpLERP(a3_SpatialPose* pose_out, a3_SpatialP
 	/* TO-DO: Make sure these are all the correct calculations*/
 	if (pose0 && pose1)
 	{
-		pose_out->angles = a3vec4NLerp( pose0->angles, pose1->angles, u);
+		pose_out->angles = a3vec4Lerp( pose0->angles, pose1->angles, u);
 
 		
 		pose_out->scale = a3vec4LogLerp( pose0->scale, pose1->scale, u);
@@ -134,19 +130,18 @@ inline a3_SpatialPose* a3spatialPoseOpCubic(a3_SpatialPose* pose_out, a3_Spatial
 {
 	a3real mu2 = u * u;
 
-	a3_SpatialPose* a0;
+	a3_SpatialPose a0[1];
 	a3spatialPoseOpDeconcat(a0, pose3, pose2);
 	a3spatialPoseOpDeconcat(a0, a0, pose0);
 	a3spatialPoseOpConcat(a0, a0, pose1);
 
-	a3_SpatialPose* a1;
+	a3_SpatialPose a1[1];
 	a3spatialPoseOpDeconcat(a1, pose0, pose1);
 	a3spatialPoseOpDeconcat(a1, a1, a0);
 
-	a3_SpatialPose* a2;
+	a3_SpatialPose a2[1];
 	a3spatialPoseOpDeconcat(a2, pose2, pose0);
 	
-	a3_SpatialPose* a3 = pose1;
 
 	a3spatialPoseOpTriangular(pose_out, a0, a1, a2, u, mu2);
 
@@ -182,21 +177,29 @@ inline a3_SpatialPose* a3spatialPoseOpScale(a3_SpatialPose* pose_out, a3_Spatial
 inline a3_SpatialPose* a3spatialPoseOpTriangular(a3_SpatialPose* pose_out, a3_SpatialPose const* pose0, a3_SpatialPose const* pose1, a3_SpatialPose const* pose2, a3real const u1, a3real const u2)
 {
 	a3real u0 = 1 - u1 - u2;
-	a3spatialPoseOpScale(pose0, pose0, u0);
-	a3spatialPoseOpScale(pose1, pose1, u1);
-	a3spatialPoseOpScale(pose2, pose2, u2);
 
-	a3spatialPoseOpConcat(pose_out, pose0, pose1);
-	a3spatialPoseOpConcat(pose_out, pose_out, pose2);
+	a3_SpatialPose a0[1];
+	a3_SpatialPose a1[1];
+	a3_SpatialPose a2[1];
+
+	a3spatialPoseOpScale(a0, pose0, u0);
+	a3spatialPoseOpScale(a1, pose1, u1);
+	a3spatialPoseOpScale(a2, pose2, u2);
+
+	a3spatialPoseOpConcat(pose_out, a0, a1);
+	a3spatialPoseOpConcat(pose_out, pose_out, a2);
 
 	return pose_out;
 }
 
 inline a3_SpatialPose* a3spatialPoseOpBiNearest(a3_SpatialPose* pose_out, a3_SpatialPose const* pose0, a3_SpatialPose const* pose1, a3_SpatialPose const* pose2, a3_SpatialPose const* pose3, a3real const u1, a3real const u2, a3real const u3)
 {
-	a3spatialPoseOpNearest(pose0, pose0, pose1, u1);
-	a3spatialPoseOpNearest(pose2, pose2, pose3, u2);
-	a3spatialPoseOpNearest(pose_out, pose0, pose2, u3);
+	a3_SpatialPose tmp0[1];
+	a3_SpatialPose tmp1[1];
+
+	a3spatialPoseOpNearest(tmp0, pose0, pose1, u1);
+	a3spatialPoseOpNearest(tmp1, pose2, pose3, u2);
+	a3spatialPoseOpNearest(pose_out, tmp0, tmp1, u3);
 	return pose_out;
 }
 
@@ -205,18 +208,18 @@ inline a3_SpatialPose* a3spatialPoseOpBiLinear(a3_SpatialPose* pose_out, a3_Spat
 
 	a3_SpatialPose tmp[1];
 	a3spatialPoseOpLERP(tmp, pose0, pose1, u1);
-	a3spatialPoseOpLerp(pose_out, pose2, pose3, u2);
-	a3spatialPoseOpLerp(pose_out, tmp, pose_out, u3);
+	a3spatialPoseOpLERP(pose_out, pose2, pose3, u2);
+	a3spatialPoseOpLERP(pose_out, tmp, pose_out, u3);
 
 	return pose_out;
 }
 
 inline a3_SpatialPose* a3spatialPoseOpBiCubic(a3_SpatialPose* pose_out, a3_SpatialPose const* poses0[4], a3_SpatialPose const* poses1[4], a3_SpatialPose const* poses2[4], a3_SpatialPose const* poses3[4], a3real const u[5])
 {
-	a3_SpatialPose* pose1;
-	a3_SpatialPose* pose2;
-	a3_SpatialPose* pose3;
-	a3_SpatialPose* pose4;
+	a3_SpatialPose pose1[1];
+	a3_SpatialPose pose2[1];
+	a3_SpatialPose pose3[1];
+	a3_SpatialPose pose4[1];
 	a3spatialPoseOpCubic(pose1, poses0[0], poses0[1], poses0[2], poses0[3], u[0]);
 	a3spatialPoseOpCubic(pose2, poses1[0], poses1[1], poses1[2], poses1[3], u[1]);
 	a3spatialPoseOpCubic(pose3, poses2[0], poses2[1], poses2[2], poses2[3], u[2]);
