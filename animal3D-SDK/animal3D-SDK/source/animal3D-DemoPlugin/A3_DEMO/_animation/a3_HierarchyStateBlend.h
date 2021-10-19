@@ -49,23 +49,23 @@ resultAngles = testLerp.opOrientation(args)
 
 */
 
-typedef a3vec4 (*a3_BlendOpLerp)(a3vec4 const v0, a3vec4 const v1, a3real const u);
+typedef a3vec4 (*a3_BlendOpLerp)(a3vec4 v0, a3vec4 v1, a3real const u);
 typedef struct a3SpatialposeBlendOpLerp {
 	a3_BlendOpLerp opOrientation, opAngles, opScale, opTranslation;
 } a3SpatialposeBlendOpLerp;
 
-inline a3vec4 a3vec4Lerp(a3vec4 const v0, a3vec4 const v1, a3real const u) {
+inline a3vec4 a3vec4Lerp(a3vec4 v0, a3vec4 v1, a3real const u) {
 	//implement linear interpolation 
 	a3real4Sub(v1.v, v0.v);
 	a3real4MulS(v1.v, u);
 	a3real4Add(v0.v, v1.v);
 	return v0;
 }
-inline a3vec4 a3vec4SLerp(a3vec4 const v0, a3vec4 const v1, a3real const u) {
+inline a3vec4 a3vec4SLerp(a3vec4 v0, a3vec4 v1, a3real const u) {
 	//implement spherical interpolation 
 	return v0;
 }
-inline a3vec4 a3vec4NLerp(a3vec4 const v0, a3vec4 const v1, a3real const u) {
+inline a3vec4 a3vec4NLerp(a3vec4 v0, a3vec4 v1, a3real const u) {
 	//implement normal interpolation 
 	a3real4Sub(v1.v, v0.v);
 	a3real3MulS(v1.v, u);
@@ -73,7 +73,7 @@ inline a3vec4 a3vec4NLerp(a3vec4 const v0, a3vec4 const v1, a3real const u) {
 	a3real3Normalize(v0.v);
 	return v0;
 }
-inline a3vec4 a3vec4LogLerp(a3vec4 const v0, a3vec4 const v1, a3real const u) {
+inline a3vec4 a3vec4LogLerp(a3vec4 v0, a3vec4 v1, a3real const u) {
 	//implement log interpolation 
 	return v0;
 }
@@ -112,7 +112,7 @@ a3_SpatialPose* a3spatialPoseOpIdentity(a3_SpatialPose* pose_out);
 // pointer-based LERP operation for single spatial pose
 a3_SpatialPose* a3spatialPoseOpLERP(a3_SpatialPose* pose_out, a3_SpatialPose const* pose0, a3_SpatialPose const* pose1, a3real const u);
 
-a3_SpatialPose* a3spatialPoseOpConstruct(a3_SpatialPose* pose_out, a3mat4 transform, a3vec4 orientation, a3vec4 angles, a3vec4 scale, a3vec4 translation);
+a3_SpatialPose* a3spatialPoseOpConstruct(a3_SpatialPose* pose_out, a3vec4 orientation, a3vec4 scale, a3vec4 translation);
 
 a3_SpatialPose* a3spatialPoseOpCopy(a3_SpatialPose* pose_out, a3_SpatialPose const* pose);
 

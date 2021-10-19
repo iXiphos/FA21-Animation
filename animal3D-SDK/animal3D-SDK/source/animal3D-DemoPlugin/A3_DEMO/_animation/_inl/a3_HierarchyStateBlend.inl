@@ -53,13 +53,11 @@ inline a3_SpatialPose* a3spatialPoseOpLERP(a3_SpatialPose* pose_out, a3_SpatialP
 		a3real3NLerp(pose_out->angles.v, pose0->angles.v, pose1->angles.v, u);
 
 		/**** TO-DO: Update this to be exponential lerp instead of regular lerp   ****/
-		a3real3Lerp(pose_out->scale.v, pose0->scale.v, pose1->scale.v, u);
+		a3real4Lerp(pose_out->scale.v, pose0->scale.v, pose1->scale.v, u);
 
-		a3real3Lerp(pose_out->translation.v, pose0->translation.v, pose1->translation.v, u);
+		a3real4Lerp(pose_out->translation.v, pose0->translation.v, pose1->translation.v, u);
 
-		a3real3Lerp(pose_out->transform.v, pose0->transform.v, pose1->transform.v, u);
 
-		return 1;
 	}
 	// done
 	return pose_out;
@@ -98,14 +96,15 @@ Controls (1): spatial pose.*/
 inline a3_SpatialPose* a3spatialPoseOpInvert(a3_SpatialPose* pose_out, a3_SpatialPose const* pose)
 {
 	//I think this is right but I could be wrong
-	a3real4MulS(pose->angles.v, -1);
 	pose_out->angles = pose->angles;
+	a3real4MulS(pose_out->angles.v, -1);
 
-	a3real4MulS(pose->scale.v, -1);
 	pose_out->scale = pose->scale;
+	a3real4MulS(pose_out->scale.v, -1);
 
-	a3real4x4MulS(pose->transform.v, -1);
 	pose_out->transform = pose->transform;
+	a3real4x4MulS(pose_out->transform.m, -1);
+	
 
 	return pose_out;
 }
@@ -121,11 +120,11 @@ inline a3_SpatialPose* a3spatialPoseOpNearest(a3_SpatialPose* pose_out, a3_Spati
 
 	if (u < 0.5f) 
 	{
-		pose_out = pose0;
+		*pose_out = *pose0;
 	}
 	else if (u >= 0.5f) 
 	{
-		pose_out = pose1;
+		*pose_out = *pose1;
 	}
 
 	return pose_out;
@@ -137,12 +136,12 @@ inline a3_SpatialPose* a3spatialPoseOpCubic(a3_SpatialPose* pose_out, a3_Spatial
 
 	//This is the formula, unsure if I have to do each part individually or if there is a better wa, I know for addition I can concat
 	//But unsure about subtraction
-	a3_SpatialPose* a0 = y3 - y2 - y0 + y1;
-	a3_SpatialPose* a1 = y0 - y1 - a0;
-	a3_SpatialPose* a2 = y2 - y0;
-	a3_SpatialPose* a3 = y1;
+	//a3_SpatialPose* a0 = y3 - y2 - y0 + y1;
+	//a3_SpatialPose* a1 = y0 - y1 - a0;
+	//a3_SpatialPose* a2 = y2 - y0;
+	//a3_SpatialPose* a3 = y1;
 
-	pose_out = (a0 * u * mu2 + a1 * mu2 + a2 * u + a3);
+	//pose_out = (a0 * u * mu2 + a1 * mu2 + a2 * u + a3);
 
 
 	return pose_out;
@@ -215,7 +214,7 @@ inline a3_HierarchyPose* a3hierarchyPoseOpIdentity(a3_HierarchyPose* pose_out, a
 }
 
 // pointer-based LERP operation for hierarchical pose
-inline a3_HierarchyPose* a3hierarchyPoseOpLERP(a3_HierarchyPose* pose_out, a3_HierarchyPose const* pose0, a3_HierarchyPose const* pose1, a3ui32 num_nodes, a3real const u)
+inline a3_HierarchyPose* a3hierarchyPoseOpLERP(a3_HierarchyPose* pose_out, a3_HierarchyPose const* pose0, a3_HierarchyPose const* pose1, a3real const u, a3ui32 num_nodes)
 {
 	a3_SpatialPose* spose_out = pose_out->pose;
 	a3_SpatialPose* spose0 = pose0->pose;
@@ -236,7 +235,7 @@ inline a3_HierarchyPose* a3hierarchyOpConstruct(a3_HierarchyPose* pose_out, a3ve
 	a3_SpatialPose* spose_out = pose_out->pose;
 
 	for (a3ui32 i = 0; i < num_nodes; i++, spose_out++) {
-		a3spatialPoseOponstruct(spose_out, orientation, scale, translation);
+		a3spatialPoseOpConstruct(spose_out, orientation, scale, translation);
 	}
 	return pose_out;
 }
