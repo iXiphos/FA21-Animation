@@ -35,17 +35,11 @@
 inline a3_SpatialPose* a3spatialPoseOpIdentity(a3_SpatialPose* pose_out)
 {
 	pose_out->transform = a3mat4_identity;
-<<<<<<< HEAD
 	pose_out->orientation = (a3vec4){ 0, 0, 0, 1};
 	pose_out->scale = a3vec4_one;
 	pose_out->translation = a3vec4_zero;
-
-=======
-	pose_out->translation = a3vec4_zero;
 	pose_out->angles = a3vec4_zero;
-	pose_out->orientation = a3vec4_zero;
-	pose_out->scale = a3vec4_one;
->>>>>>> e8f991526338030b311f7e8d49e9775eadb1787f
+
 	// done
 	return pose_out;
 }
@@ -53,11 +47,6 @@ inline a3_SpatialPose* a3spatialPoseOpIdentity(a3_SpatialPose* pose_out)
 // pointer-based LERP operation for single spatial pose
 inline a3_SpatialPose* a3spatialPoseOpLERP(a3_SpatialPose* pose_out, a3_SpatialPose const* pose0, a3_SpatialPose const* pose1, a3real const u)
 {
-<<<<<<< HEAD
-	pose_out->translation = a3vec4Lerp(pose0->translation, pose1->translation, u);
-	pose_out->orientation;
-	pose_out->scale;
-=======
 	/* TO-DO: Make sure these are all the correct calculations*/
 	if (pose0 && pose1)
 	{
@@ -65,7 +54,6 @@ inline a3_SpatialPose* a3spatialPoseOpLERP(a3_SpatialPose* pose_out, a3_SpatialP
 
 		/**** TO-DO: Update this to be exponential lerp instead of regular lerp   ****/
 		a3real3Lerp(pose_out->scale.v, pose0->scale.v, pose1->scale.v, u);
->>>>>>> e8f991526338030b311f7e8d49e9775eadb1787f
 
 		a3real3Lerp(pose_out->translation.v, pose0->translation.v, pose1->translation.v, u);
 
