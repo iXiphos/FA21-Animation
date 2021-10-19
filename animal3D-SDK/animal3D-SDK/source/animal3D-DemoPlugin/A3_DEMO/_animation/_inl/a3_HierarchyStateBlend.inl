@@ -35,10 +35,10 @@
 inline a3_SpatialPose* a3spatialPoseOpIdentity(a3_SpatialPose* pose_out)
 {
 	pose_out->transform = a3mat4_identity;
-	pose_out->orientation = (a3vec4){ 0, 0, 0, 1};
 	pose_out->scale = a3vec4_one;
-	pose_out->translation = a3vec4_zero;
+	pose_out->translation = a3vec4_w;
 	pose_out->angles = a3vec4_zero;
+	pose_out->orientation = a3vec4_w;
 
 	// done
 	return pose_out;
@@ -185,6 +185,12 @@ inline a3_SpatialPose* a3spatialPoseOpBiNearest(a3_SpatialPose* pose_out, a3_Spa
 
 inline a3_SpatialPose* a3spatialPoseOpBiLinear(a3_SpatialPose* pose_out, a3_SpatialPose const* pose0, a3_SpatialPose const* pose1, a3_SpatialPose const* pose2, a3_SpatialPose const* pose3, a3real const u1, a3real const u2, a3real const u3)
 {
+
+	a3_SpatialPose tmp[1];
+	a3spatialPoseOpLERP(tmp, pose0, pose1, u1);
+	a3spatialPoseOpLerp(pose_out, pose2, pose3, u2);
+	a3spatialPoseOpLerp(pose_out, tmp, pose_out, u3);
+
 	return pose_out;
 }
 
