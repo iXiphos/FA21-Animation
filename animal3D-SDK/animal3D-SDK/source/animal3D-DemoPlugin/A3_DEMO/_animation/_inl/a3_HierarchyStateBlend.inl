@@ -148,6 +148,32 @@ inline a3_SpatialPose* a3spatialPoseOpCubic(a3_SpatialPose* pose_out, a3_Spatial
 	return pose_out;
 }
 
+inline a3_SpatialPose* a3spatialPoseOpDeconcat(a3_SpatialPose* pose_out, a3_SpatialPose const* pose0, a3_SpatialPose const* pose1)
+{
+
+	pose_out->angles.x = a3trigValid_sind(pose0->angles.x - pose1->angles.x);
+	pose_out->angles.y = a3trigValid_sind(pose0->angles.y - pose1->angles.y);
+	pose_out->angles.z = a3trigValid_sind(pose0->angles.z - pose1->angles.z);
+
+	pose_out->scale.x = pose0->scale.x / pose1->scale.x;
+	pose_out->scale.y = pose0->scale.y / pose1->scale.y;
+	pose_out->scale.z = pose0->scale.z / pose1->scale.z;
+
+	pose_out->translation.x = pose0->translation.x - pose1->translation.x;
+	pose_out->translation.y = pose0->translation.y - pose1->translation.y;
+	pose_out->translation.z = pose0->translation.z - pose1->translation.z;
+
+	return pose_out;
+
+}
+
+inline a3_SpatialPose* a3spatialPoseOpScale(a3_SpatialPose* pose_out, a3_SpatialPose const* pose0, a3real const u)
+{
+
+
+	return pose_out;
+}
+
 
 //-----------------------------------------------------------------------------
 
@@ -199,6 +225,8 @@ inline a3_HierarchyPose* a3hierarchyPoseOpLERP(a3_HierarchyPose* pose_out, a3_Hi
 		a3spatialPoseOpLERP(spose_out, spose0, spose1, u);
 	}
 	// done
+	a3spatialPoseLerp(pose_out->pose, pose0->pose, pose1->pose, u);
+
 	return pose_out;
 }
 
@@ -273,6 +301,7 @@ inline a3_HierarchyPose* a3hierarchyOpCubic(a3_HierarchyPose* pose_out, a3_Hiera
 	}
 	return pose_out;
 }
+
 
 
 
