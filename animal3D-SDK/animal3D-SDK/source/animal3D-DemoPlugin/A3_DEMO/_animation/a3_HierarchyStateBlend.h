@@ -56,6 +56,9 @@ typedef struct a3SpatialposeBlendOpLerp {
 
 inline a3vec4 a3vec4Lerp(a3vec4 const v0, a3vec4 const v1, a3real const u) {
 	//implement linear interpolation 
+	a3real3Sub(v1, v0);
+	a3real3MulS(v1, u);
+	a3real3Add(v0, v1);
 	return v0;
 }
 inline a3vec4 a3vec4SLerp(a3vec4 const v0, a3vec4 const v1, a3real const u) {
@@ -64,6 +67,10 @@ inline a3vec4 a3vec4SLerp(a3vec4 const v0, a3vec4 const v1, a3real const u) {
 }
 inline a3vec4 a3vec4NLerp(a3vec4 const v0, a3vec4 const v1, a3real const u) {
 	//implement normal interpolation 
+	a3real3Sub(v1, v0);
+	a3real3MulS(v1, u);
+	a3real3Add(v0, v1);
+	a3real3Normalize(v0);
 	return v0;
 }
 inline a3vec4 a3vec4LogLerp(a3vec4 const v0, a3vec4 const v1, a3real const u) {
@@ -93,6 +100,20 @@ a3_SpatialPose* a3spatialPoseOpIdentity(a3_SpatialPose* pose_out);
 
 // pointer-based LERP operation for single spatial pose
 a3_SpatialPose* a3spatialPoseOpLERP(a3_SpatialPose* pose_out, a3_SpatialPose const* pose0, a3_SpatialPose const* pose1, a3real const u);
+
+
+a3_SpatialPose* a3spatialPoseOpConstruct(a3_SpatialPose* pose_out, a3mat4 transform, a3vec4 orientation, a3vec4 angles, a3vec4 scale, a3vec4 translation);
+
+a3_SpatialPose* a3spatialPoseOpCopy(a3_SpatialPose* pose_out, a3_SpatialPose const* pose);
+
+a3_SpatialPose* a3spatialPoseOpInvert(a3_SpatialPose* pose_out, a3_SpatialPose const* pose);
+
+a3_SpatialPose* a3spatialPoseOpConcat(a3_SpatialPose* pose_out, a3_SpatialPose const* pose0, a3_SpatialPose const* pose1);
+
+a3_SpatialPose* a3spatialPoseOpNearest(a3_SpatialPose* pose_out, a3_SpatialPose const* pose0, a3_SpatialPose const* pose1, a3real const u);
+
+a3_SpatialPose* a3spatialPoseOpCubic(a3_SpatialPose* pose_out, a3_SpatialPose const* pose0, a3_SpatialPose const* pose1, a3_SpatialPose const* pose2, a3_SpatialPose const* pose3, a3real const u);
+
 
 
 //-----------------------------------------------------------------------------
