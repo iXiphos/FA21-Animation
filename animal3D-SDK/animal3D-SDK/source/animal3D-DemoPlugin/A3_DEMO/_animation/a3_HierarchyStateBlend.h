@@ -22,9 +22,11 @@
 	Hierarchy blend operations.
 */
 
+
 #ifndef __ANIMAL3D_HIERARCHYSTATEBLEND_H
 #define __ANIMAL3D_HIERARCHYSTATEBLEND_H
 
+#include <math.h>
 
 #include "a3_HierarchyState.h"
 
@@ -63,18 +65,28 @@ inline a3vec4 a3vec4Lerp(a3vec4 v0, a3vec4 v1, a3real const u) {
 }
 inline a3vec4 a3vec4SLerp(a3vec4 v0, a3vec4 v1, a3real const u) {
 	//implement spherical interpolation 
+
+
 	return v0;
 }
 inline a3vec4 a3vec4NLerp(a3vec4 v0, a3vec4 v1, a3real const u) {
 	//implement normal interpolation 
 	a3real4Sub(v1.v, v0.v);
-	a3real3MulS(v1.v, u);
-	a3real3Add(v0.v, v1.v);
+	a3real4MulS(v1.v, u);
+	a3real4Add(v0.v, v1.v);
 	a3real3Normalize(v0.v);
 	return v0;
 }
 inline a3vec4 a3vec4LogLerp(a3vec4 v0, a3vec4 v1, a3real const u) {
 	//implement log interpolation 
+
+	a3real4DivComp(v1.v, v0.v);
+	v1.x = powf(v1.x, u);
+	v1.y = powf(v1.y, u);
+	v1.z = powf(v1.z, u);
+
+	a3real4MulComp(v0.v, v1.v);
+
 	return v0;
 }
 

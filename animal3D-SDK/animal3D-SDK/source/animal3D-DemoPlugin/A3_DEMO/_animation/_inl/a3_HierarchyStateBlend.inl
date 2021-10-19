@@ -50,12 +50,12 @@ inline a3_SpatialPose* a3spatialPoseOpLERP(a3_SpatialPose* pose_out, a3_SpatialP
 	/* TO-DO: Make sure these are all the correct calculations*/
 	if (pose0 && pose1)
 	{
-		a3real3NLerp(pose_out->angles.v, pose0->angles.v, pose1->angles.v, u);
+		pose_out->angles = a3vec4NLerp( pose0->angles, pose1->angles, u);
 
-		/**** TO-DO: Update this to be exponential lerp instead of regular lerp   ****/
-		a3real4Lerp(pose_out->scale.v, pose0->scale.v, pose1->scale.v, u);
+		
+		pose_out->scale = a3vec4LogLerp( pose0->scale, pose1->scale, u);
 
-		a3real4Lerp(pose_out->translation.v, pose0->translation.v, pose1->translation.v, u);
+		pose_out->translation = a3vec4Lerp( pose0->translation, pose1->translation, u);
 
 
 	}
@@ -168,9 +168,9 @@ inline a3_SpatialPose* a3spatialPoseOpDeconcat(a3_SpatialPose* pose_out, a3_Spat
 
 inline a3_SpatialPose* a3spatialPoseOpScale(a3_SpatialPose* pose_out, a3_SpatialPose const* pose0, a3real const u)
 {
+	a3spatialPoseOpIdentity(pose_out);
 
-
-	return pose_out;
+	return a3spatialPoseOpLERP(pose_out, pose_out, pose0, u);
 }
 
 inline a3_SpatialPose* a3spatialPoseOpTriangular(a3_SpatialPose* pose_out, a3_SpatialPose const* pose0, a3_SpatialPose const* pose1, a3_SpatialPose const* pose2, a3real const u1, a3real const u2)
