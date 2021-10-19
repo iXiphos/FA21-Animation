@@ -40,6 +40,7 @@ void a3animation_init_animation(a3_DemoState const* demoState, a3_DemoMode1_Anim
 {
 	// general counters
 	//a3ui32 j, p;
+	demoMode->playbackDirection = 1;
 
 	// object pointers
 	a3_Hierarchy* hierarchy = 0;

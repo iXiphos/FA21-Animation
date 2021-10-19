@@ -64,6 +64,8 @@ void a3demo_applyScale_internal(a3_DemoSceneObject* sceneObject, a3real4x4p s);
 
 void a3animation_update(a3_DemoState* demoState, a3_DemoMode1_Animation* demoMode, a3f64 const dt)
 {
+
+
 	a3ui32 i;
 	a3_DemoModelMatrixStack matrixStack[animationMaxCount_sceneObject];
 
@@ -100,12 +102,13 @@ void a3animation_update(a3_DemoState* demoState, a3_DemoMode1_Animation* demoMod
 
 
 	// skeletal
-	if (demoState->updateAnimation)
+	if (demoState->updateAnimation && demoMode->updateAnimation)
 	{
-		i = (a3ui32)(demoState->timer_display->totalTime);
+		demoMode->animationTime += dt;
+		i = (a3ui32)(demoMode->animationTime);
 		demoMode->hierarchyKeyPose_display[0] = (i + 0) % (demoMode->hierarchyPoseGroup_skel->hposeCount - 1);
 		demoMode->hierarchyKeyPose_display[1] = (i + 1) % (demoMode->hierarchyPoseGroup_skel->hposeCount - 1);
-		demoMode->hierarchyKeyPose_param = (a3real)(demoState->timer_display->totalTime - (a3f64)i);
+		demoMode->hierarchyKeyPose_param = (a3real)(demoMode->animationTime - (a3f64)i * demoMode->playbackDirection);
 	}
 
 	//a3hierarchyPoseCopy(activeHS->objectSpace,

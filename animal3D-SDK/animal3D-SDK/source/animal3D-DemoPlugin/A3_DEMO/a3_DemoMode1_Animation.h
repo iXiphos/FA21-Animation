@@ -116,6 +116,8 @@ typedef enum a3_DemoMode1_Animation_TargetName				a3_DemoMode1_Animation_TargetN
 		animation_target_scene_max,
 	};
 
+	// changeme
+	#define animation_blendop_max 10
 
 //-----------------------------------------------------------------------------
 
@@ -163,6 +165,12 @@ typedef enum a3_DemoMode1_Animation_TargetName				a3_DemoMode1_Animation_TargetN
 					proj_camera_main[1];
 			};
 		};
+
+
+		a3f32 playbackDirection;
+		a3ui32 blendOpIndex;
+		a3f64 animationTime;
+		a3boolean updateAnimation;
 	};
 
 

@@ -121,6 +121,14 @@ void a3animation_render_controls(a3_DemoState const* demoState, a3_DemoMode1_Ani
 		"    Display mode (%u / %u) ('J' | 'K'): %s", display + 1, animation_display_max, displayProgramName[display]);
 	a3textDraw(text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
 		"    Active camera (%u / %u) ('c' prev | next 'v'): %s", activeCamera + 1, animation_camera_max, cameraText[activeCamera]);
+
+	const char* blend_mode_name = "blend mode name";
+	a3textDraw(text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
+		"    Active blend mode (%u / %u) ('u' prev | next 'y'): %s", demoMode->blendOpIndex, animation_blendop_max, blend_mode_name);
+
+	a3textDraw(text, textAlign, textOffset += textOffsetDelta, textDepth, col.r, col.g, col.b, col.a,
+		"    Anim Controller (play/pause 'p' | forward/reverse 'o' ): t: %f", demoMode->hierarchyKeyPose_param);
+
 }
 
 

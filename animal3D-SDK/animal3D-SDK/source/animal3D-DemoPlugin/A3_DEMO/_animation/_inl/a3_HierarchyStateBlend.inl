@@ -34,7 +34,9 @@
 inline a3_SpatialPose* a3spatialPoseOpIdentity(a3_SpatialPose* pose_out)
 {
 	pose_out->transform = a3mat4_identity;
-	// ...
+	pose_out->orientation = (a3vec4){ 0, 0, 0, 1};
+	pose_out->scale = a3vec4_one;
+	pose_out->translation = a3vec4_zero;
 
 	// done
 	return pose_out;
@@ -43,6 +45,9 @@ inline a3_SpatialPose* a3spatialPoseOpIdentity(a3_SpatialPose* pose_out)
 // pointer-based LERP operation for single spatial pose
 inline a3_SpatialPose* a3spatialPoseOpLERP(a3_SpatialPose* pose_out, a3_SpatialPose const* pose0, a3_SpatialPose const* pose1, a3real const u)
 {
+	pose_out->translation = a3vec4Lerp(pose0->translation, pose1->translation, u);
+	pose_out->orientation;
+	pose_out->scale;
 
 	// done
 	return pose_out;
@@ -54,7 +59,7 @@ inline a3_SpatialPose* a3spatialPoseOpLERP(a3_SpatialPose* pose_out, a3_SpatialP
 // data-based reset/identity
 inline a3_SpatialPose a3spatialPoseDOpIdentity()
 {
-	a3_SpatialPose const result = { a3mat4_identity /*, ...*/ };
+	a3_SpatialPose const result = { a3mat4_identity, a3vec4_zero, a3vec4_zero,   /*, ...*/ };
 	return result;
 }
 
@@ -62,7 +67,7 @@ inline a3_SpatialPose a3spatialPoseDOpIdentity()
 inline a3_SpatialPose a3spatialPoseDOpLERP(a3_SpatialPose const pose0, a3_SpatialPose const pose1, a3real const u)
 {
 	a3_SpatialPose result = { 0 };
-	// ...
+	a3spatialPoseOpLERP(&result, &pose0, &pose1, u);
 
 	// done
 	return result;
@@ -73,7 +78,7 @@ inline a3_SpatialPose a3spatialPoseDOpLERP(a3_SpatialPose const pose0, a3_Spatia
 
 // pointer-based reset/identity operation for hierarchical pose
 inline a3_HierarchyPose* a3hierarchyPoseOpIdentity(a3_HierarchyPose* pose_out)
-{
+{	
 
 	// done
 	return pose_out;

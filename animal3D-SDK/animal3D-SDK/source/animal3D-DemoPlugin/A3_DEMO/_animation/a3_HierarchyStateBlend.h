@@ -73,6 +73,21 @@ inline a3vec4 a3vec4LogLerp(a3vec4 const v0, a3vec4 const v1, a3real const u) {
 
 //-----------------------------------------------------------------------------
 
+typedef struct a3_SpatialPoseBlendArgs {
+	union {
+		a3_SpatialPose poses[4];
+		struct {
+			a3_SpatialPose* pose0;
+			a3_SpatialPose* pose1;
+			a3_SpatialPose* pose2;
+			a3_SpatialPose* pose3;
+		};
+	};
+} a3_SpatialPoseBlendArgs;
+
+typedef a3_SpatialPose* (*a3_SpatialPoseBlendOp)(a3_SpatialPose* pose_out, a3_SpatialPoseBlendArgs args, a3real const u);
+
+
 // pointer-based reset/identity operation for single spatial pose
 a3_SpatialPose* a3spatialPoseOpIdentity(a3_SpatialPose* pose_out);
 
@@ -91,11 +106,19 @@ a3_SpatialPose a3spatialPoseDOpLERP(a3_SpatialPose const pose0, a3_SpatialPose c
 
 //-----------------------------------------------------------------------------
 
+
+struct a3_HierarchyPoseBlend {
+	a3_SpatialPoseBlendOp* blend;
+};
+
+typedef a3_HierarchyPose* (*a3_HierarchyPoseBlendOp)(a3_HierarchyPose* pose_out, a3_HierarchyPose const* pose0, a3_HierarchyPose const* pose1, a3ui32 num_nodes, a3real const u);
+
 // pointer-based reset/identity operation for hierarchical pose
 a3_HierarchyPose* a3hierarchyPoseOpIdentity(a3_HierarchyPose* pose_out);
 
 // pointer-based LERP operation for hierarchical pose
 a3_HierarchyPose* a3hierarchyPoseOpLERP(a3_HierarchyPose* pose_out, a3_HierarchyPose const* pose0, a3_HierarchyPose const* pose1, a3real const u);
+
 
 
 //-----------------------------------------------------------------------------
