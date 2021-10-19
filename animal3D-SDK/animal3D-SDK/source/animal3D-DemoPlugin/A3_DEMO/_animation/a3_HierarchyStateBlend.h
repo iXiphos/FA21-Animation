@@ -161,7 +161,7 @@ a3_HierarchyPose* a3hierarchyOpInvert(a3_HierarchyPose* pose_out, a3_HierarchyPo
 
 a3_HierarchyPose* a3hierarchyOpConcat(a3_HierarchyPose* pose_out, a3_HierarchyPose const* pose0, a3_HierarchyPose const* pose1, a3ui32 num_nodes);
 
-a3_HierarchyPose* a3hierarchyOpNearest(a3_HierarchyPose* pose_out, a3_HierarchyPose const* pose0, a3_HierarchyPose const* pose1, a3real const u, a3ui32 num_nodes)
+a3_HierarchyPose* a3hierarchyOpNearest(a3_HierarchyPose* pose_out, a3_HierarchyPose const* pose0, a3_HierarchyPose const* pose1, a3real const u, a3ui32 num_nodes);
 
 a3_HierarchyPose* a3hierarchyOpCubic(a3_HierarchyPose* pose_out, a3_HierarchyPose const* pose0, a3_HierarchyPose const* pose1, a3_HierarchyPose const* pose2, a3_HierarchyPose const* pose3, a3real const u, a3ui32 num_nodes);
 

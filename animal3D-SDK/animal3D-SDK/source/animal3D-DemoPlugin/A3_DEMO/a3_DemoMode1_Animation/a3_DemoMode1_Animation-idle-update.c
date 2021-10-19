@@ -101,19 +101,77 @@ void a3animation_update(a3_DemoState* demoState, a3_DemoMode1_Animation* demoMod
 	}
 
 
+	a3_HierarchyPose* poses[16];
+
 	// skeletal
 	if (demoState->updateAnimation && demoMode->updateAnimation)
 	{
 		demoMode->animationTime += dt;
 		i = (a3ui32)(demoMode->animationTime);
-		demoMode->hierarchyKeyPose_display[0] = (i + 0) % (demoMode->hierarchyPoseGroup_skel->hposeCount - 1);
-		demoMode->hierarchyKeyPose_display[1] = (i + 1) % (demoMode->hierarchyPoseGroup_skel->hposeCount - 1);
+
+		for (a3ui32 j = 0; j < 16; j++) {
+			a3ui32 index = (i + j) % (demoMode->hierarchyPoseGroup_skel->hposeCount - 1);
+			demoMode->hierarchyKeyPose_display[j] = demoMode->hierarchyPoseGroup_skel->hpose + index;
+		}
+
 		demoMode->hierarchyKeyPose_param = (a3real)(demoMode->animationTime - (a3f64)i * demoMode->playbackDirection);
+	}
+
+	for (a3ui32 j = 0; j < 16; j++) {
+		a3ui32 index = demoMode->hierarchyKeyPose_display[j];
+		poses[j] = demoMode->hierarchyPoseGroup_skel->hpose + index;
 	}
 
 	//a3hierarchyPoseCopy(activeHS->objectSpace,
 	//	demoMode->hierarchyPoseGroup_skel->hpose + demoMode->hierarchyKeyPose_display[0] + 1,
 	//	demoMode->hierarchy_skel->numNodes);
+
+	a3_HierarchyPose* pose_out = activeHS->objectSpace;
+
+	a3ui32 numNodes = demoMode->hierarchy_skel->numNodes;
+	a3real u = demoMode->hierarchyKeyPose_param;
+	a3real u0 = 0;
+	a3real u1 = 0;
+	a3real u2 = 0;
+	a3real ua[5] = { u0, u1, u2, 0, u};
+	/*
+		"identity",
+		"construct",
+		"copy",
+		"negate",
+		"concat",
+		"nearest",
+		"lerp",
+		"cubic",
+		"split",
+		"scale",
+		"triangular",
+		"bi-nearest",
+		"bi-linear",
+		"bi-cubic"
+	*/
+
+	switch (demoMode->blendOpIndex)
+	{
+	case 0:
+		a3hierarchyPoseOpIdentity(pose_out, numNodes);
+	case 1: a3hierarchyPoseOpConstruct(pose_out, (a3vec4){0, 0, 0, 1}, a3vec4_one, (a3vec4){ 20, 50, 0}, numNodes);
+	case 2: a3hierarchyPoseOpCopy(pose_out, poses[0], numNodes);
+	case 3: a3hierarchyPoseOpInvert(pose_out, poses[0], numNodes);
+	case 4: a3hierarchyPoseOpConcat(pose_out, poses[0], poses[1], numNodes);
+	case 5: a3hierarchyPoseOpNearest(pose_out, poses[0], poses[1], u, numNodes);
+	case 6: a3hierarchyPoseOpLerp(pose_out, poses[0], poses[1], u, numNodes);
+	case 7: a3hierarchyPoseOpCubic(pose_out, poses[0], poses[1], poses[2], poses[3], u, numNodes);
+	case 8: a3hierarchyPoseOpDeconcat(pose_out, poses[0], poses[1], numNodes);
+	case 9: a3hierarchyPoseOpScale(pose_out, u, numNodes);
+	case 10: a3hierarchyPoseOpTriangular(pose_out, poses[0], poses[1], poses[2], u1, u2, numNodes);
+	case 11: a3hierarchyPoseOpBiNearest(pose_out, poses[0], poses[1], poses[2], poses[3], u0, u1, u, numNodes);
+	case 12: a3hierarchyPoseOpBiLinear(pose_out, poses[0], poses[1], poses[2], poses[3], u0, u1, u, numNodes);
+	case 13: a3hierarchyPoseOpBiCubic(pose_out, poses, poses + 4, poses + 8, poses + 12, ua, numNodes);
+	default:
+		break;
+	}
+
 	a3hierarchyPoseLerp(activeHS->objectSpace,	// use as temp storage
 		demoMode->hierarchyPoseGroup_skel->hpose + demoMode->hierarchyKeyPose_display[0] + 1,
 		demoMode->hierarchyPoseGroup_skel->hpose + demoMode->hierarchyKeyPose_display[1] + 1,

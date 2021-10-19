@@ -250,7 +250,7 @@ inline a3_HierarchyPose* a3hierarchyPoseOpLERP(a3_HierarchyPose* pose_out, a3_Hi
 }
 
 
-inline a3_HierarchyPose* a3hierarchyOpConstruct(a3_HierarchyPose* pose_out, a3vec4 orientation, a3vec4 scale, a3vec4 translation, a3ui32 num_nodes)
+inline a3_HierarchyPose* a3hierarchyPoseOpConstruct(a3_HierarchyPose* pose_out, a3vec4 orientation, a3vec4 scale, a3vec4 translation, a3ui32 num_nodes)
 {
 	a3_SpatialPose* spose_out = pose_out->pose;
 
@@ -261,7 +261,7 @@ inline a3_HierarchyPose* a3hierarchyOpConstruct(a3_HierarchyPose* pose_out, a3ve
 }
 
 
-inline  a3_HierarchyPose* a3hierarchyOpCopy(a3_HierarchyPose* pose_out, a3_HierarchyPose const* pose, a3ui32 num_nodes)
+inline  a3_HierarchyPose* a3hierarchyPoseOpCopy(a3_HierarchyPose* pose_out, a3_HierarchyPose const* pose, a3ui32 num_nodes)
 {
 	a3_SpatialPose* spose_out = pose_out->pose;
 	a3_SpatialPose* spose = pose->pose;
@@ -272,7 +272,7 @@ inline  a3_HierarchyPose* a3hierarchyOpCopy(a3_HierarchyPose* pose_out, a3_Hiera
 	return pose_out;
 }
 
-inline  a3_HierarchyPose* a3hierarchyOpInvert(a3_HierarchyPose* pose_out, a3_HierarchyPose const* pose, a3ui32 num_nodes)
+inline  a3_HierarchyPose* a3hierarchyPoseOpInvert(a3_HierarchyPose* pose_out, a3_HierarchyPose const* pose, a3ui32 num_nodes)
 {
 	a3_SpatialPose* spose_out = pose_out->pose;
 	a3_SpatialPose* spose = pose->pose;
@@ -283,7 +283,7 @@ inline  a3_HierarchyPose* a3hierarchyOpInvert(a3_HierarchyPose* pose_out, a3_Hie
 	return pose_out;
 }
 
-inline a3_HierarchyPose* a3hierarchyOpConcat(a3_HierarchyPose* pose_out, a3_HierarchyPose const* pose0, a3_HierarchyPose const* pose1, a3ui32 num_nodes)
+inline a3_HierarchyPose* a3hierarchyPoseOpConcat(a3_HierarchyPose* pose_out, a3_HierarchyPose const* pose0, a3_HierarchyPose const* pose1, a3ui32 num_nodes)
 {
 	a3_SpatialPose* spose_out = pose_out->pose;
 	a3_SpatialPose* spose0 = pose0->pose;
@@ -295,7 +295,7 @@ inline a3_HierarchyPose* a3hierarchyOpConcat(a3_HierarchyPose* pose_out, a3_Hier
 	return pose_out;
 }
 
-inline a3_HierarchyPose* a3hierarchyOpNearest(a3_HierarchyPose* pose_out, a3_HierarchyPose const* pose0, a3_HierarchyPose const* pose1, a3real const u, a3ui32 num_nodes)
+inline a3_HierarchyPose* a3hierarchyPoseOpNearest(a3_HierarchyPose* pose_out, a3_HierarchyPose const* pose0, a3_HierarchyPose const* pose1, a3real const u, a3ui32 num_nodes)
 {
 	a3_SpatialPose* spose_out = pose_out->pose;
 	a3_SpatialPose* spose0 = pose0->pose;
@@ -307,7 +307,7 @@ inline a3_HierarchyPose* a3hierarchyOpNearest(a3_HierarchyPose* pose_out, a3_Hie
 	return pose_out;
 }
 
-inline a3_HierarchyPose* a3hierarchyOpCubic(a3_HierarchyPose* pose_out, a3_HierarchyPose const* pose0, a3_HierarchyPose const* pose1, a3_HierarchyPose const* pose2, a3_HierarchyPose const* pose3, a3real const u, a3ui32 num_nodes)
+inline a3_HierarchyPose* a3hierarchyPoseOpCubic(a3_HierarchyPose* pose_out, a3_HierarchyPose const* pose0, a3_HierarchyPose const* pose1, a3_HierarchyPose const* pose2, a3_HierarchyPose const* pose3, a3real const u, a3ui32 num_nodes)
 {
 	a3_SpatialPose* spose_out = pose_out->pose;
 	a3_SpatialPose* spose0 = pose0->pose;

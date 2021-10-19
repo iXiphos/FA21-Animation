@@ -138,7 +138,7 @@ typedef enum a3_DemoMode1_Animation_TargetName				a3_DemoMode1_Animation_TargetN
 		a3_HierarchyPoseGroup hierarchyPoseGroup_skel[1];
 		a3mat4 mvp_joint[128], mvp_bone[128], t_skin[128];
 		a3dualquat dq_skin[128];
-		a3ui32 hierarchyKeyPose_display[2];
+		a3ui32 hierarchyKeyPose_display[16];
 		a3real hierarchyKeyPose_param;
 
 		// objects
