@@ -51,44 +51,68 @@ resultAngles = testLerp.opOrientation(args)
 
 */
 
-typedef a3vec4 (*a3_BlendOpLerp)(a3vec4 v0, a3vec4 v1, a3real const u);
-typedef struct a3SpatialposeBlendOpLerp {
-	a3_BlendOpLerp opOrientation, opAngles, opScale, opTranslation;
-} a3SpatialposeBlendOpLerp;
+//Robust Blend Node
+typedef a3_SpatialPose* (*a3_SpatialPoseBlendOp)(a3_SpatialPose* p_out, a3_SpatialPose const* ctrl[], a3real const* param[]);
 
-inline a3vec4 a3vec4Lerp(a3vec4 v0, a3vec4 v1, a3real const u) {
-	//implement linear interpolation 
-	a3real4Sub(v1.v, v0.v);
-	a3real4MulS(v1.v, u);
-	a3real4Add(v0.v, v1.v);
-	return v0;
+typdef struct a3_SpatialPoseBlendNode
+{
+	a3_SpatialPoseBlendOp op;
+	a3_SpatialPose* p_out;
+	a3_SpatialPose* p_ctrl[16];
+	a3real* u[4];
+
+} a3_SpatialPoseBlendNode;
+
+
+a3_SpatialPose* a3_SpatialPoseBlendLerp(a3_SpatialPose* p_out, a3_SpatialPose const* ctrl[2], a3real const* param[1]) {
+
+	a3_SpatialPose const* p0 = ctrl[0];
+	a3_SpatialPose const* p1 = ctrl[1];
+	a3real const* u = param[0];
+	a3spatialPoseLerp(p_out, p0, p1, u);
+	return p_out;
 }
-inline a3vec4 a3vec4SLerp(a3vec4 v0, a3vec4 v1, a3real const u) {
-	//implement spherical interpolation 
-
-
-	return v0;
-}
-inline a3vec4 a3vec4NLerp(a3vec4 v0, a3vec4 v1, a3real const u) {
-	//implement normal interpolation 
-	a3real4Sub(v1.v, v0.v);
-	a3real4MulS(v1.v, u);
-	a3real4Add(v0.v, v1.v);
-	a3real3Normalize(v0.v);
-	return v0;
-}
-inline a3vec4 a3vec4LogLerp(a3vec4 v0, a3vec4 v1, a3real const u) {
-	//implement log interpolation 
-
-	a3real4DivComp(v1.v, v0.v);
-	v1.x = powf(v1.x, u);
-	v1.y = powf(v1.y, u);
-	v1.z = powf(v1.z, u);
-
-	a3real4MulComp(v0.v, v1.v);
-
-	return v0;
-}
+//typedef a3_SpatialPose(*a3SpatialPoseBlendOpLerp)(a3_SpatialPose const p0, a3_SpatialPose const p1, a3real const u);
+//typedef a3_SpatialPose*(*a3SpatialPoseBlendOpLerp)(a3_SpatialPose* p_out, a3_SpatialPose const p0, a3_SpatialPose const p1, a3real const u);
+//
+//typedef a3vec4 (*a3_BlendOpLerp)(a3vec4 v0, a3vec4 v1, a3real const u);
+//typedef struct a3SpatialposeBlendOpLerp {
+//	a3_BlendOpLerp opOrientation, opAngles, opScale, opTranslation;
+//} a3SpatialposeBlendOpLerp;
+//
+//inline a3vec4 a3vec4Lerp(a3vec4 v0, a3vec4 v1, a3real const u) {
+//	//implement linear interpolation 
+//	a3real4Sub(v1.v, v0.v);
+//	a3real4MulS(v1.v, u);
+//	a3real4Add(v0.v, v1.v);
+//	return v0;
+//}
+//inline a3vec4 a3vec4SLerp(a3vec4 v0, a3vec4 v1, a3real const u) {
+//	//implement spherical interpolation 
+//
+//
+//	return v0;
+//}
+//inline a3vec4 a3vec4NLerp(a3vec4 v0, a3vec4 v1, a3real const u) {
+//	//implement normal interpolation 
+//	a3real4Sub(v1.v, v0.v);
+//	a3real4MulS(v1.v, u);
+//	a3real4Add(v0.v, v1.v);
+//	a3real3Normalize(v0.v);
+//	return v0;
+//}
+//inline a3vec4 a3vec4LogLerp(a3vec4 v0, a3vec4 v1, a3real const u) {
+//	//implement log interpolation 
+//
+//	a3real4DivComp(v1.v, v0.v);
+//	v1.x = powf(v1.x, u);
+//	v1.y = powf(v1.y, u);
+//	v1.z = powf(v1.z, u);
+//
+//	a3real4MulComp(v0.v, v1.v);
+//
+//	return v0;
+//}
 
 //-----------------------------------------------------------------------------
 /*
