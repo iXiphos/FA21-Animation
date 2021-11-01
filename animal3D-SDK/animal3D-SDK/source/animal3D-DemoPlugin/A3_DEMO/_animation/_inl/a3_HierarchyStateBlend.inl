@@ -41,17 +41,17 @@ inline a3_SpatialPose* a3spatialPoseOpIdentity(a3_SpatialPose* pose_out)
 }
 
 // pointer-based LERP operation for single spatial pose
-inline a3_SpatialPose* a3spatialPoseOpLERP(a3_SpatialPose* pose_out, a3_SpatialPose const* pose0, a3_SpatialPose const* pose1, a3real const u)
+inline a3_SpatialPose* a3spatialPoseOpLERP(a3_SpatialPose* pose_out, a3_SpatialPoseBlendArgs args)
 {
 	/* TO-DO: Make sure these are all the correct calculations*/
-	if (pose0 && pose1)
+	if (args.pose0 && args.pose1)
 	{
-		pose_out->angles = a3vec4Lerp( pose0->angles, pose1->angles, u);
+		pose_out->angles = a3vec4Lerp( args.pose0->angles, args.pose1->angles, args.param0);
 
 		
-		pose_out->scale = a3vec4LogLerp( pose0->scale, pose1->scale, u);
+		pose_out->scale = a3vec4LogLerp( args.pose0->scale, args.pose1->scale, args.param0);
 
-		pose_out->translation = a3vec4Lerp( pose0->translation, pose1->translation, u);
+		pose_out->translation = a3vec4Lerp(args.pose0->translation, args.pose1->translation, args.param0);
 
 
 	}
@@ -78,9 +78,9 @@ Return: control pose.
 Controls (1): spatial pose.
 Kinda Confused on how this one works
 */
-inline a3_SpatialPose* a3spatialPoseOpCopy(a3_SpatialPose* pose_out, a3_SpatialPose const* pose)
+inline a3_SpatialPose* a3spatialPoseOpCopy(a3_SpatialPose* pose_out, a3_SpatialPoseBlendArgs args)
 {
-	a3spatialPoseCopy(pose_out, pose);
+	a3spatialPoseCopy(pose_out, args.pose0);
 	return pose_out;
 }
 
@@ -89,127 +89,175 @@ inline a3_SpatialPose* a3spatialPoseOpCopy(a3_SpatialPose* pose_out, a3_SpatialP
 Formats: negateP( ); invertP( ); minusP( ).
 Return: inverted/negated control pose.
 Controls (1): spatial pose.*/
-inline a3_SpatialPose* a3spatialPoseOpInvert(a3_SpatialPose* pose_out, a3_SpatialPose const* pose)
+inline a3_SpatialPose* a3spatialPoseOpInvert(a3_SpatialPose* pose_out, a3_SpatialPoseBlendArgs args)
 {
 	//I think this is right but I could be wrong
-	pose_out->angles = pose->angles;
+	pose_out->angles = args.pose0->angles;
 	a3real4MulS(pose_out->angles.v, -1);
 
-	pose_out->scale = pose->scale;
+	pose_out->scale = args.pose0->scale;
 	a3real4MulS(pose_out->scale.v, -1);
 
-	pose_out->transform = pose->transform;
+	pose_out->transform = args.pose0->transform;
 	a3real4x4MulS(pose_out->transform.m, -1);
 	
 
 	return pose_out;
 }
 
-inline a3_SpatialPose* a3spatialPoseOpConcat(a3_SpatialPose* pose_out, a3_SpatialPose const* pose0, a3_SpatialPose const* pose1)
+inline a3_SpatialPose* a3spatialPoseOpConcat(a3_SpatialPose* pose_out, a3_SpatialPoseBlendArgs args)
 {
-	a3spatialPoseConcat(pose_out, pose0, pose1);
+	a3spatialPoseConcat(pose_out, args.pose0, args.pose1);
 	return pose_out;
 }
 
-inline a3_SpatialPose* a3spatialPoseOpNearest(a3_SpatialPose* pose_out, a3_SpatialPose const* pose0, a3_SpatialPose const* pose1, a3real const u)
+inline a3_SpatialPose* a3spatialPoseOpNearest(a3_SpatialPose* pose_out, a3_SpatialPoseBlendArgs args)
 {
 
-	if (u < 0.5f) 
+	if (args.param0 < 0.5f) 
 	{
-		*pose_out = *pose0;
+		*pose_out = *args.pose0;
 	}
-	else if (u >= 0.5f) 
+	else if (args.param0 >= 0.5f) 
 	{
-		*pose_out = *pose1;
+		*pose_out = *args.pose1;
 	}
 
 	return pose_out;
 }
 
-inline a3_SpatialPose* a3spatialPoseOpCubic(a3_SpatialPose* pose_out, a3_SpatialPose const* pose0, a3_SpatialPose const* pose1, a3_SpatialPose const* pose2, a3_SpatialPose const* pose3, a3real const u)
+inline a3_SpatialPose* a3spatialPoseOpCubic(a3_SpatialPose* pose_out, a3_SpatialPoseBlendArgs args)
 {
-	a3real mu2 = u * u;
+	a3real mu2 = args.param0 * args.param0;
+	a3_SpatialPoseBlendArgs temp;
 
 	a3_SpatialPose a0[1];
-	a3spatialPoseOpDeconcat(a0, pose3, pose2);
-	a3spatialPoseOpDeconcat(a0, a0, pose0);
-	a3spatialPoseOpConcat(a0, a0, pose1);
+
+	temp.pose0 = args.pose3;
+	temp.pose1 = args.pose2;
+	a3spatialPoseOpDeconcat(a0, args);
+	
+	temp.pose0 = a0;
+	temp.pose1 = args.pose0;
+	a3spatialPoseOpDeconcat(a0, temp);
+
+	temp.pose1 = args.pose1;
+	a3spatialPoseOpConcat(a0, args);
 
 	a3_SpatialPose a1[1];
-	a3spatialPoseOpDeconcat(a1, pose0, pose1);
-	a3spatialPoseOpDeconcat(a1, a1, a0);
+
+	temp.pose0 = args.pose0;
+	temp.pose1 = args.pose1;
+	a3spatialPoseOpDeconcat(a1, temp);
+	
+	temp.pose0 = a0;
+	temp.pose1 = a1;
+	a3spatialPoseOpDeconcat(a1, temp);
 
 	a3_SpatialPose a2[1];
-	a3spatialPoseOpDeconcat(a2, pose2, pose0);
+	temp.pose0 = args.pose2;
+	temp.pose1 = args.pose0;
+	a3spatialPoseOpDeconcat(a2, temp);
 	
+	temp.pose0 = a0;
+	temp.pose1 = a1;
+	temp.pose2 = a2;
+	temp.param0 = args.param0;
+	temp.param1 = mu2;
 
-	a3spatialPoseOpTriangular(pose_out, a0, a1, a2, u, mu2);
+	a3spatialPoseOpTriangular(pose_out, temp);
 
 	return pose_out;
 }
 
-inline a3_SpatialPose* a3spatialPoseOpDeconcat(a3_SpatialPose* pose_out, a3_SpatialPose const* pose0, a3_SpatialPose const* pose1)
+inline a3_SpatialPose* a3spatialPoseOpDeconcat(a3_SpatialPose* pose_out, a3_SpatialPoseBlendArgs args)
 {
 
-	pose_out->angles.x = a3trigValid_sind(pose0->angles.x - pose1->angles.x);
-	pose_out->angles.y = a3trigValid_sind(pose0->angles.y - pose1->angles.y);
-	pose_out->angles.z = a3trigValid_sind(pose0->angles.z - pose1->angles.z);
-
-	pose_out->scale.x = pose0->scale.x / pose1->scale.x;
-	pose_out->scale.y = pose0->scale.y / pose1->scale.y;
-	pose_out->scale.z = pose0->scale.z / pose1->scale.z;
-
-	pose_out->translation.x = pose0->translation.x - pose1->translation.x;
-	pose_out->translation.y = pose0->translation.y - pose1->translation.y;
-	pose_out->translation.z = pose0->translation.z - pose1->translation.z;
+	a3_SpatialPoseBlendArgs tempArgs;
+	tempArgs.pose0 = args.pose1;
+	a3spatialPoseOpInvert(args.pose1, tempArgs);
+	a3spatialPoseConcat(pose_out, args.pose0, args.pose1);
 
 	return pose_out;
 
 }
 
-inline a3_SpatialPose* a3spatialPoseOpScale(a3_SpatialPose* pose_out, a3_SpatialPose const* pose0, a3real const u)
+inline a3_SpatialPose* a3spatialPoseOpScale(a3_SpatialPose* pose_out, a3_SpatialPoseBlendArgs args)
 {
 	a3spatialPoseOpIdentity(pose_out);
 
-	return a3spatialPoseOpLERP(pose_out, pose_out, pose0, u);
+	return a3spatialPoseOpLERP(pose_out, args);
 }
 
-inline a3_SpatialPose* a3spatialPoseOpTriangular(a3_SpatialPose* pose_out, a3_SpatialPose const* pose0, a3_SpatialPose const* pose1, a3_SpatialPose const* pose2, a3real const u1, a3real const u2)
+inline a3_SpatialPose* a3spatialPoseOpTriangular(a3_SpatialPose* pose_out, a3_SpatialPoseBlendArgs args)
 {
-	a3real u0 = 1 - u1 - u2;
+	a3real u0 = 1 - args.param0 -args.param1;
 
 	a3_SpatialPose a0[1];
 	a3_SpatialPose a1[1];
 	a3_SpatialPose a2[1];
+	a3_SpatialPoseBlendArgs temp;
+	temp.pose0 = args.pose0;
+	temp.param0 = u0;
 
-	a3spatialPoseOpScale(a0, pose0, u0);
-	a3spatialPoseOpScale(a1, pose1, u1);
-	a3spatialPoseOpScale(a2, pose2, u2);
+	a3spatialPoseOpScale(a0, temp);
+	temp.pose0 = args.pose1;
+	temp.param0 = args.param0;
+	a3spatialPoseOpScale(a1, temp);
 
-	a3spatialPoseOpConcat(pose_out, a0, a1);
-	a3spatialPoseOpConcat(pose_out, pose_out, a2);
+	temp.pose0 = args.pose2;
+	a3spatialPoseOpScale(a2, temp);
+
+	a3spatialPoseConcat(pose_out, a0, a1);
+	a3spatialPoseConcat(pose_out, pose_out, a2);
 
 	return pose_out;
 }
 
-inline a3_SpatialPose* a3spatialPoseOpBiNearest(a3_SpatialPose* pose_out, a3_SpatialPose const* pose0, a3_SpatialPose const* pose1, a3_SpatialPose const* pose2, a3_SpatialPose const* pose3, a3real const u1, a3real const u2, a3real const u3)
+inline a3_SpatialPose* a3spatialPoseOpBiNearest(a3_SpatialPose* pose_out, a3_SpatialPoseBlendArgs args)
 {
 	a3_SpatialPose tmp0[1];
 	a3_SpatialPose tmp1[1];
 
-	a3spatialPoseOpNearest(tmp0, pose0, pose1, u1);
-	a3spatialPoseOpNearest(tmp1, pose2, pose3, u2);
-	a3spatialPoseOpNearest(pose_out, tmp0, tmp1, u3);
+	a3_SpatialPoseBlendArgs temp;
+
+	temp.pose0 = args.pose0;
+	temp.pose1 = args.pose1;
+	temp.param0 = args.param0;
+	a3spatialPoseOpNearest(tmp0, temp);
+
+	temp.pose0 = args.pose2;
+	temp.pose1 = args.pose3;
+	temp.param0 = args.param2;
+	a3spatialPoseOpNearest(tmp1, temp);
+
+	temp.pose0 = tmp0;
+	temp.pose1 = tmp1;
+	temp.param0 = args.param3;
+	a3spatialPoseOpNearest(pose_out, temp);
 	return pose_out;
 }
 
-inline a3_SpatialPose* a3spatialPoseOpBiLinear(a3_SpatialPose* pose_out, a3_SpatialPose const* pose0, a3_SpatialPose const* pose1, a3_SpatialPose const* pose2, a3_SpatialPose const* pose3, a3real const u1, a3real const u2, a3real const u3)
+inline a3_SpatialPose* a3spatialPoseOpBiLinear(a3_SpatialPose* pose_out, a3_SpatialPoseBlendArgs args)
 {
 
 	a3_SpatialPose tmp[1];
-	a3spatialPoseOpLERP(tmp, pose0, pose1, u1);
-	a3spatialPoseOpLERP(pose_out, pose2, pose3, u2);
-	a3spatialPoseOpLERP(pose_out, tmp, pose_out, u3);
+	a3_SpatialPoseBlendArgs temp;
+	
+	temp.pose0 = args.pose0;
+	temp.pose1 = args.pose1;
+	temp.param0 = args.param0;
+	a3spatialPoseOpLERP(tmp, temp);
+
+	temp.pose0 = args.pose2;
+	temp.pose1 = args.pose3;
+	temp.param0 = args.param1;
+	a3spatialPoseOpLERP(pose_out, temp);
+
+	temp.pose0 = tmp;
+	temp.pose1 = pose_out;
+	temp.param0 = args.param2;
+	a3spatialPoseOpLERP(pose_out, temp);
 
 	return pose_out;
 }
