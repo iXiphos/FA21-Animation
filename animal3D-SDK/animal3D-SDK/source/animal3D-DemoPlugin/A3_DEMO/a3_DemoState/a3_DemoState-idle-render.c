@@ -187,6 +187,7 @@ void a3demo_render_bloomIteration(a3_DemoState const* demoState, a3real2 pixelSi
 
 void a3demo_render(a3_DemoState const* demoState, a3f64 const dt)
 {
+	
 	// display mode for current pipeline
 	// ensures we don't go through the whole pipeline if not needed
 	a3_DemoState_ModeName const demoMode = demoState->demoMode;
@@ -251,6 +252,8 @@ void a3demo_render(a3_DemoState const* demoState, a3f64 const dt)
 			}
 		}
 	}
+
+	igRender();
 }
 
 

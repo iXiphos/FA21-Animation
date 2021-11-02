@@ -128,7 +128,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>Debug</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(ANIMAL3D_SDK)lib\$(PlatformTarget)\$(PlatformToolset)\$(Configuration)\;$(ANIMAL3D_SDK)thirdparty\lib\$(PlatformTarget)\$(PlatformToolset)\$(Configuration)\;$(DEV_SDK_DIR)lib\$(PlatformTarget)\$(PlatformToolset)\$(Configuration)\;$(DEV_SDK_DIR)lib\$(PlatformTarget)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ANIMAL3D_SDK)lib\$(PlatformTarget)\$(PlatformToolset)\$(Configuration)\;$(ANIMAL3D_SDK)thirdparty\lib\$(PlatformTarget)\$(PlatformToolset)\$(Configuration)\;$(DEV_SDK_DIR)lib\$(PlatformTarget)\$(PlatformToolset)\$(Configuration)\;$(DEV_SDK_DIR)lib\$(PlatformTarget)\;$(ANIMAL3D_SDK)cimgui;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>animal3D.lib;animal3D-A3DM.lib;devil.lib;ilu.lib;ilut.lib;xinput1_3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>

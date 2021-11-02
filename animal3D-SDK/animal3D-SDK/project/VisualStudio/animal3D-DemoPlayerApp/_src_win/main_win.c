@@ -31,6 +31,12 @@
 
 #include "../animal3D-DemoPlayerApp.rc.h"
 
+#pragma comment(lib, "cimgui.lib")
+
+#define CIMGUI_DEFINE_ENUMS_AND_STRUCTS
+#include "cimgui.h"
+#include "cimgui_impl.h"
+
 
 //-----------------------------------------------------------------------------
 // link renderer lib and respective dependencies
@@ -40,6 +46,23 @@
 
 //-----------------------------------------------------------------------------
 // main
+
+
+HGLRC   g_GLRenderContext;
+HDC     g_HDCDeviceContext;
+HWND    g_hwnd;
+int     g_display_w = 800;
+int     g_display_h = 600;
+
+enum A3_MESSAGE
+{
+	A3_MESSAGE_BEGIN = WM_USER,
+	A3_HOTLOAD_COMPLETE,
+	A3_USER_EXIT_DEMO,
+
+	A3_MENU_ITEM = 1000,
+};
+
 
 int APIENTRY wWinMain(
 	_In_ HINSTANCE hInstance,
@@ -82,14 +105,34 @@ int APIENTRY wWinMain(
 
 			// create window
 			status = a3windowCreate(&wnd, &wndClass, &env, &renderContext, wndName, winWidth, winHeight, 1, 0);
+
+
+			igCreateContext(NULL);
+			igStyleColorsDark(NULL);
+
+			ImGui_ImplWin32_Init(wnd.windowHandle);
+			const char* glsl_version = "#version 430";
+			ImGui_ImplOpenGL3_Init(glsl_version);
+
 			if (status > 0)
 			{
+				ImGui_ImplOpenGL3_NewFrame();
+				ImGui_ImplWin32_NewFrame();
+				igNewFrame();
 				// main loop
 				status = a3windowBeginMainLoop(&wnd);
 			}
 
+			ImGui_ImplOpenGL3_Shutdown();
 			// kill rendering context
 			status = a3rendererReleaseContext(&renderContext);
+			// Cleanup
+			
+		
+			igDestroyContext(NULL);
+			ImGui_ImplWin32_Shutdown();
+
+
 		}
 
 		// kill window class

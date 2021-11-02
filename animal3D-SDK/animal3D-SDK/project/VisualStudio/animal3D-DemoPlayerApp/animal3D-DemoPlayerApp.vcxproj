@@ -120,7 +120,7 @@ if not exist "%ANIMAL3D_SDK%" ( echo A3 ERROR: ONLY USE LAUNCHER TO OPEN ANIMAL 
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_A3VSLAUNCHPATHSTR=$(a3vslaunchpath.Replace('\','\\'));_A3SLNPATHSTR="$(SolutionPath.Replace('\','\\'))";_A3SDKDIRSTR="$(ANIMAL3D_SDK.Replace('\','\\')).";_A3CFGDIRSTR="\\$(PlatformTarget)\\$(PlatformToolset)\\$(Configuration)\\.";WIN$(PlatformArchitecture);_WINDOWS;WIN32_LEAN_AND_MEAN;_CRT_SECURE_NO_WARNINGS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ANIMAL3D_SDK)source\$(ProjectName)\;$(ANIMAL3D_SDK)include\animal3D\a3\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ANIMAL3D_SDK)source\$(ProjectName)\;$(ANIMAL3D_SDK)include\animal3D\a3\;$(ANIMAL3D_SDK)include\cimgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <TreatWarningAsError>true</TreatWarningAsError>
       <SDLCheck>
@@ -130,7 +130,7 @@ if not exist "%ANIMAL3D_SDK%" ( echo A3 ERROR: ONLY USE LAUNCHER TO OPEN ANIMAL 
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>Debug</GenerateDebugInformation>
       <AdditionalDependencies>animal3D-DemoPlayerApp-Platform.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(ANIMAL3D_SDK)lib\$(PlatformTarget)\$(PlatformToolset)\$(Configuration)\;$(DEV_SDK_DIR)lib\$(PlatformTarget)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ANIMAL3D_SDK)cimgui;$(ANIMAL3D_SDK)lib\$(PlatformTarget)\$(PlatformToolset)\$(Configuration)\;$(DEV_SDK_DIR)lib\$(PlatformTarget)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
       <Command>@echo off
@@ -212,6 +212,8 @@ if not exist "%ANIMAL3D_SDK%" ( echo A3 ERROR: ONLY USE LAUNCHER TO OPEN ANIMAL 
     </PreLinkEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\include\cimgui\cimgui.h" />
+    <ClInclude Include="..\..\..\include\cimgui\cimgui_impl.h" />
     <ClInclude Include="..\..\..\source\animal3D-DemoPlayerApp\a3_app_utils\a3_app_load.h" />
     <ClInclude Include="..\..\..\source\animal3D-DemoPlayerApp\a3_app_utils\Win32\a3_app_application.h" />
     <ClInclude Include="..\..\..\source\animal3D-DemoPlayerApp\a3_app_utils\Win32\a3_app_console.h" />
@@ -222,6 +224,7 @@ if not exist "%ANIMAL3D_SDK%" ( echo A3 ERROR: ONLY USE LAUNCHER TO OPEN ANIMAL 
     <ClInclude Include="_src_win\a3_app_renderer_config.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\source\animal3D-DemoPlayerApp\a3_app_utils\Win32\a3_app_windows.c" />
     <ClCompile Include="_src_win\main_win.c" />
   </ItemGroup>
   <ItemGroup>

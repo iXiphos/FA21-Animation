@@ -39,7 +39,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+#pragma comment(lib, "cimgui.lib")
 
 //-----------------------------------------------------------------------------
 // callback prototypes
@@ -342,6 +342,7 @@ A3DYLIBSYMBOL a3i32 a3demoCB_idle(a3_DemoState *demoState)
 	{
 		if (a3timerUpdate(demoState->timer_display) > 0)
 		{
+			
 			// render timer ticked, update demo state and draw
 			a3f64 const dt = demoState->timer_display->secondsPerTick;
 
@@ -405,9 +406,12 @@ A3DYLIBSYMBOL void a3demoCB_windowDeactivate(a3_DemoState *demoState)
 A3DYLIBSYMBOL void a3demoCB_windowMove(a3_DemoState *demoState, a3i32 newWindowPosX, a3i32 newWindowPosY)
 {
 	// nothing needed here
+	if (igGetCurrentContext() == NULL)
+		igSetCurrentContext(demoState->imGuiContext);
 }
 
-// window resizes
+// window 
+
 A3DYLIBSYMBOL void a3demoCB_windowResize(a3_DemoState *demoState, a3i32 newWindowWidth, a3i32 newWindowHeight)
 {
 	// account for borders here
