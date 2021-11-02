@@ -130,7 +130,7 @@ if not exist "%ANIMAL3D_SDK%" ( echo A3 ERROR: ONLY USE LAUNCHER TO OPEN ANIMAL 
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>Debug</GenerateDebugInformation>
       <AdditionalDependencies>animal3D-DemoPlayerApp-Platform.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(ANIMAL3D_SDK)lib\$(PlatformTarget)\$(PlatformToolset)\$(Configuration)\;$(DEV_SDK_DIR)lib\$(PlatformTarget)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(ANIMAL3D_SDK)cimgui;$(ANIMAL3D_SDK)lib\$(PlatformTarget)\$(PlatformToolset)\$(Configuration)\;$(DEV_SDK_DIR)lib\$(PlatformTarget)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
       <Command>@echo off
