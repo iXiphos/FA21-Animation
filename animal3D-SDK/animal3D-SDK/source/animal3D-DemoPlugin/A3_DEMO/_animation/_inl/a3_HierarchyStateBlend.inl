@@ -646,6 +646,44 @@ inline a3_HierarchyPose* a3hierarchyPoseOpRevert(a3_HierarchyPose* pose_out, a3_
 	for (a3ui32 i = 0; i < num_nodes; i++, spose_out++, temp.pose0++) {
 		a3spatialPoseOpRevert(pose_out->pose, temp);
 	}
+
+	return pose_out;
+}
+
+inline a3_HierarchyPose* a3hierarchyPoseOKinematics(a3_HierarchyPose* pose_out, a3_Hierarchy const* hierarchy, a3_HierarchyPose const* poseObj, a3_HierarchyPose const* poseLoc)
+{
+	const a3_HierarchyNode* itr = hierarchy->nodes;
+	const a3_HierarchyNode* const end = itr + hierarchy->numNodes;
+	for (; itr < end; ++itr)
+	{
+		if (itr->parentIndex >= 0)
+			a3real4x4Product(poseObj->pose[itr->index].transform.m,
+				poseObj->pose[itr->parentIndex].transform.m,
+				poseLoc->pose[itr->index].transform.m);
+		else
+			poseObj->pose[itr->index] = poseLoc->pose[itr->index];
+	}
+	pose_out = poseObj;
+	return pose_out;
+}
+
+inline a3_HierarchyPose* a3hierarchyPoseOpInverseKinematics(a3_HierarchyPose* pose_out, a3_Hierarchy const* hierarchy, a3_HierarchyPose const* poseObj, a3_HierarchyPose const* poseLoc)
+{
+	const a3_HierarchyNode* itr = hierarchy->nodes;
+	const a3_HierarchyNode* const end = itr + hierarchy->numNodes;
+	a3hierarchyPoseOpInvert(pose_out, poseObj, hierarchy->numNodes);
+
+	for (; itr < end; ++itr)
+	{
+		if (itr->parentIndex >= 0)
+			a3real4x4Product(poseLoc->pose[itr->index].transform.m,
+				pose_out->pose[itr->parentIndex].transform.m,
+				poseObj->pose[itr->index].transform.m);
+		else
+			poseLoc->pose[itr->index] = poseObj->pose[itr->index];
+	}
+	pose_out = poseLoc;
+
 	return pose_out;
 }
 

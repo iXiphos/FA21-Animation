@@ -205,6 +205,11 @@ a3_HierarchyPose* a3hierarchyPoseOpDeScale(a3_HierarchyPose* pose_out, a3_Hierar
 a3_HierarchyPose* a3hierarchyPoseOpConvert(a3_HierarchyPose* pose_out, a3_HierarchyPose const* pose, a3ui32 num_nodes);
 
 a3_HierarchyPose* a3hierarchyPoseOpRevert(a3_HierarchyPose* pose_out, a3_HierarchyPose const* pose, a3ui32 num_nodes);
+
+a3_HierarchyPose* a3hierarchyPoseOKinematics(a3_HierarchyPose* pose_out, a3_Hierarchy const* hierarchy, a3_HierarchyPose const* poseObj, a3_HierarchyPose const* poseLoc);
+
+a3_HierarchyPose* a3hierarchyPoseOpInverseKinematics(a3_HierarchyPose* pose_out, a3_Hierarchy const* hierarchy, a3_HierarchyPose const* poseObj, a3_HierarchyPose const* poseLoc);
+
 //-----------------------------------------------------------------------------
 
 
