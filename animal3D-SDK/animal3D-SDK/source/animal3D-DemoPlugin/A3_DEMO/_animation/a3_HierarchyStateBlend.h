@@ -40,17 +40,6 @@ extern "C"
 
 #endif	// __cplusplus
 
-//Blend operation function
-/*
-All blendable values in spatial pose is a a4vec4
-example in load:
-a3_SpatialPoseBlendOpLerp testLerp;
-testLerp.opOrientation = a3vec4Nlerp;
-
-resultAngles = testLerp.opOrientation(args)
-
-*/
-
 typedef a3vec4 (*a3_BlendOpLerp)(a3vec4 v0, a3vec4 v1, a3real const u);
 typedef struct a3SpatialposeBlendOpLerp {
 	a3_BlendOpLerp opOrientation, opAngles, opScale, opTranslation;
@@ -117,7 +106,6 @@ typedef struct a3_SpatialPoseBlendArgs {
 } a3_SpatialPoseBlendArgs;
 
 typedef a3_SpatialPose* (*a3_SpatialPoseBlendOp)(a3_SpatialPose* pose_out, a3_SpatialPoseBlendArgs args);
-*/
 
 // pointer-based reset/identity operation for single spatial pose
 a3_SpatialPose* a3spatialPoseOpIdentity(a3_SpatialPose* pose_out);

@@ -46,12 +46,12 @@ inline a3_SpatialPose* a3spatialPoseOpLERP(a3_SpatialPose* pose_out, a3_SpatialP
 	/* TO-DO: Make sure these are all the correct calculations*/
 	if (args.pose0 && args.pose1)
 	{
-		pose_out->angles = a3vec4Lerp( args.pose0->angles, args.pose1->angles, args.param0);
+		pose_out->angles = a3vec4Lerp( args.pose0->angles, args.pose1->angles, (a3real)args.param0);
 
 		
-		pose_out->scale = a3vec4LogLerp( args.pose0->scale, args.pose1->scale, args.param0);
+		pose_out->scale = a3vec4LogLerp( args.pose0->scale, args.pose1->scale, (a3real)args.param0);
 
-		pose_out->translation = a3vec4Lerp(args.pose0->translation, args.pose1->translation, args.param0);
+		pose_out->translation = a3vec4Lerp(args.pose0->translation, args.pose1->translation, (a3real)args.param0);
 
 
 	}
@@ -128,7 +128,7 @@ inline a3_SpatialPose* a3spatialPoseOpNearest(a3_SpatialPose* pose_out, a3_Spati
 
 inline a3_SpatialPose* a3spatialPoseOpCubic(a3_SpatialPose* pose_out, a3_SpatialPoseBlendArgs args)
 {
-	a3real mu2 = args.param0 * args.param0;
+	a3real mu2 = (a3real)args.param0 * (a3real)args.param0;
 	a3_SpatialPoseBlendArgs temp;
 
 	a3_SpatialPose a0[1];
@@ -191,7 +191,7 @@ inline a3_SpatialPose* a3spatialPoseOpScale(a3_SpatialPose* pose_out, a3_Spatial
 
 inline a3_SpatialPose* a3spatialPoseOpTriangular(a3_SpatialPose* pose_out, a3_SpatialPoseBlendArgs args)
 {
-	a3real u0 = 1 - args.param0 -args.param1;
+	a3real u0 = 1 - (a3real)args.param0 - (a3real)args.param1;
 
 	a3_SpatialPose a0[1];
 	a3_SpatialPose a1[1];
@@ -266,7 +266,7 @@ inline a3_SpatialPose* a3spatialPoseOpSmoothStep(a3_SpatialPose* pose_out, a3_Sp
 {
 	//https://www.febucci.com/2018/08/easing-functions/
 
-	a3real u = args.param0;
+	a3real u = (a3real)args.param0;
 	a3real easeIn = u * u;
 	a3real easeOut = 1.0f - (((a3real)1.0f - u) * ((a3real)1.0f - u));
 
@@ -368,7 +368,7 @@ inline a3_SpatialPose a3spatialPoseDOpIdentity()
 inline a3_SpatialPose a3spatialPoseDOpLERP(a3_SpatialPose const pose0, a3_SpatialPose const pose1, a3real const u)
 {
 	a3_SpatialPose result = { 0 };
-	a3spatialPoseLERP(result, pose0, pose1, u);
+	//a3spatialPoseLERP(result, pose0, pose1, u);
 
 	// done
 	return result;
@@ -663,7 +663,7 @@ inline a3_HierarchyPose* a3hierarchyPoseOKinematics(a3_HierarchyPose* pose_out, 
 		else
 			poseObj->pose[itr->index] = poseLoc->pose[itr->index];
 	}
-	pose_out = poseObj;
+	pose_out->pose = poseObj->pose;
 	return pose_out;
 }
 
@@ -682,7 +682,7 @@ inline a3_HierarchyPose* a3hierarchyPoseOpInverseKinematics(a3_HierarchyPose* po
 		else
 			poseLoc->pose[itr->index] = poseObj->pose[itr->index];
 	}
-	pose_out = poseLoc;
+	pose_out->pose = poseLoc->pose;
 
 	return pose_out;
 }
