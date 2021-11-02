@@ -71,6 +71,9 @@
     <ClCompile Include="_src_win\main_win.c">
       <Filter>Source Files\platform</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\source\animal3D-DemoPlayerApp\a3_app_utils\Win32\a3_app_windows_custom.c">
+      <Filter>Source Files\platform</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="_src_win\resource\icon\cbtk.ico">

@@ -140,7 +140,7 @@ int APIENTRY wWinMain(
 			igCreateContext(NULL);
 			igStyleColorsDark(NULL);
 
-			ImGui_ImplWin32_Init(g_hwnd);
+			ImGui_ImplWin32_Init(wnd.windowHandle);
 			const char* glsl_version = "#version 430";
 			ImGui_ImplOpenGL3_Init(glsl_version);
 
@@ -217,17 +217,8 @@ a3ret a3windowBeginCustomMainLoop(a3_WindowInterface* window) {
 		{
 			idle = window->demo->callbacks->callback_idle(window->demo->data);
 	
-			ImGui_ImplOpenGL3_NewFrame();
-			ImGui_ImplWin32_NewFrame();
-			igNewFrame();
-			igShowDemoWindow(NULL);
-			igRender();       
-      
-			wglMakeCurrent(g_HDCDeviceContext, g_GLRenderContext);
-			//glViewport(0, 0, g_display_w, g_display_h);
-			ImGui_ImplOpenGL3_RenderDrawData(igGetDrawData());
-			wglMakeCurrent(g_HDCDeviceContext, g_GLRenderContext);
-			SwapBuffers(g_HDCDeviceContext);
+		
+			//SwapBuffers(g_HDCDeviceContext);
 			
 			// if the result is positive, idle is successful
 			// if rendering, this should mean that a frame was rendered
@@ -235,6 +226,16 @@ a3ret a3windowBeginCustomMainLoop(a3_WindowInterface* window) {
 			{
 				if (a3rendererInternalContextIsCurrent(window->renderingContext))
 				{
+					ImGui_ImplOpenGL3_NewFrame();
+					ImGui_ImplWin32_NewFrame();
+					igNewFrame();
+					igShowDemoWindow(NULL);
+					igRender();
+
+					wglMakeCurrent(window->deviceContext, window->renderingContext);
+					//glViewport(0, 0, g_display_w, g_display_h);
+					ImGui_ImplOpenGL3_RenderDrawData(igGetDrawData());
+					wglMakeCurrent(window->deviceContext, window->renderingContext);
 					// swap buffers
 					SwapBuffers(window->deviceContext);
 				}
