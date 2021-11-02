@@ -143,7 +143,7 @@ a3_SpatialPose* a3spatialPoseOpConvert(a3_SpatialPose* pose_out, a3_SpatialPoseB
 
 a3_SpatialPose* a3spatialPoseOpRevert(a3_SpatialPose* pose_out, a3_SpatialPoseBlendArgs args);
 
-a3_SpatialPose* a3spatialPoseOpBiCubic(a3_SpatialPose* pose_out, a3_SpatialPose const* poses0[4], a3_SpatialPose const* poses1[4], a3_SpatialPose const* poses2[4], a3_SpatialPose const* poses3[4], a3real const u[5]);
+a3_SpatialPose* a3spatialPoseOpBiCubic(a3_SpatialPose* pose_out, a3_SpatialPose * poses0[4], a3_SpatialPose * poses1[4], a3_SpatialPose * poses2[4], a3_SpatialPose * poses3[4], a3real u[5]);
 
 //-----------------------------------------------------------------------------
 
@@ -184,7 +184,7 @@ a3_HierarchyPose* a3hierarchyPoseOpBiNearest(a3_HierarchyPose* pose_out, a3_Hier
 
 a3_HierarchyPose* a3hierarchyPoseOpBiLinear(a3_HierarchyPose* pose_out, a3_HierarchyPose const* pose0, a3_HierarchyPose const* pose1, a3_HierarchyPose const* pose2, a3_HierarchyPose const* pose3, a3real const u1, a3real const u2, a3real const u3, a3ui32 num_nodes);
 
-a3_HierarchyPose* a3hierarchyPoseOpBiCubic(a3_HierarchyPose* pose_out, a3_HierarchyPose const* poses0[4], a3_HierarchyPose const* poses1[4], a3_HierarchyPose const* poses2[4], a3_HierarchyPose const* poses3[4], a3real const u[5], a3ui32 num_nodes);
+a3_HierarchyPose* a3hierarchyPoseOpBiCubic(a3_HierarchyPose* pose_out, a3_HierarchyPose* poses0[4], a3_HierarchyPose* poses1[4], a3_HierarchyPose* poses2[4], a3_HierarchyPose * poses3[4], a3real  u[5], a3ui32 num_nodes);
 
 a3_HierarchyPose* a3hierarchyPoseOpSmoothLERP(a3_HierarchyPose* pose_out, a3_HierarchyPose const* pose0, a3_HierarchyPose const* pose1, a3real const u, a3ui32 num_nodes);
 

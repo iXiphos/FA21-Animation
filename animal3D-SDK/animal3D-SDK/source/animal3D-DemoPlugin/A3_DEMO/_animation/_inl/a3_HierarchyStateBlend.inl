@@ -300,7 +300,7 @@ inline a3_SpatialPose* a3spatialPoseOpRevert(a3_SpatialPose* pose_out, a3_Spatia
 	return pose_out;
 }
 
-inline a3_SpatialPose* a3spatialPoseOpBiCubic(a3_SpatialPose* pose_out, a3_SpatialPose const* poses0[4], a3_SpatialPose const* poses1[4], a3_SpatialPose const* poses2[4], a3_SpatialPose const* poses3[4], a3real const u[5])
+inline a3_SpatialPose* a3spatialPoseOpBiCubic(a3_SpatialPose* pose_out, a3_SpatialPose* poses0[4], a3_SpatialPose* poses1[4], a3_SpatialPose* poses2[4], a3_SpatialPose* poses3[4], a3real u[5])
 {
 	a3_SpatialPoseBlendArgs temp;
 	a3_SpatialPose pose1[1];
@@ -563,7 +563,7 @@ inline a3_HierarchyPose* a3hierarchyPoseOpBiLinear(a3_HierarchyPose* pose_out, a
 	return pose_out;
 }
 
-inline a3_HierarchyPose* a3hierarchyPoseOpBiCubic(a3_HierarchyPose* pose_out, a3_HierarchyPose const* poses0[4], a3_HierarchyPose const* poses1[4], a3_HierarchyPose const* poses2[4], a3_HierarchyPose const* poses3[4], a3real const u[5], a3ui32 num_nodes)
+inline a3_HierarchyPose* a3hierarchyPoseOpBiCubic(a3_HierarchyPose* pose_out, a3_HierarchyPose* poses0[4], a3_HierarchyPose* poses1[4], a3_HierarchyPose* poses2[4], a3_HierarchyPose* poses3[4], a3real u[5], a3ui32 num_nodes)
 {
 	a3_SpatialPose* spose_out = pose_out->pose;
 	a3_SpatialPose* spose0[4];
