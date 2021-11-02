@@ -456,6 +456,22 @@ void a3animation_load(a3_DemoState const* demoState, a3_DemoMode1_Animation* dem
 	demoMode->targetCount[animation_passScene] = animation_target_scene_max;
 	demoMode->targetCount[animation_passComposite] = 1;
 
+	a3clipPoolCreate(demoMode->clipPool, 5);
+	a3keyframePoolCreate(demoMode->keyframePool, 64);
+
+	for (a3ui32 i = 0; i < 64; i++) {
+		a3keyframeInit(demoMode->keyframePool->keyframes + i, 0.5f, (float)i);
+	}
+
+	a3clipInit(demoMode->clipPool->clips + 0, " 0 -> 19", demoMode->keyframePool, 0, 19);
+	a3clipInit(demoMode->clipPool->clips + 1, " 0 ->  5", demoMode->keyframePool, 0, 5);
+	a3clipInit(demoMode->clipPool->clips + 2, " 5 -> 10", demoMode->keyframePool, 5, 10);
+	a3clipInit(demoMode->clipPool->clips + 3, "10 -> 19", demoMode->keyframePool, 10, 19);
+	a3clipInit(demoMode->clipPool->clips + 4, " 2 ->  7", demoMode->keyframePool, 2, 7);
+
+	a3clipControllerInit(demoMode->clipControllers + 0, "first clip ctrl", demoMode->clipPool, 0);
+	a3clipControllerInit(demoMode->clipControllers + 1, "second clip ctrl", demoMode->clipPool, 1);
+	a3clipControllerInit(demoMode->clipControllers + 2, "third clip ctrl", demoMode->clipPool, 2);
 
 	// setup
 	a3animation_init_animation(demoState, demoMode);
