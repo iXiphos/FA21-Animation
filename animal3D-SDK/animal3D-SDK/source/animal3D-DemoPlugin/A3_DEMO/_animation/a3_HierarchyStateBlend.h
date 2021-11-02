@@ -63,6 +63,7 @@ inline a3vec4 a3vec4Lerp(a3vec4 v0, a3vec4 v1, a3real const u) {
 	a3real4Add(v0.v, v1.v);
 	return v0;
 }
+
 inline a3vec4 a3vec4SLerp(a3vec4 v0, a3vec4 v1, a3real const u) {
 	//implement spherical interpolation 
 
@@ -142,9 +143,21 @@ a3_SpatialPose* a3spatialPoseOpScale(a3_SpatialPose* pose_out, a3_SpatialPoseBle
 
 a3_SpatialPose* a3spatialPoseOpTriangular(a3_SpatialPose* pose_out, a3_SpatialPoseBlendArgs args);
 
-a3_SpatialPose* a3spatialPoseOpBiNearest(a3_SpatialPose* pose_outa3_SpatialPoseBlendArgs args);
+a3_SpatialPose* a3spatialPoseOpBiNearest(a3_SpatialPose* pose_out, a3_SpatialPoseBlendArgs args);
 
-a3_SpatialPose* a3spatialPoseOpBiLinear(a3_SpatialPose* pose_outa3_SpatialPoseBlendArgs args);
+a3_SpatialPose* a3spatialPoseOpBiLinear(a3_SpatialPose* pose_out, a3_SpatialPoseBlendArgs args);
+
+a3_SpatialPose* a3spatialPoseOpSmoothStep(a3_SpatialPose* pose_out, a3_SpatialPoseBlendArgs args);
+
+a3_SpatialPose* a3spatialPoseOpDescale(a3_SpatialPose* pose_out, a3_SpatialPoseBlendArgs args);
+
+a3_SpatialPose* a3spatialPoseOpConvert(a3_SpatialPose* pose_out, a3_SpatialPoseBlendArgs args);
+
+a3_SpatialPose* a3spatialPoseOpRevert(a3_SpatialPose* pose_out, a3_SpatialPoseBlendArgs args);
+
+a3_SpatialPose* a3spatialPoseOpForwardKinematics(a3_SpatialPose* pose_out, a3_SpatialPoseBlendArgs args);
+
+a3_SpatialPose* a3spatialPoseOpInverseKinematics(a3_SpatialPose* pose_out, a3_SpatialPoseBlendArgs args);
 
 a3_SpatialPose* a3spatialPoseOpBiCubic(a3_SpatialPose* pose_out, a3_SpatialPose const* poses0[4], a3_SpatialPose const* poses1[4], a3_SpatialPose const* poses2[4], a3_SpatialPose const* poses3[4], a3real const u[5]);
 
