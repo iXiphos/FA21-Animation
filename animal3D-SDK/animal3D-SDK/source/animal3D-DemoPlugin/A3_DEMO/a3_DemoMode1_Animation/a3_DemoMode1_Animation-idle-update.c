@@ -249,6 +249,14 @@ void a3animation_update(a3_DemoState* demoState, a3_DemoMode1_Animation* demoMod
 			}
 		}
 		
+		a3f32 animDelta = (a3real)dt * (0.5f + (a3f32)demoMode->playbackSlowmo / 2.0f);
+		for (i = 0; i < starterMaxCount_clipControllers; i++)
+			a3clipControllerUpdate(demoMode->clipControllers + i, (a3real)dt);
+
+		a3_Sample tempSample;
+
+		a3clipControllerEvaulate(demoMode->clip_controller_main, &tempSample);
+
 		// upload
 		a3bufferRefill(demoState->ubo_transformMVP, 0, mvp_size, demoMode->mvp_joint);
 		a3bufferRefill(demoState->ubo_transformMVPB, 0, mvp_size, demoMode->mvp_bone);
