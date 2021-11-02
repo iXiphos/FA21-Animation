@@ -759,9 +759,12 @@ a3ret a3windowGetThreadReturnValue(a3_ThreadHandle* handle)
 
 //-----------------------------------------------------------------------------
 // window message processing
+extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 LRESULT CALLBACK a3windowInternalWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+	if (ImGui_ImplWin32_WndProcHandler(hWnd, message, wParam, lParam))
+		return 1;
 	// window counter
 	// used to determine when the quit message is posted
 	static a3ui32 renderWindowCount = 0;
