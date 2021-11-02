@@ -46,9 +46,8 @@ inline a3_SpatialPose* a3spatialPoseOpLERP(a3_SpatialPose* pose_out, a3_SpatialP
 	/* TO-DO: Make sure these are all the correct calculations*/
 	if (args.pose0 && args.pose1)
 	{
-		pose_out->angles = a3vec4Lerp( args.pose0->angles, args.pose1->angles, (a3real)args.param0);
+		pose_out->angles = a3vec4Lerp(args.pose0->angles, args.pose1->angles, (a3real)args.param0);
 
-		
 		pose_out->scale = a3vec4LogLerp( args.pose0->scale, args.pose1->scale, (a3real)args.param0);
 
 		pose_out->translation = a3vec4Lerp(args.pose0->translation, args.pose1->translation, (a3real)args.param0);
@@ -185,6 +184,7 @@ inline a3_SpatialPose* a3spatialPoseOpDeconcat(a3_SpatialPose* pose_out, a3_Spat
 inline a3_SpatialPose* a3spatialPoseOpScale(a3_SpatialPose* pose_out, a3_SpatialPoseBlendArgs args)
 {
 	a3spatialPoseOpIdentity(pose_out);
+	args.pose1 = pose_out;
 
 	return a3spatialPoseOpLERP(pose_out, args);
 }
