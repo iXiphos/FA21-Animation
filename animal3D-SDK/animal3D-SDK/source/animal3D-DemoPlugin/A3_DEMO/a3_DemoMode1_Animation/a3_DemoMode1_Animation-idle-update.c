@@ -97,7 +97,7 @@ void a3animation_drawui(a3_DemoState * demoState, a3_DemoMode1_Animation * demoM
 			if (igSmallButton("Play")) { clipCtrl->playing = true; }
 			if (igSmallButton("Pause")) { clipCtrl->playing = false; }
 			ImGuiInputTextFlags flags = { 0 };
-			igText("Active Clip", activeClip->name);
+			igText("Active Clip %s", activeClip->name);
 			igSliderFloat("input float", &clipCtrl->clipTime, 0.0f, activeClip->duration, "%.3f", flags);
 
 			igTreePop();
