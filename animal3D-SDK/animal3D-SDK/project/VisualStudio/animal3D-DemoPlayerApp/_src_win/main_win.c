@@ -47,7 +47,6 @@
 //-----------------------------------------------------------------------------
 // main
 
-a3ret a3windowBeginCustomMainLoop(a3_WindowInterface* window);
 
 HGLRC   g_GLRenderContext;
 HDC     g_HDCDeviceContext;
@@ -63,9 +62,8 @@ enum A3_MESSAGE
 
 	A3_MENU_ITEM = 1000,
 };
-void CreateGlContext();
 
-a3ret a3rendererInternalInitializeExtensions();
+
 int APIENTRY wWinMain(
 	_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,

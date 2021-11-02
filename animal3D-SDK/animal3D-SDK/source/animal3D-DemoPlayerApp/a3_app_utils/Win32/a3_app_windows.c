@@ -712,7 +712,7 @@ a3ret a3windowBeginMainLoop(a3_WindowInterface* window)
 					ImGui_ImplWin32_NewFrame();
 					igNewFrame();
 
-					igShowDemoWindow(NULL);
+					
 					
 				}
 			}
