@@ -34,6 +34,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define CIMGUI_DEFINE_ENUMS_AND_STRUCTS
+#include "cimgui.h"
+#include "cimgui_impl.h"
 
 //-----------------------------------------------------------------------------
 
@@ -695,8 +698,22 @@ a3ret a3windowBeginMainLoop(a3_WindowInterface* window)
 			{
 				if (a3rendererInternalContextIsCurrent(window->renderingContext))
 				{
+
+				
+					igRender();
+
+					wglMakeCurrent(window->deviceContext, window->renderingContext);
+					ImGui_ImplOpenGL3_RenderDrawData(igGetDrawData());
+					wglMakeCurrent(window->deviceContext, window->renderingContext);
+
 					// swap buffers
 					SwapBuffers(window->deviceContext);
+					ImGui_ImplOpenGL3_NewFrame();
+					ImGui_ImplWin32_NewFrame();
+					igNewFrame();
+
+					igShowDemoWindow(NULL);
+					
 				}
 			}
 
@@ -765,6 +782,10 @@ LRESULT CALLBACK a3windowInternalWndProc(HWND hWnd, UINT message, WPARAM wParam,
 {
 	if (ImGui_ImplWin32_WndProcHandler(hWnd, message, wParam, lParam))
 		return 1;
+	
+	ImGuiIO fallbackio = { 0 };
+
+	ImGuiIO* io = igGetCurrentContext() ? igGetIO() : &fallbackio;
 	// window counter
 	// used to determine when the quit message is posted
 	static a3ui32 renderWindowCount = 0;
@@ -1035,14 +1056,17 @@ LRESULT CALLBACK a3windowInternalWndProc(HWND hWnd, UINT message, WPARAM wParam,
 
 		// keyboard callbacks
 	case WM_KEYDOWN:
+		if (!io->WantCaptureKeyboard)
 		// any virtual key
 		(HIWORD(lParam) & KF_REPEAT ? callbacks->callback_keyHold : callbacks->callback_keyPress)(demo->data, (a3i32)LOWORD(wParam));
 		break;
 	case WM_CHAR:
+		if (!io->WantCaptureKeyboard)
 		// character keys, no up call
 		(HIWORD(lParam) & KF_REPEAT ? callbacks->callback_keyCharHold : callbacks->callback_keyCharPress)(demo->data, (a3i32)LOWORD(wParam));
 		break;
 	case WM_KEYUP:
+		if (!io->WantCaptureKeyboard)
 		// release for keyPress
 		callbacks->callback_keyRelease(demo->data, (a3i32)wParam);
 		break;
@@ -1059,49 +1083,64 @@ LRESULT CALLBACK a3windowInternalWndProc(HWND hWnd, UINT message, WPARAM wParam,
 
 				// mouse callbacks
 	case WM_LBUTTONDOWN:
-		callbacks->callback_mouseClick(demo->data, 0, (a3i32)LOWORD(lParam), (a3i32)HIWORD(lParam));
+		if (!io->WantCaptureMouse)
+			callbacks->callback_mouseClick(demo->data, 0, (a3i32)LOWORD(lParam), (a3i32)HIWORD(lParam));
 		break;
 	case WM_MBUTTONDOWN:
+		if (!io->WantCaptureMouse)
 		callbacks->callback_mouseClick(demo->data, 1, (a3i32)LOWORD(lParam), (a3i32)HIWORD(lParam));
 		break;
 	case WM_RBUTTONDOWN:
+		if (!io->WantCaptureMouse)
 		callbacks->callback_mouseClick(demo->data, 3, (a3i32)LOWORD(lParam), (a3i32)HIWORD(lParam));
 		break;
 	case WM_XBUTTONDOWN:
+		if (!io->WantCaptureMouse)
 		callbacks->callback_mouseClick(demo->data, (a3i32)HIWORD(wParam) + 3, (a3i32)LOWORD(lParam), (a3i32)HIWORD(lParam));
 		break;
 	case WM_LBUTTONDBLCLK:
+		if (!io->WantCaptureMouse)
 		callbacks->callback_mouseDoubleClick(demo->data, 0, (a3i32)LOWORD(lParam), (a3i32)HIWORD(lParam));
 		break;
 	case WM_MBUTTONDBLCLK:
+		if (!io->WantCaptureMouse)
 		callbacks->callback_mouseDoubleClick(demo->data, 1, (a3i32)LOWORD(lParam), (a3i32)HIWORD(lParam));
 		break;
 	case WM_RBUTTONDBLCLK:
+		if (!io->WantCaptureMouse)
 		callbacks->callback_mouseDoubleClick(demo->data, 3, (a3i32)LOWORD(lParam), (a3i32)HIWORD(lParam));
 		break;
 	case WM_XBUTTONDBLCLK:
+		if (!io->WantCaptureMouse)
 		callbacks->callback_mouseDoubleClick(demo->data, (a3i32)HIWORD(wParam) + 3, (a3i32)LOWORD(lParam), (a3i32)HIWORD(lParam));
 		break;
 	case WM_LBUTTONUP:
+		if (!io->WantCaptureMouse)
 		callbacks->callback_mouseRelease(demo->data, 0, (a3i32)LOWORD(lParam), (a3i32)HIWORD(lParam));
 		break;
 	case WM_MBUTTONUP:
+		if (!io->WantCaptureMouse)
 		callbacks->callback_mouseRelease(demo->data, 1, (a3i32)LOWORD(lParam), (a3i32)HIWORD(lParam));
 		break;
 	case WM_RBUTTONUP:
+		if (!io->WantCaptureMouse)
 		callbacks->callback_mouseRelease(demo->data, 3, (a3i32)LOWORD(lParam), (a3i32)HIWORD(lParam));
 		break;
 	case WM_XBUTTONUP:
+		if (!io->WantCaptureMouse)
 		callbacks->callback_mouseClick(demo->data, (a3i32)HIWORD(wParam) + 3, (a3i32)LOWORD(lParam), (a3i32)HIWORD(lParam));
 		break;
 	case WM_MOUSEWHEEL:
+		if (!io->WantCaptureMouse)
 		callbacks->callback_mouseWheel(demo->data, (a3i32)GET_WHEEL_DELTA_WPARAM(wParam) / WHEEL_DELTA, (a3i32)LOWORD(lParam), (a3i32)HIWORD(lParam));
 		break;
 	case WM_MOUSEMOVE:
+		if (!io->WantCaptureMouse)
 		callbacks->callback_mouseMove(demo->data, (a3i32)LOWORD(lParam), (a3i32)HIWORD(lParam));
 		TrackMouseEvent(wnd->mouseTracker);
 		break;
 	case WM_MOUSELEAVE:
+		if (!io->WantCaptureMouse)
 		callbacks->callback_mouseLeave(demo->data);
 		break;
 

@@ -118,13 +118,23 @@ int APIENTRY wWinMain(
 
 			if (status > 0)
 			{
+				ImGui_ImplOpenGL3_NewFrame();
+				ImGui_ImplWin32_NewFrame();
+				igNewFrame();
 				// main loop
-				//status = a3windowBeginMainLoop(&wnd);
-				status = a3windowBeginCustomMainLoop(&wnd);
+				status = a3windowBeginMainLoop(&wnd);
 			}
 
+			ImGui_ImplOpenGL3_Shutdown();
 			// kill rendering context
 			status = a3rendererReleaseContext(&renderContext);
+			// Cleanup
+			
+		
+			igDestroyContext(NULL);
+			ImGui_ImplWin32_Shutdown();
+
+
 		}
 
 		// kill window class
@@ -133,78 +143,6 @@ int APIENTRY wWinMain(
 
 	// the end
 	return 0;
-}
-
-extern a3boolean a3rendererInternalContextIsCurrent(const a3_RenderingContext renderingContext);
-a3ret a3windowBeginCustomMainLoop(a3_WindowInterface* window) {
-	// message
-	MSG msg[1] = { 0 };
-
-	// idle result
-	a3i32 idle;
-	//bool show_demo_window;
-	// while quit message has not been posted
-	while (msg->message - WM_QUIT)
-	{	
-		// check for message
-		if (PeekMessage(msg, NULL, 0, 0, PM_REMOVE))
-		{
-			// if there is a message, process the message
-			TranslateMessage(msg);
-			DispatchMessage(msg);
-		}
-
-		// if no message, idle (window required)
-		else if (window)
-		{
-			idle = window->demo->callbacks->callback_idle(window->demo->data);
-	
-		
-			//SwapBuffers(g_HDCDeviceContext);
-			
-			// if the result is positive, idle is successful
-			// if rendering, this should mean that a frame was rendered
-			if (idle > 0)
-			{
-				if (a3rendererInternalContextIsCurrent(window->renderingContext))
-				{
-					ImGui_ImplOpenGL3_NewFrame();
-					ImGui_ImplWin32_NewFrame();
-					igNewFrame();
-					igShowDemoWindow(NULL);
-					igRender();
-
-					wglMakeCurrent(window->deviceContext, window->renderingContext);
-					//glViewport(0, 0, g_display_w, g_display_h);
-					ImGui_ImplOpenGL3_RenderDrawData(igGetDrawData());
-					wglMakeCurrent(window->deviceContext, window->renderingContext);
-					// swap buffers
-					SwapBuffers(window->deviceContext);
-				}
-			}
-
-			// if the result is negative, the demo should be unloaded
-			// standalone window should close the window, which also unloads
-			else if (idle < 0)
-			{
-				if (window->isStandalone)
-				{
-					// standalone mode, kill window
-					PostMessageA(window->windowHandle, WM_CLOSE, 0, 0);
-				}
-				else
-				{
-					// exit demo
-					PostMessageA(window->windowHandle, A3_USER_EXIT_DEMO, 0, 0);
-				}
-			}
-			
-			// if result is zero, nothing happened
-			// ...carry on
-		}
-		
-	}
-	return (a3i32)msg->wParam;
 }
 
 
