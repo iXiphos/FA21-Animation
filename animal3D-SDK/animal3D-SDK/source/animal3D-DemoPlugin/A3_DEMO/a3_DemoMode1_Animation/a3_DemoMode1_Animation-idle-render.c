@@ -152,12 +152,6 @@ void a3animation_render_controls(a3_DemoState const* demoState, a3_DemoMode1_Ani
 }
 
 
-
-void a3animation_drawui(a3_DemoState const* demoState, a3_DemoMode1_Animation const* demoMode, a3f64 const dt) {
-	igShowDemoWindow(NULL);
-
-
-}
 //-----------------------------------------------------------------------------
 
 //void a3demo_render_bloomIteration(a3_DemoState const* demoState, a3real2 pixelSize, a3_Framebuffer const* fbo_prev,
@@ -667,7 +661,6 @@ void a3animation_render(a3_DemoState const* demoState, a3_DemoMode1_Animation co
 		}
 	}
 
-	a3animation_drawui(demoState, demoMode, dt);
 }
 
 

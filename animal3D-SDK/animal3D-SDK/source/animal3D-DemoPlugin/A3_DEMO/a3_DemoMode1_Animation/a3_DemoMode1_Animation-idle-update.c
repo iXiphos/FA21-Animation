@@ -62,9 +62,59 @@ void a3demo_update_pointLight(a3_DemoSceneObject* obj_camera, a3_DemoPointLight*
 
 void a3demo_applyScale_internal(a3_DemoSceneObject* sceneObject, a3real4x4p s);
 
+
+
+void a3animation_drawui(a3_DemoState * demoState, a3_DemoMode1_Animation * demoMode, a3f64 dt) {
+	igShowDemoWindow(NULL);
+
+	//IM_ASSERT(igGetCurrentContext() != NULL && "Missing dear imgui context.");
+
+
+
+	bool bopen[1];
+	ImGuiWindowFlags window_flags = 0;
+
+	if (!igBegin("Menu", bopen, window_flags)) {
+		igEnd();
+		return;
+	}
+
+	igPushItemWidth(igGetFontSize() * -12);
+	if (!igCollapsingHeader_TreeNodeFlags("Clip Controllers", ImGuiTreeNodeFlags_DefaultOpen)) {
+		igEnd();
+		return;
+	}
+
+	
+
+	for (int i = 0; i < starterMaxCount_clipControllers; i++)
+	{
+		a3_ClipController* clipCtrl = demoMode->clipControllers + i;
+		a3_Clip* activeClip = demoMode->clipPool->clips + clipCtrl->clip;
+		igPushID_Int(i);
+		if (igTreeNode_Str(clipCtrl->name))
+		{
+			if (igSmallButton("Play")) { clipCtrl->playing = true; }
+			if (igSmallButton("Pause")) { clipCtrl->playing = false; }
+			ImGuiInputTextFlags flags = { 0 };
+			igText("Active Clip", activeClip->name);
+			igSliderFloat("input float", &clipCtrl->clipTime, 0.0f, activeClip->duration, "%.3f", flags);
+
+			igTreePop();
+		}
+		igPopID();
+	}
+
+
+
+
+	igPopItemWidth();
+	igEnd();
+}
+
 void a3animation_update(a3_DemoState* demoState, a3_DemoMode1_Animation* demoMode, a3f64 const dt)
 {
-
+	a3animation_drawui(demoState, demoMode, dt);
 
 	a3ui32 i;
 	a3_DemoModelMatrixStack matrixStack[animationMaxCount_sceneObject];
