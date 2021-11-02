@@ -47,6 +47,34 @@ typedef struct a3_ClipController			a3_ClipController;
 struct a3_ClipController
 {
 	a3byte name[a3keyframeAnimation_nameLenMax];
+
+	// index of clip to control in referenced clip pool
+	a3ui32 clip;
+
+	// current time relative to start of clip; should always be between 0 and current clip's duration
+	a3f32 clipTime;
+
+	//  normalized keyframe time; should always be between 0 and 1
+	a3f32 clipParam;
+
+	// index of current keyframe in referenced keyframe pool 
+	a3ui32 keyframe;
+
+	// current time relative to current keyframe; should always be between 0 and current keyframe's duration
+	a3f32 keyframeTime;
+
+	// normalized keyframe time; should always be between 0 and 1.
+	a3f32 keyframeParam;
+
+
+	// is it playing reversed?
+	a3i8 reverse;
+
+	// boolean
+	a3i8 playing;
+
+	// the pool of clips that the controller will control
+	const a3_ClipPool* clipPool;
 };
 
 
@@ -60,6 +88,18 @@ a3i32 a3clipControllerUpdate(a3_ClipController* clipCtrl, const a3real dt);
 
 // set clip to play
 a3i32 a3clipControllerSetClip(a3_ClipController* clipCtrl, const a3_ClipPool* clipPool, const a3ui32 clipIndex_pool);
+
+a3i32 a3clipControllerGetClip(a3_ClipController* clipCtrl);
+
+a3i32 a3clipControllerJumpToFrame(a3_ClipController* clipCtrl, const a3ui32 index);
+
+a3i32 a3clipControllerEvaulate(const a3_ClipController* clipCtrl, a3_Sample* sample_out);
+
+
+// get a frame based on an offset from the current frame
+// will follow termination behavior and play direction
+a3_Keyframe* a3clipControllerGetFrameByOffset(const a3_ClipController* clipCtrl, a3i32 offset);
+
 
 
 //-----------------------------------------------------------------------------
