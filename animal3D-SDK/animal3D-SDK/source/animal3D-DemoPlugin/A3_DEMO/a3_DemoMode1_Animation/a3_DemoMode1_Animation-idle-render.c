@@ -155,6 +155,8 @@ void a3animation_render_controls(a3_DemoState const* demoState, a3_DemoMode1_Ani
 
 void a3animation_drawui(a3_DemoState const* demoState, a3_DemoMode1_Animation const* demoMode, a3f64 const dt) {
 	igShowDemoWindow(NULL);
+
+
 }
 //-----------------------------------------------------------------------------
 

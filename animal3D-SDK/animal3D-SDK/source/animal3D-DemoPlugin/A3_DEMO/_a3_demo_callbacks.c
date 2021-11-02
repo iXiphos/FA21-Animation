@@ -39,7 +39,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+#pragma comment(lib, "cimgui.lib")
 
 //-----------------------------------------------------------------------------
 // callback prototypes
@@ -406,10 +406,12 @@ A3DYLIBSYMBOL void a3demoCB_windowDeactivate(a3_DemoState *demoState)
 A3DYLIBSYMBOL void a3demoCB_windowMove(a3_DemoState *demoState, a3i32 newWindowPosX, a3i32 newWindowPosY)
 {
 	// nothing needed here
+	if (igGetCurrentContext() == NULL)
+		igSetCurrentContext(demoState->imGuiContext);
 }
 
 // window 
-s
+
 A3DYLIBSYMBOL void a3demoCB_windowResize(a3_DemoState *demoState, a3i32 newWindowWidth, a3i32 newWindowHeight)
 {
 	// account for borders here

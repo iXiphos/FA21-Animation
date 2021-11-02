@@ -390,6 +390,7 @@ void a3windowInternalLoadDemo(a3_WindowInterface* window, a3i32 id)
 
 		// callbacks: load, invoke window move, invoke resize
 		window->demo->data = window->demo->callbacks->callback_load(window->demo->data, 0);
+		*(ImGuiContext**)window->demo->data = igGetCurrentContext();
 		window->demo->callbacks->callback_windowMove(window->demo->data, window->demo->winPosX, window->demo->winPosY);
 		window->demo->callbacks->callback_windowResize(window->demo->data, window->demo->winSzX, window->demo->winSzY);
 	}
@@ -708,6 +709,7 @@ a3ret a3windowBeginMainLoop(a3_WindowInterface* window)
 
 					// swap buffers
 					SwapBuffers(window->deviceContext);
+
 					ImGui_ImplOpenGL3_NewFrame();
 					ImGui_ImplWin32_NewFrame();
 					igNewFrame();
