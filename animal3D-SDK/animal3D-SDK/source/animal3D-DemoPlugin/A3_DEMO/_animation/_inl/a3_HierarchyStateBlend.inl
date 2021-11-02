@@ -264,10 +264,13 @@ inline a3_SpatialPose* a3spatialPoseOpBiLinear(a3_SpatialPose* pose_out, a3_Spat
 
 inline a3_SpatialPose* a3spatialPoseOpSmoothStep(a3_SpatialPose* pose_out, a3_SpatialPoseBlendArgs args)
 {
-	//https://www.gamedeveloper.com/programming/improved-lerp-smoothing-
+	//https://www.febucci.com/2018/08/easing-functions/
 
 	a3real u = args.param0;
-	u *= u;
+	a3real easeIn = u * u;
+	a3real easeOut = 1.0f - (((a3real)1.0f - u) * ((a3real)1.0f - u));
+
+	u = a3lerp(easeIn, easeOut, u);
 	a3spatialPoseLerp(pose_out, args.pose0, args.pose1, u);
 
 	return pose_out;
@@ -278,29 +281,23 @@ inline a3_SpatialPose* a3spatialPoseOpDescale(a3_SpatialPose* pose_out, a3_Spati
 	a3spatialPoseOpInvert(pose_out, args);
 	args.pose0 = pose_out;
 	a3spatialPoseOpScale(pose_out, args);
-
 	return pose_out;
 }
 
 inline a3_SpatialPose* a3spatialPoseOpConvert(a3_SpatialPose* pose_out, a3_SpatialPoseBlendArgs args)
 {
-	
+
+	a3spatialPoseConvert(args.pose0, a3poseChannel_none, a3poseEulerOrder_xyz);
+	pose_out = args.pose0;
+
 	return pose_out;
 }
 
 inline a3_SpatialPose* a3spatialPoseOpRevert(a3_SpatialPose* pose_out, a3_SpatialPoseBlendArgs args)
 {
+	pose_out = args.pose0;
+	pose_out->transform = a3mat4_identity;
 	return pose_out;
-}
-
-inline a3_SpatialPose* a3spatialPoseOpForwardKinematics(a3_SpatialPose* pose_out, a3_SpatialPoseBlendArgs args)
-{
-	return NULL;
-}
-
-inline a3_SpatialPose* a3spatialPoseOpInverseKinematics(a3_SpatialPose* pose_out, a3_SpatialPoseBlendArgs args)
-{
-	return NULL;
 }
 
 inline a3_SpatialPose* a3spatialPoseOpBiCubic(a3_SpatialPose* pose_out, a3_SpatialPose const* poses0[4], a3_SpatialPose const* poses1[4], a3_SpatialPose const* poses2[4], a3_SpatialPose const* poses3[4], a3real const u[5])
@@ -595,6 +592,59 @@ inline a3_HierarchyPose* a3hierarchyPoseOpBiCubic(a3_HierarchyPose* pose_out, a3
 
 	for (a3ui32 i = 0; i < num_nodes; i++, spose_out++) {
 		a3spatialPoseOpBiCubic(spose_out, spose0, spose1, spose2, spose3, u);
+	}
+	return pose_out;
+}
+
+inline a3_HierarchyPose* a3hierarchyPoseOpSmoothLERP(a3_HierarchyPose* pose_out, a3_HierarchyPose const* pose0, a3_HierarchyPose const* pose1, a3real const u, a3ui32 num_nodes)
+{
+	a3_SpatialPose* spose_out = pose_out->pose;
+	a3_SpatialPoseBlendArgs temp;
+	temp.pose0 = pose0->pose;
+	temp.pose1 = pose1->pose;
+	temp.param0 = u;
+
+	for (a3ui32 i = 0; i < num_nodes; i++, spose_out++, temp.pose0++, temp.pose1++) {
+		a3spatialPoseOpSmoothStep(spose_out, temp);
+	}
+	// done
+	a3spatialPoseLerp(pose_out->pose, pose0->pose, pose1->pose, u);
+	return pose_out;
+}
+
+inline a3_HierarchyPose* a3hierarchyPoseOpDeScale(a3_HierarchyPose* pose_out, a3_HierarchyPose const* pose0, a3real const u, a3ui32 num_nodes)
+{
+	a3_SpatialPose* spose_out = pose_out->pose;
+	a3_SpatialPoseBlendArgs temp;
+	temp.pose0 = pose0->pose;
+	temp.param0 = u;
+
+	for (a3ui32 i = 0; i < num_nodes; i++, spose_out++, temp.pose0++) {
+		a3spatialPoseOpDescale(spose_out, temp);
+	}
+	return pose_out;
+}
+
+inline a3_HierarchyPose* a3hierarchyPoseOpConvert(a3_HierarchyPose* pose_out, a3_HierarchyPose const* pose, a3ui32 num_nodes)
+{
+	a3_SpatialPose* spose_out = pose_out->pose;
+	a3_SpatialPoseBlendArgs temp;
+	temp.pose0 = pose->pose;
+
+	for (a3ui32 i = 0; i < num_nodes; i++, spose_out++, temp.pose0++) {
+		a3spatialPoseOpConvert(pose_out->pose, temp);
+	}
+	return pose_out;
+
+}
+
+inline a3_HierarchyPose* a3hierarchyPoseOpRevert(a3_HierarchyPose* pose_out, a3_HierarchyPose const* pose, a3ui32 num_nodes)
+{
+	a3_SpatialPose* spose_out = pose_out->pose;
+	a3_SpatialPoseBlendArgs temp;
+	temp.pose0 = pose->pose;
+	for (a3ui32 i = 0; i < num_nodes; i++, spose_out++, temp.pose0++) {
+		a3spatialPoseOpRevert(pose_out->pose, temp);
 	}
 	return pose_out;
 }
