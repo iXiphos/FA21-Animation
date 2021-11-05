@@ -646,9 +646,18 @@ a3ret a3windowCreate(a3_WindowInterface* window_out, a3_WindowClass* windowClass
 			ShowWindow(wndHandle, showWindow);
 			UpdateWindow(wndHandle);
 
+			// now that we have a real window we can 
+			// initilize the imgui context
+			ImGui_ImplWin32_Init(wndHandle);
+			const char* glsl_version = "#version 430";
+			ImGui_ImplOpenGL3_Init(glsl_version);
+
+
 			// load demo if standalone
 			if (standalone)
 				a3windowInternalLoadDemo(window_out, 0);
+
+
 
 			// done
 			return 1;
@@ -691,6 +700,10 @@ a3ret a3windowBeginMainLoop(a3_WindowInterface* window)
 		// if no message, idle (window required)
 		else if (window)
 		{
+			// for these, unlike igNewFrame() it doesn't matter if we dont render on this loop (i think)
+			// putting it here just lets us remove cimgui_impl from the demo plugin
+			ImGui_ImplWin32_NewFrame();
+			ImGui_ImplOpenGL3_NewFrame();
 			idle = window->demo->callbacks->callback_idle(window->demo->data);
 
 			// if the result is positive, idle is successful
@@ -700,19 +713,15 @@ a3ret a3windowBeginMainLoop(a3_WindowInterface* window)
 				if (a3rendererInternalContextIsCurrent(window->renderingContext))
 				{
 
-				
+					// generate imgui render data
 					igRender();
 
-					wglMakeCurrent(window->deviceContext, window->renderingContext);
+					// apply render data to back buffer
 					ImGui_ImplOpenGL3_RenderDrawData(igGetDrawData());
-					wglMakeCurrent(window->deviceContext, window->renderingContext);
 
 					// swap buffers
 					SwapBuffers(window->deviceContext);
 
-					ImGui_ImplOpenGL3_NewFrame();
-					ImGui_ImplWin32_NewFrame();
-					igNewFrame();
 
 					
 					
@@ -787,7 +796,7 @@ LRESULT CALLBACK a3windowInternalWndProc(HWND hWnd, UINT message, WPARAM wParam,
 	
 	ImGuiIO fallbackio = { 0 };
 
-	ImGuiIO* io = igGetCurrentContext() ? igGetIO() : &fallbackio;
+	ImGuiIO* io = igGetIO();
 	// window counter
 	// used to determine when the quit message is posted
 	static a3ui32 renderWindowCount = 0;
@@ -957,7 +966,10 @@ LRESULT CALLBACK a3windowInternalWndProc(HWND hWnd, UINT message, WPARAM wParam,
 			break;
 		}
 		break;
-
+	case WM_SYSCOMMAND:
+		if ((wParam & 0xfff0) == SC_KEYMENU) // Disable ALT application menu
+			return 0;
+		break;
 		// messages from window extension (menu)
 	case WM_COMMAND: {
 		a3i32 selection = LOWORD(wParam);
@@ -1137,9 +1149,10 @@ LRESULT CALLBACK a3windowInternalWndProc(HWND hWnd, UINT message, WPARAM wParam,
 		callbacks->callback_mouseWheel(demo->data, (a3i32)GET_WHEEL_DELTA_WPARAM(wParam) / WHEEL_DELTA, (a3i32)LOWORD(lParam), (a3i32)HIWORD(lParam));
 		break;
 	case WM_MOUSEMOVE:
-		if (!io->WantCaptureMouse)
-		callbacks->callback_mouseMove(demo->data, (a3i32)LOWORD(lParam), (a3i32)HIWORD(lParam));
-		TrackMouseEvent(wnd->mouseTracker);
+		if (!io->WantCaptureMouse) {
+			callbacks->callback_mouseMove(demo->data, (a3i32)LOWORD(lParam), (a3i32)HIWORD(lParam));
+			TrackMouseEvent(wnd->mouseTracker);
+		}
 		break;
 	case WM_MOUSELEAVE:
 		if (!io->WantCaptureMouse)

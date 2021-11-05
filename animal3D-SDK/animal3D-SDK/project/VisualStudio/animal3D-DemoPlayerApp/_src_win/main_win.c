@@ -92,6 +92,10 @@ int APIENTRY wWinMain(
 	// initialize app
 	status = a3appStartSingleInstanceSwitchExisting(wndClassName, wndName);
 
+	// create imgui context
+	igCreateContext(NULL);
+	igStyleColorsDark(NULL);
+
 	// register window class
 	status = a3windowCreateDefaultRenderingClass(&wndClass, hInstance, wndClassName, sizeof(void *), IDI_ICON1, IDI_ICON1);
 	if (status > 0)
@@ -106,19 +110,9 @@ int APIENTRY wWinMain(
 			// create window
 			status = a3windowCreate(&wnd, &wndClass, &env, &renderContext, wndName, winWidth, winHeight, 1, 0);
 
-
-			igCreateContext(NULL);
-			igStyleColorsDark(NULL);
-
-			ImGui_ImplWin32_Init(wnd.windowHandle);
-			const char* glsl_version = "#version 430";
-			ImGui_ImplOpenGL3_Init(glsl_version);
-
+		
 			if (status > 0)
 			{
-				ImGui_ImplOpenGL3_NewFrame();
-				ImGui_ImplWin32_NewFrame();
-				igNewFrame();
 				// main loop
 				status = a3windowBeginMainLoop(&wnd);
 			}
@@ -128,9 +122,9 @@ int APIENTRY wWinMain(
 			status = a3rendererReleaseContext(&renderContext);
 			// Cleanup
 			
-		
-			igDestroyContext(NULL);
 			ImGui_ImplWin32_Shutdown();
+			igDestroyContext(NULL);
+		
 
 
 		}
