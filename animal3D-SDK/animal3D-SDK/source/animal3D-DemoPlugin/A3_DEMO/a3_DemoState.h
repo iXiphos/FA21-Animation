@@ -44,7 +44,13 @@
 #include "_a3_demo_utilities/a3_DemoShaderProgram.h"
 
 #include "a3_DemoMode0_Starter.h"
+#include "a3_DemoMode1_Animation.h"
 
+#define CIMGUI_DEFINE_ENUMS_AND_STRUCTS
+#undef true
+#undef false
+#include "cimgui/cimgui.h"
+#include "cimgui/cimgui_impl.h"
 
 //-----------------------------------------------------------------------------
 
@@ -65,6 +71,7 @@ typedef enum	a3_DemoState_TextDisplayName	a3_DemoState_TextDisplayName;
 enum a3_DemoState_ModeName
 {
 	demoState_modeStarter,				// starter scene
+	demoState_modeAnimation,			// animation scene
 
 	demoState_mode_max
 };
@@ -95,6 +102,7 @@ enum a3_DemoState_ObjectMaxCount
 	demoStateMaxCount_drawable = 16,
 
 	demoStateMaxCount_shaderProgram = 32,
+	demoStateMaxCount_uniformBuffer = 4,
 
 	demoStateMaxCount_texture = 8,
 
@@ -123,6 +131,8 @@ struct a3_DemoModeCallbacks
 // persistent demo state data structure
 struct a3_DemoState
 {
+	ImGuiContext* imGuiContext;
+
 	//-------------------------------------------------------------------------
 	// general variables pertinent to the state
 
@@ -166,6 +176,7 @@ struct a3_DemoState
 
 	// demo modes
 	a3_DemoMode0_Starter demoMode0_starter[1];
+	a3_DemoMode1_Animation demoMode1_animation[1];
 	a3_DemoState_ModeName demoMode;
 	a3_DemoModeCallbacks demoModeCallbacks[demoState_mode_max];
 	a3_DemoModeCallbacks const* demoModeCallbacksPtr;
@@ -212,7 +223,7 @@ struct a3_DemoState
 		struct {
 			a3_VertexArrayDescriptor
 				vao_tangentbasis_texcoord_morph5[1],		// VAO for vertex format with partial tangent bases for 5-target morphing model, with texcoords
-			//	vao_tangentbasis_texcoord_skin[1],			// VAO for vertex format with complete tangent basis, with texcoords and skin weights
+				vao_tangentbasis_texcoord_skin[1],			// VAO for vertex format with complete tangent basis, with texcoords and skin weights
 				vao_tangentbasis_texcoord[1];				// VAO for vertex format with complete tangent basis, with texcoords
 			a3_VertexArrayDescriptor
 				vao_position_color[1],						// VAO for vertex format with position and color
@@ -227,9 +238,9 @@ struct a3_DemoState
 			a3_VertexDrawable
 				draw_grid[1],								// wireframe ground plane to emphasize scaling
 				draw_axes[1];								// coordinate axes at the center of the world
-			//a3_VertexDrawable
-			//	draw_link[1],								// wireframe link between nodes (e.g. bone)
-			//	draw_node[1];								// wireframe node (e.g. joint)
+			a3_VertexDrawable
+				draw_link[1],								// wireframe link between nodes (e.g. bone)
+				draw_node[1];								// wireframe node (e.g. joint)
 			a3_VertexDrawable
 				draw_unit_box[1],							// unit box (width = height = depth = 1)
 				draw_unit_sphere[1],						// unit sphere (radius = 1)
@@ -238,7 +249,7 @@ struct a3_DemoState
 				draw_unit_torus[1],							// unit torus (major radius = 1)
 				draw_unit_plane_z[1];						// unit plane (width = height = 1) with Z normal
 			a3_VertexDrawable
-			//	draw_character_skin[1],						// can't not have a skinnable character
+				draw_character_skin[1],						// can't not have a skinnable character
 				draw_teapot_morph[1],						// can't not have a morphing Utah teapot
 				draw_teapot[1];								// can't not have a Utah teapot
 		};
@@ -265,17 +276,29 @@ struct a3_DemoState
 				prog_drawLambert[1],						// draw Lambert shading model
 				prog_drawTexture[1];						// draw texture
 			a3_DemoStateShaderProgram
-			//	prog_drawPhong_skin_instanced[1],			// draw skinned model with instancing
+				prog_drawPhong_skin_instanced[1],			// draw skinned model with instancing
 				prog_drawPhong_morph5_instanced[1],			// draw 5-target morphing model with instancing
-			//	prog_drawPhong_skin[1],						// draw skinned model
+				prog_drawPhong_skin[1],						// draw skinned model
 				prog_drawPhong_morph5[1];					// draw 5-target morphing model
 			a3_DemoStateShaderProgram
-			//	prog_drawTangentBasis_skin_instanced[1],	// draw vertex/face tangent bases and wireframe for skinned model with instancing
+				prog_drawTangentBasis_skin_instanced[1],	// draw vertex/face tangent bases and wireframe for skinned model with instancing
 				prog_drawTangentBasis_morph5_instanced[1],	// draw vertex/face tangent bases and wireframe for 5-target morphing model with instancing
 				prog_drawTangentBasis_instanced[1],			// draw vertex/face tangent bases and wireframe with instancing
-			//	prog_drawTangentBasis_skin[1],				// draw vertex/face tangent bases and wireframe for skinned model
+				prog_drawTangentBasis_skin[1],				// draw vertex/face tangent bases and wireframe for skinned model
 				prog_drawTangentBasis_morph5[1],			// draw vertex/face tangent bases and wireframe for 5-target morphing model
 				prog_drawTangentBasis[1];					// draw vertex/face tangent bases and wireframe
+		};
+	};
+
+	// uniform buffers
+	union {
+		a3_UniformBuffer uniformBuffer[demoStateMaxCount_uniformBuffer];
+		struct {
+			a3_UniformBuffer
+				ubo_transformMVPB[1],
+				ubo_transformMVP[1],
+				ubo_transformBlend[1],
+				ubo_transformStack[1];
 		};
 	};
 
