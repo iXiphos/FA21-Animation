@@ -251,6 +251,7 @@ void a3demo_render(a3_DemoState const* demoState, a3f64 const dt)
 			}
 		}
 	}
+	igRender();
 }
 
 
