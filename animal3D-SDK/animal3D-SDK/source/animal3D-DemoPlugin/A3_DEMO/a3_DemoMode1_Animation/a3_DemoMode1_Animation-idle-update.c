@@ -85,7 +85,18 @@ void a3demo_applyScale_internal(a3_DemoSceneObject* sceneObject, a3real4x4p s);
 
 void a3animation_update(a3_DemoState* demoState, a3_DemoMode1_Animation* demoMode, a3f64 const dt)
 {
-	igShowDemoWindow(NULL);
+	static a3i32 idle_index = -1;
+	static a3i32 walk_index = -1;
+
+	if (idle_index == -1) {
+		idle_index = a3clipGetIndexInPool(demoMode->clipPool, "xbot_idle_pistol");
+	}
+
+	if (walk_index == -1) {
+		walk_index = a3clipGetIndexInPool(demoMode->clipPool, "xbot_run_f");
+	}
+
+	//igShowDemoWindow(NULL);
 	a3ui32 i, j;
 	a3_DemoModelMatrixStack matrixStack[animationMaxCount_sceneObject];
 
@@ -147,6 +158,20 @@ void a3animation_update(a3_DemoState* demoState, a3_DemoMode1_Animation* demoMod
 		a3real const dtr = (a3real)dt;
 		a3_ClipController* clipCtrl = demoMode->clipCtrlA;
 
+		 
+		if (demoState->xcontrol->ctrl.lThumbX_unit < 0.05 && demoState->xcontrol->ctrl.lThumbY_unit < 0.05) {
+			
+			if (demoMode->clipCtrlA->clipIndex != idle_index)
+				a3clipControllerSetClip(demoMode->clipCtrlA, demoMode->clipPool, idle_index, 24, 24);
+			//demoMode->clipCtrlA->shouldTransition = true;
+			// no input
+		}
+		else {
+			if (demoMode->clipCtrlA->clipIndex != walk_index)
+				a3clipControllerSetClip(demoMode->clipCtrlA, demoMode->clipPool, walk_index, 24, 24);
+			//demoMode->clipCtrlA->shouldTransition = false;
+			// input
+		}
 		// update controllers
 		a3clipControllerUpdate(demoMode->clipCtrl, dt);
 		a3clipControllerUpdate(demoMode->clipCtrlA, dt);
@@ -156,6 +181,8 @@ void a3animation_update(a3_DemoState* demoState, a3_DemoMode1_Animation* demoMod
 	//	a3hierarchyPoseCopy(activeHS->animPose,
 	//		demoMode->hierarchyPoseGroup_skel->hpose + demoMode->clipCtrl->keyframeIndex,
 	//		demoMode->hierarchy_skel->numNodes);
+
+		
 
 		// LERP
 		a3hierarchyPoseLerp(activeHS->animPose,
@@ -168,6 +195,9 @@ void a3animation_update(a3_DemoState* demoState, a3_DemoMode1_Animation* demoMod
 			baseHS->localSpace, // holds base pose
 			activeHS->animPose, // holds current sample pose
 			demoMode->hierarchy_skel->numNodes);
+
+		activeHS->localSpace->pose->translate = baseHS->localSpace->pose->translate;
+
 		a3hierarchyPoseConvert(activeHS->localSpace,
 			demoMode->hierarchy_skel->numNodes,
 			demoMode->hierarchyPoseGroup_skel->channel,
@@ -175,6 +205,8 @@ void a3animation_update(a3_DemoState* demoState, a3_DemoMode1_Animation* demoMod
 		a3kinematicsSolveForward(activeHS);
 		a3hierarchyStateUpdateObjectInverse(activeHS);
 		a3hierarchyStateUpdateObjectBindToCurrent(activeHS, baseHS);
+
+
 
 		// ****TO-DO: 
 		// process input, change to switch
