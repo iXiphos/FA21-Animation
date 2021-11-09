@@ -46,6 +46,11 @@
 #include "a3_DemoMode0_Starter.h"
 #include "a3_DemoMode1_Animation.h"
 
+#define CIMGUI_DEFINE_ENUMS_AND_STRUCTS
+#undef true
+#undef false
+#include "cimgui/cimgui.h"
+#include "cimgui/cimgui_impl.h"
 
 //-----------------------------------------------------------------------------
 
@@ -126,6 +131,8 @@ struct a3_DemoModeCallbacks
 // persistent demo state data structure
 struct a3_DemoState
 {
+	ImGuiContext* imGuiContext;
+
 	//-------------------------------------------------------------------------
 	// general variables pertinent to the state
 

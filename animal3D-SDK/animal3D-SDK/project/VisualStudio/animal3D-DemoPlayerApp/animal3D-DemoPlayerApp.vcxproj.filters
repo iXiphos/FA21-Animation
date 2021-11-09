@@ -62,6 +62,9 @@
     <ClCompile Include="_src_win\main_win.c">
       <Filter>Source Files\platform</Filter>
     </ClCompile>
+    <ClCompile Include="_src_win\a3_app_windows.c">
+      <Filter>Source Files\platform</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="_src_win\resource\icon\cbtk.ico">
