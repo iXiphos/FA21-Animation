@@ -127,18 +127,26 @@ void a3animation_input(a3_DemoState* demoState, a3_DemoMode1_Animation* demoMode
 		{
 			// ****TO-DO:
 			// get directly from joysticks
-
-			a3f64 leftJoyStick[2] = { demoState->xcontrol->ctrl.lThumbX_unit, demoState->xcontrol->ctrl.lThumbY_unit };
 			
 
+			//Can't Find controller so we need to test, should work but uncertain
+			a3f64 leftJoyStick[2] = { demoState->xcontrol->ctrl.lThumbX_unit, demoState->xcontrol->ctrl.lThumbY_unit };
+			a3XboxControlGetLeftJoystick(demoState->xcontrol, leftJoyStick);
+
+
+			//Can't Find controller so we need to test, should work but uncertain
 			a3f64 rightJoyStick[2] = { demoState->xcontrol->ctrl.rThumbX_unit, demoState->xcontrol->ctrl.rThumbY_unit };
-		
+			a3XboxControlGetRightJoystick(demoState->xcontrol, rightJoyStick);
 		}
 		else
 		{
 			// ****TO-DO:
 			// calculate normalized vectors given keyboard state
-			
+			demoState->xcontrol->ctrl.lThumbX_unit = a3keyboardIsPressed(demoState->keyboard, a3key_A);
+			demoState->xcontrol->ctrl.lThumbX_unit = -a3keyboardIsPressed(demoState->keyboard, a3key_D);
+
+			demoState->xcontrol->ctrl.lThumbY_unit = a3keyboardIsPressed(demoState->keyboard, a3key_W);
+			demoState->xcontrol->ctrl.lThumbY_unit = -a3keyboardIsPressed(demoState->keyboard, a3key_S);
 		}
 		break;
 	}

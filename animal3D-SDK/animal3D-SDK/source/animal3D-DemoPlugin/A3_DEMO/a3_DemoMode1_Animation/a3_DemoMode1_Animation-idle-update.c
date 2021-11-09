@@ -176,12 +176,18 @@ void a3animation_update(a3_DemoState* demoState, a3_DemoMode1_Animation* demoMod
 		a3hierarchyStateUpdateObjectBindToCurrent(activeHS, baseHS);
 
 		// ****TO-DO: 
-		// process input
+		// process input, change to switch
+		//animation_input_euler,
+		//animation_input_kinematic
 		if (demoMode->ctrl_position == animation_input_direct) {
-
+			demoMode->pos.x = (a3f32)demoState->xcontrol->ctrl.lThumbX_unit;
+			demoMode->pos.y = (a3f32)demoState->xcontrol->ctrl.lThumbY_unit;
 		}
-
-
+		else if (demoMode->ctrl_position == animation_input_euler) 
+		{
+			demoMode->pos.x = demoMode->obj_skeleton_ctrl->position.x + (a3f32)demoState->xcontrol->ctrl.lThumbX_unit;
+			demoMode->pos.y = demoMode->obj_skeleton_ctrl->position.y + (a3f32)demoState->xcontrol->ctrl.lThumbY_unit;
+		}
 		// apply input
 		demoMode->obj_skeleton_ctrl->position.x = +(demoMode->pos.x);
 		demoMode->obj_skeleton_ctrl->position.y = +(demoMode->pos.y);
