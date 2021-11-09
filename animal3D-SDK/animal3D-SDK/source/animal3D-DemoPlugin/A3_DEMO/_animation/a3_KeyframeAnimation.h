@@ -109,6 +109,7 @@ enum a3_ClipTransitionFlag
 	a3clip_branchFlag = 0x80,	// there is a branch/condition
 };
 
+
 // clip transition
 struct a3_ClipTransition
 {

@@ -91,6 +91,11 @@ inline a3i32 a3clipControllerUpdate(a3_ClipController* clipCtrl, a3f64 dt)
 			{
 				// handle forward transition
 
+				const a3_ClipTransition* transition = clipCtrl->clip->transitionForward;
+				if (transition->flag == a3clip_branchFlag && clipCtrl->shouldTransition) {
+					clipCtrl->clip = clipCtrl->clipPool->clip + transition->clipIndex;
+				}
+
 				// default testing behavior: loop with overstep
 				clipCtrl->keyframeIndex = clipCtrl->clip->keyframeIndex_first;
 				clipCtrl->keyframe = clipCtrl->clipPool->keyframe + clipCtrl->keyframeIndex;
@@ -118,10 +123,18 @@ inline a3i32 a3clipControllerUpdate(a3_ClipController* clipCtrl, a3f64 dt)
 			{
 				// handle reverse transition
 
+				const a3_ClipTransition* transition = clipCtrl->clip->transitionReverse;
+				if (transition->flag == a3clip_branchFlag && clipCtrl->shouldTransition) {
+					clipCtrl->clip = clipCtrl->clipPool->clip + transition->clipIndex;
+				}
+
 				// default testing behavior: loop with overstep
+				
 				clipCtrl->keyframeIndex = clipCtrl->clip->keyframeIndex_final;
 				clipCtrl->keyframe = clipCtrl->clipPool->keyframe + clipCtrl->keyframeIndex;
 				clipCtrl->keyframeTime_sec = overstep + clipCtrl->keyframe->duration_sec;
+				
+
 			}
 			// are we simply moving to the previous keyframe
 			else
