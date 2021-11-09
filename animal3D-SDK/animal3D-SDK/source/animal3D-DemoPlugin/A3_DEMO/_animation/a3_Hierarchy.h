@@ -69,6 +69,7 @@ struct a3_HierarchyNode
 struct a3_Hierarchy
 {
 	a3_HierarchyNode *nodes;
+	
 	a3ui32 numNodes;
 };
 

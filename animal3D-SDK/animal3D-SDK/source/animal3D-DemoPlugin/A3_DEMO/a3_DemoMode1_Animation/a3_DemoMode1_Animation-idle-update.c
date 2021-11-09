@@ -177,6 +177,10 @@ void a3animation_update(a3_DemoState* demoState, a3_DemoMode1_Animation* demoMod
 
 		// ****TO-DO: 
 		// process input
+		if (demoMode->ctrl_position == animation_input_direct) {
+
+		}
+
 
 		// apply input
 		demoMode->obj_skeleton_ctrl->position.x = +(demoMode->pos.x);

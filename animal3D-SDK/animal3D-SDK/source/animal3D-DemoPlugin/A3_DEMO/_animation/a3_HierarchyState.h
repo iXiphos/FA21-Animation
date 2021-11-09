@@ -86,7 +86,7 @@ struct a3_HierarchyState
 {
 	// pointer to hierarcy
 	const a3_Hierarchy* hierarchy;
-
+	
 	// collection of poses
 	union {
 		a3_HierarchyPose hpose[5];

@@ -127,13 +127,18 @@ void a3animation_input(a3_DemoState* demoState, a3_DemoMode1_Animation* demoMode
 		{
 			// ****TO-DO:
 			// get directly from joysticks
+
+			a3f64 leftJoyStick[2] = { demoState->xcontrol->ctrl.lThumbX_unit, demoState->xcontrol->ctrl.lThumbY_unit };
+			
+
+			a3f64 rightJoyStick[2] = { demoState->xcontrol->ctrl.rThumbX_unit, demoState->xcontrol->ctrl.rThumbY_unit };
 		
 		}
 		else
 		{
 			// ****TO-DO:
 			// calculate normalized vectors given keyboard state
-
+			
 		}
 		break;
 	}
