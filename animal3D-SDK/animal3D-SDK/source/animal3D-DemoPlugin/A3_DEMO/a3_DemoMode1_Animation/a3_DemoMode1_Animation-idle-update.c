@@ -177,8 +177,6 @@ void a3animation_update(a3_DemoState* demoState, a3_DemoMode1_Animation* demoMod
 
 		// ****TO-DO: 
 		// process input, change to switch
-		//animation_input_euler,
-		//animation_input_kinematic
 		switch(demoMode->ctrl_position){
 		case animation_input_direct:
 			demoMode->pos.x = (a3f32)demoState->xcontrol->ctrl.lThumbX_unit;
@@ -189,9 +187,38 @@ void a3animation_update(a3_DemoState* demoState, a3_DemoMode1_Animation* demoMod
 			demoMode->pos.y = demoMode->obj_skeleton_ctrl->position.y + (a3f32)(demoState->xcontrol->ctrl.lThumbY_unit * dt);
 			break;
 		case animation_input_interpolate1:
+			demoMode->pos.x = demoMode->obj_skeleton_ctrl->position.x + (a3f32)((demoState->xcontrol->ctrl.lThumbX_unit - demoMode->obj_skeleton_ctrl->position.x)* dt);
+			demoMode->pos.y = demoMode->obj_skeleton_ctrl->position.y + (a3f32)((demoState->xcontrol->ctrl.lThumbY_unit - demoMode->obj_skeleton_ctrl->position.y)* dt);
+			break;
+		case animation_input_interpolate2:
+			//This needs to be velocity interpolate
 			break;
 		case animation_input_kinematic:
-			
+			//https://openstax.org/books/university-physics-volume-1/pages/3-6-finding-velocity-and-displacement-from-acceleration
+			demoMode->pos.x = demoMode->obj_skeleton_ctrl->position.x + (a3f32)((demoMode->vel.x + demoState->xcontrol->ctrl.lThumbX_unit) * dt) + (a3f32)(0.5f * demoState->xcontrol->ctrl.lThumbX_unit * (dt * dt));
+			demoMode->pos.y = demoMode->obj_skeleton_ctrl->position.y + (a3f32)((demoMode->vel.y + demoState->xcontrol->ctrl.lThumbY_unit) * dt) + (a3f32)(0.5f * demoState->xcontrol->ctrl.lThumbY_unit * (dt * dt));
+			break;
+		}
+
+		switch (demoMode->ctrl_rotation) {
+		case animation_input_direct:
+			demoMode->rot = (a3f32)demoState->xcontrol->ctrl.rThumbX_unit;
+			break;
+		case animation_input_euler:
+			demoMode->pos.x = demoMode->obj_skeleton_ctrl->position.x + (a3f32)(demoState->xcontrol->ctrl.lThumbX_unit * dt);
+			demoMode->pos.y = demoMode->obj_skeleton_ctrl->position.y + (a3f32)(demoState->xcontrol->ctrl.lThumbY_unit * dt);
+			break;
+		case animation_input_interpolate1:
+			demoMode->pos.x = demoMode->obj_skeleton_ctrl->position.x + (a3f32)((demoState->xcontrol->ctrl.lThumbX_unit - demoMode->obj_skeleton_ctrl->position.x) * dt);
+			demoMode->pos.y = demoMode->obj_skeleton_ctrl->position.y + (a3f32)((demoState->xcontrol->ctrl.lThumbY_unit - demoMode->obj_skeleton_ctrl->position.y) * dt);
+			break;
+		case animation_input_interpolate2:
+			//This needs to be velocity interpolate
+			break;
+		case animation_input_kinematic:
+			//https://openstax.org/books/university-physics-volume-1/pages/3-6-finding-velocity-and-displacement-from-acceleration
+			demoMode->pos.x = demoMode->obj_skeleton_ctrl->position.x + (a3f32)((demoMode->vel.x + demoState->xcontrol->ctrl.lThumbX_unit) * dt) + (a3f32)(0.5f * demoState->xcontrol->ctrl.lThumbX_unit * (dt * dt));
+			demoMode->pos.y = demoMode->obj_skeleton_ctrl->position.y + (a3f32)((demoMode->vel.y + demoState->xcontrol->ctrl.lThumbY_unit) * dt) + (a3f32)(0.5f * demoState->xcontrol->ctrl.lThumbY_unit * (dt * dt));
 			break;
 		}
 		// apply input
