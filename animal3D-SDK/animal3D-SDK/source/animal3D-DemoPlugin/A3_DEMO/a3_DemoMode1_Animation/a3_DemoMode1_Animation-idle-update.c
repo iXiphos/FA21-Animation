@@ -158,19 +158,17 @@ void a3animation_update(a3_DemoState* demoState, a3_DemoMode1_Animation* demoMod
 		a3real const dtr = (a3real)dt;
 		a3_ClipController* clipCtrl = demoMode->clipCtrlA;
 
-		 
-		if (demoState->xcontrol->ctrl.lThumbX_unit < 0.05 && demoState->xcontrol->ctrl.lThumbY_unit < 0.05) {
-			
-			if (demoMode->clipCtrlA->clipIndex != idle_index)
-				a3clipControllerSetClip(demoMode->clipCtrlA, demoMode->clipPool, idle_index, 24, 24);
-			//demoMode->clipCtrlA->shouldTransition = true;
-			// no input
-		}
-		else {
+		a3f64 x = demoState->xcontrol->ctrl.lThumbX_unit;
+		a3f64 y = demoState->xcontrol->ctrl.lThumbY_unit;
+		if (x < -0.05 || x > 0.05 || y < -0.05 || y > 0.05) {
+			// some input
 			if (demoMode->clipCtrlA->clipIndex != walk_index)
 				a3clipControllerSetClip(demoMode->clipCtrlA, demoMode->clipPool, walk_index, 24, 24);
-			//demoMode->clipCtrlA->shouldTransition = false;
-			// input
+		}
+		else {
+			// no input
+			if (demoMode->clipCtrlA->clipIndex != idle_index)
+				a3clipControllerSetClip(demoMode->clipCtrlA, demoMode->clipPool, idle_index, 24, 24);
 		}
 		// update controllers
 		a3clipControllerUpdate(demoMode->clipCtrl, dt);
