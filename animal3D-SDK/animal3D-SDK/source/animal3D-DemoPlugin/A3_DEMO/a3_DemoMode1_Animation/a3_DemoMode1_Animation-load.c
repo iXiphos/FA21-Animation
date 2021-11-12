@@ -79,6 +79,7 @@ void a3animation_init_animation(a3_DemoState const* demoState, a3_DemoMode1_Anim
 		a3hierarchySetNode(demoMode->sceneGraph, 2, 0, "scene_light_main");
 		a3hierarchySetNode(demoMode->sceneGraph, 3, 0, "scene_skeleton_ctrl");
 		a3hierarchySetNode(demoMode->sceneGraph, 4, 0, "scene_skybox");
+		a3hierarchySetNode(demoMode->sceneGraph, 5, 3, "scene_skeleton");
 
 	/*
 		// manually set up a skeleton
