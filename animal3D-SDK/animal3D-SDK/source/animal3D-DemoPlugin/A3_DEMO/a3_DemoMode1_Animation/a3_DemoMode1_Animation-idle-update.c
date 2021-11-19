@@ -83,6 +83,8 @@ void a3demo_update_pointLight(a3_DemoSceneObject* obj_camera, a3_DemoPointLight*
 
 void a3demo_applyScale_internal(a3_DemoSceneObject* sceneObject, a3real4x4p s);
 
+void a3animation_updateUI(a3_DemoState* demoState, a3_DemoMode1_Animation* demoMode, a3f64 const dt);
+
 void a3animation_update_graphics(a3_DemoState* demoState, a3_DemoMode1_Animation* demoMode,
 	a3_DemoModelMatrixStack const* matrixStack, a3_HierarchyState const* activeHS)
 {
@@ -355,6 +357,7 @@ void a3animation_update_sceneGraph(a3_DemoMode1_Animation* demoMode, a3f64 const
 
 void a3animation_update(a3_DemoState* demoState, a3_DemoMode1_Animation* demoMode, a3f64 const dt)
 {
+	a3animation_updateUI(demoState, demoMode, dt);
 	a3ui32 i;
 	a3_DemoModelMatrixStack matrixStack[animationMaxCount_sceneObject];
 
@@ -400,5 +403,18 @@ void a3animation_update(a3_DemoState* demoState, a3_DemoMode1_Animation* demoMod
 	//demoMode->obj_skeleton_ctrl->euler.z = -a3trigValid_sind(demoMode->rot);
 }
 
+
+void a3animation_updateUI(a3_DemoState* demoState, a3_DemoMode1_Animation* demoMode, a3f64 const dt) {
+
+	const char* format = "%.3f";
+
+
+	igDragFloat3("look at", demoMode->obj_skeleton_neckLookat_ctrl->position.v, 0.5, 300, 300, format, 0);
+	igDragFloat3("skeleton base", demoMode->obj_skeleton_ctrl->position.v, 0.5, 300, 300, format, 0);
+	igDragFloat3("wrist effector", demoMode->obj_skeleton_wristEffector_r_ctrl->position.v, 0.5, 300, 300, format, 0);
+	igDragFloat3("wrist constraint", demoMode->obj_skeleton_wristConstraint_r_ctrl->position.v, 0.5, 300, 300, format, 0);
+
+
+}
 
 //-----------------------------------------------------------------------------

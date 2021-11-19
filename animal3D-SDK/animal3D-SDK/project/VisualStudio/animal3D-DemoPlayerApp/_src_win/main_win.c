@@ -32,6 +32,12 @@
 #include "../animal3D-DemoPlayerApp.rc.h"
 
 
+#pragma comment(lib, "cimgui.lib")
+
+#define CIMGUI_DEFINE_ENUMS_AND_STRUCTS
+#include "cimgui.h"
+#include "cimgui_impl.h"
+
 //-----------------------------------------------------------------------------
 // link renderer lib and respective dependencies
 #define A3_RENDERER_DEFAULT
@@ -69,6 +75,10 @@ int APIENTRY wWinMain(
 	// initialize app
 	status = a3appStartSingleInstanceSwitchExisting(wndClassName, wndName);
 
+	// create imgui context
+	igCreateContext(NULL);
+	igStyleColorsDark(NULL);
+
 	// register window class
 	status = a3windowCreateDefaultRenderingClass(&wndClass, hInstance, wndClassName, sizeof(void *), IDI_ICON1, IDI_ICON1);
 	if (status > 0)
@@ -88,8 +98,14 @@ int APIENTRY wWinMain(
 				status = a3windowBeginMainLoop(&wnd);
 			}
 
+			ImGui_ImplOpenGL3_Shutdown();
+
 			// kill rendering context
 			status = a3rendererReleaseContext(&renderContext);
+
+			ImGui_ImplWin32_Shutdown();
+			igDestroyContext(NULL);
+
 		}
 
 		// kill window class
