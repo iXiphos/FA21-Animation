@@ -93,6 +93,7 @@ a3i32 a3sampleInit(a3_Sample* sample_out, a3i32 const time_step, a3f64 const pla
 a3i32 a3keyframeInit(a3_Keyframe* keyframe_out, a3_Sample const* sample0, a3_Sample const* sample1, a3f64 const playback_stepPerSec);
 
 
+
 //-----------------------------------------------------------------------------
 
 // clip transition flags
@@ -109,12 +110,15 @@ enum a3_ClipTransitionFlag
 	a3clip_branchFlag = 0x80,	// there is a branch/condition
 };
 
+typedef a3_ClipTransitionFlag (*a3ClipEndEventCallback)(a3_DemoMode1_Animation* demoMode, a3_ClipController* clipCtrl, a3_Clip* clip, a3_ClipTransition* transition);
+
 // clip transition
 struct a3_ClipTransition
 {
 	a3_ClipTransitionFlag flag;
 	a3i32 offset;
 	a3i32 clipIndex;
+	a3ClipEndEventCallback endCallback;
 };
 
 // description of single clip

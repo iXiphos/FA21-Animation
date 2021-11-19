@@ -406,6 +406,8 @@ void a3animation_update(a3_DemoState* demoState, a3_DemoMode1_Animation* demoMod
 
 void a3animation_updateUI(a3_DemoState* demoState, a3_DemoMode1_Animation* demoMode, a3f64 const dt) {
 
+	//igShowDemoWindow(NULL);
+
 	const char* format = "%.3f";
 
 
@@ -413,6 +415,7 @@ void a3animation_updateUI(a3_DemoState* demoState, a3_DemoMode1_Animation* demoM
 	igDragFloat3("skeleton base", demoMode->obj_skeleton_ctrl->position.v, 0.5, 300, 300, format, 0);
 	igDragFloat3("wrist effector", demoMode->obj_skeleton_wristEffector_r_ctrl->position.v, 0.5, 300, 300, format, 0);
 	igDragFloat3("wrist constraint", demoMode->obj_skeleton_wristConstraint_r_ctrl->position.v, 0.5, 300, 300, format, 0);
+
 
 
 }
