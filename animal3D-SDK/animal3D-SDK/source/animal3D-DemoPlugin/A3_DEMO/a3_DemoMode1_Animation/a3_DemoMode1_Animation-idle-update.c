@@ -237,12 +237,38 @@ void a3animation_update_applyEffectors(a3_DemoMode1_Animation* demoMode,
 			// ****TO-DO: 
 			// make "look-at" matrix
 			// in this example, +Z is towards locator, +Y is up
+			a3vec4 neck = activeHS->objectSpace->pose[j].translate;
+			a3vec4 neck = activeHS->objectSpace->pose[j].translate;
+			a3vec4 lookDir = controlLocator_neckLookat;
+			a3vec4 x = a3vec4_zero;
+
+			a3real4Normalize(a3real4Sub(lookDir.v, neck.v));
+			a3real4Normalize(a3real4Sub(lookDir.v, neck.v));
+			a3real3Cross(x.xyz.v, a3vec3_y.v, lookDir.v);
+			a3real4Normalize(x.v);
+
+			a3vec4 u = a3vec4_zero;
+			a3real3Cross(u.v, lookDir.v, x.v);
+			a3real2Normalize(u.v);
+
+			a3mat4 rot = a3mat4_identity;
+
+			//Thanks to Ethan Heil for pointing me to this function
+			a3real4x4SetMajors(rot.m, x.v, u.v, lookDir.v, a3vec4_w.v);
+
+			a3real4x4Concat(rot.m, activeHS->objectSpace->pose[j].transformMat.m);
+
+			a3vec4 eulerRot = a3vec4_zero;
+			a3real4x4GetEulerXYZIgnoreScale(rot.m, &eulerRot.x, &eulerRot.y, &eulerRot.z);
+
+			activeHS->objectSpace->pose[j].rotate = eulerRot;
+
 
 			// ****TO-DO: 
 			// reassign resolved transforms to OBJECT-SPACE matrices
 			// resolve local and animation pose for affected joint
 			//	(instead of doing IK for whole skeleton when only one joint has changed)
-
+			a3kinematicsSolveInverseSingle(activeHS, j, activeHS->hierarchy->nodes[j].parentIndex);
 		}
 
 		// RIGHT ARM REACH
@@ -404,6 +430,37 @@ void a3animation_update(a3_DemoState* demoState, a3_DemoMode1_Animation* demoMod
 
 	// ****TO-DO:
 	// process input
+			// Position
+	switch (demoMode->ctrl_position)
+	{
+	case animation_input_direct:
+		demoMode->pos.x = (a3f32)demoState->xcontrol->ctrl.lThumbX_unit;
+		demoMode->pos.y = (a3f32)demoState->xcontrol->ctrl.lThumbY_unit;
+		break;
+	case animation_input_euler:
+		demoMode->pos.x = demoMode->obj_skeleton_ctrl->position.x + (a3f32)(demoState->xcontrol->ctrl.lThumbX_unit * dt);
+		demoMode->pos.y = demoMode->obj_skeleton_ctrl->position.y + (a3f32)(demoState->xcontrol->ctrl.lThumbY_unit * dt);
+		break;
+	case animation_input_interpolate1:
+		demoMode->pos.x = (a3f32)(demoMode->obj_skeleton_ctrl->position.x + (5 * demoState->xcontrol->ctrl.lThumbX_unit - demoMode->obj_skeleton_ctrl->position.x) * dt);
+		demoMode->pos.y = (a3f32)(demoMode->obj_skeleton_ctrl->position.y + (5 * demoState->xcontrol->ctrl.lThumbY_unit - demoMode->obj_skeleton_ctrl->position.y) * dt);
+		break;
+	case animation_input_interpolate2:
+		demoMode->vel.x = (a3f32)(demoMode->vel.x + (5 * demoState->xcontrol->ctrl.lThumbX_unit - demoMode->vel.x) * dt);
+		demoMode->vel.y = (a3f32)(demoMode->vel.y + (5 * demoState->xcontrol->ctrl.lThumbY_unit - demoMode->vel.y) * dt);
+
+		demoMode->pos.x = demoMode->obj_skeleton_ctrl->position.x + (a3f32)(demoMode->vel.x * dt);
+		demoMode->pos.y = demoMode->obj_skeleton_ctrl->position.y + (a3f32)(demoMode->vel.y * dt);
+		break;
+	case animation_input_kinematic:
+		demoMode->vel.x = (a3real)(demoMode->vel.x + demoState->xcontrol->ctrl.lThumbX_unit * dt);
+		demoMode->pos.x = demoMode->obj_skeleton_ctrl->position.x + demoMode->vel.x + (a3f32)(demoState->xcontrol->ctrl.lThumbX_unit * (dt * dt) / 2.0f);
+
+		demoMode->vel.y = (a3real)(demoMode->vel.y + demoState->xcontrol->ctrl.lThumbY_unit * dt);
+		demoMode->pos.y = demoMode->obj_skeleton_ctrl->position.y + demoMode->vel.y + (a3f32)(demoState->xcontrol->ctrl.lThumbY_unit * (dt * dt) / 2.0f);
+		break;
+	}
+
 
 	// apply input
 	//demoMode->obj_skeleton_ctrl->position.x = +(demoMode->pos.x);
