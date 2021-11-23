@@ -170,6 +170,9 @@ void a3animation_update_fk(a3_HierarchyState* activeHS,
 			activeHS->animPose, // holds current sample pose
 			baseHS->localSpace, // holds base pose (animPose is all identity poses)
 			activeHS->hierarchy->numNodes);
+		// cancle out root motion in animation
+		activeHS->localSpace->pose->translate = baseHS->localSpace->pose->translate;
+
 		a3hierarchyPoseConvert(activeHS->localSpace,
 			activeHS->hierarchy->numNodes,
 			poseGroup->channel,
@@ -391,7 +394,11 @@ void a3animation_update_sceneGraph(a3_DemoMode1_Animation* demoMode, a3f64 const
 
 void a3animation_update(a3_DemoState* demoState, a3_DemoMode1_Animation* demoMode, a3f64 const dt)
 {
+	demoMode->axis_l[0] = (a3real)a3keyboardGetDifference(demoState->keyboard, a3key_D, a3key_A);
+	demoMode->axis_l[1] = (a3real)a3keyboardGetDifference(demoState->keyboard, a3key_S, a3key_W);
+
 	a3animation_updateUI(demoState, demoMode, dt);
+
 	a3ui32 i;
 	a3_DemoModelMatrixStack matrixStack[animationMaxCount_sceneObject];
 
@@ -428,39 +435,42 @@ void a3animation_update(a3_DemoState* demoState, a3_DemoMode1_Animation* demoMod
 		//	demoMode->hierarchyState_skel_final, demoMode->hierarchyPoseGroup_skel);
 	}
 
+	
+	
+
 	// ****TO-DO:
 	// process input
 	switch (demoMode->ctrl_position)
 	{
 	case animation_input_direct:
-		demoMode->pos.x = (a3f32)demoState->xcontrol->ctrl.lThumbX_unit;
-		demoMode->pos.y = (a3f32)demoState->xcontrol->ctrl.lThumbY_unit;
+		demoMode->pos.x = (a3f32)(demoMode->axis_l[0] * dt);
+		demoMode->pos.y = (a3f32)(demoMode->axis_l[1] * dt);
 		break;
 
 	case animation_input_euler:
-		demoMode->pos.x = demoMode->obj_skeleton_ctrl->position.x + (a3f32)(demoState->xcontrol->ctrl.lThumbX_unit * dt);
-		demoMode->pos.y = demoMode->obj_skeleton_ctrl->position.y + (a3f32)(demoState->xcontrol->ctrl.lThumbY_unit * dt);
+		demoMode->pos.x = demoMode->obj_skeleton_ctrl->position.x + (a3f32)(demoMode->axis_l[0] * dt);
+		demoMode->pos.y = demoMode->obj_skeleton_ctrl->position.x + (a3f32)(demoMode->axis_l[1] * dt);
 		break;
 
 	case animation_input_interpolate1:
-		demoMode->pos.x = (a3f32)(demoMode->obj_skeleton_ctrl->position.x + (5 * demoState->xcontrol->ctrl.lThumbX_unit - demoMode->obj_skeleton_ctrl->position.x) * dt);
-		demoMode->pos.y = (a3f32)(demoMode->obj_skeleton_ctrl->position.y + (5 * demoState->xcontrol->ctrl.lThumbY_unit - demoMode->obj_skeleton_ctrl->position.y) * dt);
+		demoMode->pos.x = (a3f32)(demoMode->obj_skeleton_ctrl->position.x + (5 * demoMode->axis_l[0] - demoMode->obj_skeleton_ctrl->position.x) * dt);
+		demoMode->pos.y = (a3f32)(demoMode->obj_skeleton_ctrl->position.y + (5 * demoMode->axis_l[1] - demoMode->obj_skeleton_ctrl->position.y) * dt);
 		break;
 
 	case animation_input_interpolate2:
-		demoMode->vel.x = (a3f32)(demoMode->vel.x + (5 * demoState->xcontrol->ctrl.lThumbX_unit - demoMode->vel.x) * dt);
-		demoMode->vel.y = (a3f32)(demoMode->vel.y + (5 * demoState->xcontrol->ctrl.lThumbY_unit - demoMode->vel.y) * dt);
+		demoMode->vel.x = (a3f32)(demoMode->vel.x + (5 * demoMode->axis_l[0] - demoMode->vel.x) * dt);
+		demoMode->vel.y = (a3f32)(demoMode->vel.y + (5 * demoMode->axis_l[1] - demoMode->vel.y) * dt);
 
 		demoMode->pos.x = demoMode->obj_skeleton_ctrl->position.x + (a3f32)(demoMode->vel.x * dt);
 		demoMode->pos.y = demoMode->obj_skeleton_ctrl->position.y + (a3f32)(demoMode->vel.y * dt);
 		break;
 
 	case animation_input_kinematic:
-		demoMode->vel.x = (a3real)(demoMode->vel.x + demoState->xcontrol->ctrl.lThumbX_unit * dt);
-		demoMode->vel.y = (a3real)(demoMode->vel.y + demoState->xcontrol->ctrl.lThumbY_unit * dt);
+		demoMode->vel.x = (a3real)(demoMode->vel.x + demoMode->axis_l[0] * dt);
+		demoMode->vel.y = (a3real)(demoMode->vel.y + demoMode->axis_l[1] * dt);
 
-		demoMode->pos.x = demoMode->obj_skeleton_ctrl->position.x + demoMode->vel.x + (a3f32)(demoState->xcontrol->ctrl.lThumbX_unit * (dt * dt) / 2.0f);
-		demoMode->pos.y = demoMode->obj_skeleton_ctrl->position.y + demoMode->vel.y + (a3f32)(demoState->xcontrol->ctrl.lThumbY_unit * (dt * dt) / 2.0f);
+		demoMode->pos.x = demoMode->obj_skeleton_ctrl->position.x + demoMode->vel.x + (a3f32)(demoMode->axis_l[0] * (dt * dt) / 2.0f);
+		demoMode->pos.y = demoMode->obj_skeleton_ctrl->position.y + demoMode->vel.y + (a3f32)(demoMode->axis_l[1] * (dt * dt) / 2.0f);
 		break;
 	}
 
@@ -485,9 +495,9 @@ void a3animation_update(a3_DemoState* demoState, a3_DemoMode1_Animation* demoMod
 	}
 
 	// apply input
-	//demoMode->obj_skeleton_ctrl->position.x = +(demoMode->pos.x);
-	//demoMode->obj_skeleton_ctrl->position.y = +(demoMode->pos.y);
-	//demoMode->obj_skeleton_ctrl->euler.z = -a3trigValid_sind(demoMode->rot);
+	demoMode->obj_skeleton_ctrl->position.x = +(demoMode->pos.x);
+	demoMode->obj_skeleton_ctrl->position.y = +(demoMode->pos.y);
+	demoMode->obj_skeleton_ctrl->euler.z = -a3trigValid_sind(demoMode->rot);
 }
 
 
@@ -498,11 +508,15 @@ void a3animation_updateUI(a3_DemoState* demoState, a3_DemoMode1_Animation* demoM
 	const char* format = "%.3f";
 
 
-	igDragFloat3("look at", demoMode->obj_skeleton_neckLookat_ctrl->position.v, 0.5, 300, 300, format, 0);
-	igDragFloat3("skeleton base", demoMode->obj_skeleton_ctrl->position.v, 0.5, 300, 300, format, 0);
-	igDragFloat3("wrist effector", demoMode->obj_skeleton_wristEffector_r_ctrl->position.v, 0.5, 300, 300, format, 0);
-	igDragFloat3("wrist constraint", demoMode->obj_skeleton_wristConstraint_r_ctrl->position.v, 0.5, 300, 300, format, 0);
+	igDragFloat3("look at", demoMode->obj_skeleton_neckLookat_ctrl->position.v, 0.5, -300, 300, format, 0);
+	igDragFloat3("skeleton base", demoMode->obj_skeleton_ctrl->position.v, 0.5, -300, 300, format, 0);
+	igDragFloat3("wrist effector", demoMode->obj_skeleton_wristEffector_r_ctrl->position.v, 0.5, -300, 300, format, 0);
+	igDragFloat3("wrist constraint", demoMode->obj_skeleton_wristConstraint_r_ctrl->position.v, 0.5, -300, 300, format, 0);
 
+
+	//igDrag("axix", demoMode->axis_l, 0.5, -10, 10, format, 0);
+	igDragFloat2("vel", demoMode->vel.v, 0.5, -10, 10, format, 0);
+	igDragFloat2("pos", demoMode->pos.v, 0.5, -10, 10, format, 0);
 
 
 }

@@ -35,6 +35,9 @@
 
 //-----------------------------------------------------------------------------
 
+a3i32 a3animation_clipEndEvent(struct a3_ClipController*, void*);
+
+
 void a3animation_load_resetEffectors(a3_DemoMode1_Animation* demoMode,
 	a3_HierarchyState* hierarchyState, a3_HierarchyPoseGroup const* poseGroup)
 {
@@ -501,6 +504,27 @@ void a3animation_init_animation(a3_DemoState const* demoState, a3_DemoMode1_Anim
 		a3clipControllerInit(demoMode->clipCtrlA, "xbot_ctrlA", demoMode->clipPool, j, rate, fps);
 		j = a3clipGetIndexInPool(demoMode->clipPool, "xbot_skintest");
 		a3clipControllerInit(demoMode->clipCtrlB, "xbot_ctrlB", demoMode->clipPool, j, rate, fps);
+
+		// setup transitions
+		{
+			
+			demoMode->clipWalkIndex = a3clipGetIndexInPool(demoMode->clipPool, "xbot_walk_f");
+			demoMode->clipRunIndex = a3clipGetIndexInPool(demoMode->clipPool, "xbot_run_f");
+			demoMode->clipIdleIndex = a3clipGetIndexInPool(demoMode->clipPool, "xbot_idle_f");
+			demoMode->clipJumpIndex = a3clipGetIndexInPool(demoMode->clipPool, "xbot_jump_f");
+
+
+			a3_ClipTransition transition;
+			transition.flag = a3clip_branchFlag;
+			transition.ctx = (void*)demoMode;
+			transition.endCallback = &a3animation_clipEndEvent;
+
+			for (a3i32 i = 0; i < 4; i++) {
+				a3_Clip* clip = demoMode->clipPool->clip + demoMode->clipIndices[i];
+				clip->transitionForward[0] = transition;
+				clip->transitionReverse[0] = transition;
+			}	
+		}
 	}
 
 	// finally set up hierarchy states
@@ -553,6 +577,33 @@ void a3animation_init_animation(a3_DemoState const* demoState, a3_DemoMode1_Anim
 		}
 	}
 }
+
+a3ubyte a3demoHasInput(const a3_DemoMode1_Animation* demoMode) {
+	
+	a3f64 x = demoMode->axis_l[0];
+	a3f64 y = demoMode->axis_l[0];
+	return (x < -0.05 || x > 0.05 || y < -0.05 || y > 0.05);
+
+}
+
+#define RUN_SPEED 0.6
+#define WALK_SPEED 0.3
+
+
+a3i32 a3animation_clipEndEvent(struct a3_ClipController* clipCtrl, void* ctx) {
+	const a3_DemoMode1_Animation* demoMode = ctx;
+
+
+	a3real speed = a3real2Length(demoMode->vel.v);
+
+	if (speed >= RUN_SPEED)
+		return demoMode->clipRunIndex;
+	if (speed >= WALK_SPEED)
+		return demoMode->clipWalkIndex;
+
+	return demoMode->clipIdleIndex;
+}
+
 
 
 //-----------------------------------------------------------------------------

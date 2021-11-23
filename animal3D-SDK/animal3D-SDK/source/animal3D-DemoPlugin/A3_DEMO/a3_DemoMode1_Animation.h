@@ -189,6 +189,16 @@ typedef enum a3_DemoMode1_Animation_InputMode				a3_DemoMode1_Animation_InputMod
 		a3vec2 pos, vel, acc;
 		a3real rot, velr, accr;
 
+		union {
+			a3i32 clipIndices[4];
+			struct {
+				a3i32 clipIdleIndex,
+					clipWalkIndex,
+					clipRunIndex,
+					clipJumpIndex;
+			};
+		};
+
 		// objects
 		union {
 			a3_DemoSceneObject object_scene[animationMaxCount_sceneObject];

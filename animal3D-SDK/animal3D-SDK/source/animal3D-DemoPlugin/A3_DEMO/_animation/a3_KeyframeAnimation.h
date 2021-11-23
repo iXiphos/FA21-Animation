@@ -110,18 +110,25 @@ enum a3_ClipTransitionFlag
 	a3clip_branchFlag = 0x80,	// there is a branch/condition
 };
 
-struct a3_DemoMode1_Animation;
 struct a3_ClipController;
-struct a3_ClipTransition;
-typedef enum a3_ClipTransitionFlag (*a3_ClipEndEventCallback)(struct a3_DemoMode1_Animation*, struct a3_ClipController*, struct a3_Clip*, struct a3_ClipTransition*);
+
+// return -1 to loop playing clip
+typedef a3i32 (*a3_ClipEndCallback)(struct a3_ClipController* ctrl, void* ctx);
 
 // clip transition
 struct a3_ClipTransition
 {
 	a3_ClipTransitionFlag flag;
-	a3i32 offset;
-	a3i32 clipIndex;
-	a3_ClipEndEventCallback endCallback;
+	union {
+		struct {
+			void* ctx;
+			a3_ClipEndCallback endCallback;
+		};
+		struct {
+			a3i32 offset;
+			a3i32 clipIndex;
+		};
+	};
 };
 
 // description of single clip
@@ -184,7 +191,6 @@ a3i32 a3clipCalculateDuration(a3_ClipPool const* clipPool, const a3ui32 clipInde
 
 // calculate keyframes' durations by distributing clip's duration
 a3i32 a3clipDistributeDuration(a3_ClipPool const* clipPool, const a3ui32 clipIndex, const a3f64 playback_stepPerSec);
-
 
 //-----------------------------------------------------------------------------
 
