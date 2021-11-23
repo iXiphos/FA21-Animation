@@ -110,7 +110,10 @@ enum a3_ClipTransitionFlag
 	a3clip_branchFlag = 0x80,	// there is a branch/condition
 };
 
-typedef a3_ClipTransitionFlag (*a3ClipEndEventCallback)(a3_DemoMode1_Animation* demoMode, a3_ClipController* clipCtrl, a3_Clip* clip, a3_ClipTransition* transition);
+struct a3_DemoMode1_Animation;
+struct a3_ClipController;
+struct a3_ClipTransition;
+typedef enum a3_ClipTransitionFlag (*a3_ClipEndEventCallback)(struct a3_DemoMode1_Animation*, struct a3_ClipController*, struct a3_Clip*, struct a3_ClipTransition*);
 
 // clip transition
 struct a3_ClipTransition
@@ -118,7 +121,7 @@ struct a3_ClipTransition
 	a3_ClipTransitionFlag flag;
 	a3i32 offset;
 	a3i32 clipIndex;
-	a3ClipEndEventCallback endCallback;
+	a3_ClipEndEventCallback endCallback;
 };
 
 // description of single clip
