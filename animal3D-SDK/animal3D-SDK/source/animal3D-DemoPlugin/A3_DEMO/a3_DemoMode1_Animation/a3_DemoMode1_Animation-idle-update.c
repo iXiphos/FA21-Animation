@@ -457,13 +457,12 @@ void a3animation_update(a3_DemoState* demoState, a3_DemoMode1_Animation* demoMod
 
 	case animation_input_kinematic:
 		demoMode->vel.x = (a3real)(demoMode->vel.x + demoState->xcontrol->ctrl.lThumbX_unit * dt);
-		demoMode->pos.x = demoMode->obj_skeleton_ctrl->position.x + demoMode->vel.x + (a3f32)(demoState->xcontrol->ctrl.lThumbX_unit * (dt * dt) / 2.0f);
-
 		demoMode->vel.y = (a3real)(demoMode->vel.y + demoState->xcontrol->ctrl.lThumbY_unit * dt);
+
+		demoMode->pos.x = demoMode->obj_skeleton_ctrl->position.x + demoMode->vel.x + (a3f32)(demoState->xcontrol->ctrl.lThumbX_unit * (dt * dt) / 2.0f);
 		demoMode->pos.y = demoMode->obj_skeleton_ctrl->position.y + demoMode->vel.y + (a3f32)(demoState->xcontrol->ctrl.lThumbY_unit * (dt * dt) / 2.0f);
 		break;
 	}
-
 
 	// apply input
 	//demoMode->obj_skeleton_ctrl->position.x = +(demoMode->pos.x);
