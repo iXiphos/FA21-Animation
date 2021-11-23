@@ -238,12 +238,12 @@ void a3animation_update_applyEffectors(a3_DemoMode1_Animation* demoMode,
 			// make "look-at" matrix
 			// in this example, +Z is towards locator, +Y is up
 			a3vec4 neck = activeHS->objectSpace->pose[j].translate;
-			a3vec4 neck = activeHS->objectSpace->pose[j].translate;
+			a3vec4 neckLook = activeHS->objectSpace->pose[j].translate;
 			a3vec4 lookDir = controlLocator_neckLookat;
 			a3vec4 x = a3vec4_zero;
 
 			a3real4Normalize(a3real4Sub(lookDir.v, neck.v));
-			a3real4Normalize(a3real4Sub(lookDir.v, neck.v));
+			a3real4Normalize(a3real4Sub(lookDir.v, neckLook.v));
 			a3real3Cross(x.xyz.v, a3vec3_y.v, lookDir.v);
 			a3real4Normalize(x.v);
 
@@ -446,11 +446,6 @@ void a3animation_update(a3_DemoState* demoState, a3_DemoMode1_Animation* demoMod
 		demoMode->pos.y = (a3f32)(demoMode->obj_skeleton_ctrl->position.y + (5 * demoState->xcontrol->ctrl.lThumbY_unit - demoMode->obj_skeleton_ctrl->position.y) * dt);
 		break;
 	case animation_input_interpolate2:
-		demoMode->vel.x = (a3f32)(demoMode->vel.x + (5 * demoState->xcontrol->ctrl.lThumbX_unit - demoMode->vel.x) * dt);
-		demoMode->vel.y = (a3f32)(demoMode->vel.y + (5 * demoState->xcontrol->ctrl.lThumbY_unit - demoMode->vel.y) * dt);
-
-		demoMode->pos.x = demoMode->obj_skeleton_ctrl->position.x + (a3f32)(demoMode->vel.x * dt);
-		demoMode->pos.y = demoMode->obj_skeleton_ctrl->position.y + (a3f32)(demoMode->vel.y * dt);
 		break;
 	case animation_input_kinematic:
 		demoMode->vel.x = (a3real)(demoMode->vel.x + demoState->xcontrol->ctrl.lThumbX_unit * dt);
