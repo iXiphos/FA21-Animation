@@ -51,6 +51,19 @@ inline void a3hierarchyInternalSetNode(a3_HierarchyNode *node, const a3ui32 inde
 	node->parentIndex = parentIndex;
 }
 
+// round up to nearest power of 2
+// src: https://graphics.stanford.edu/~seander/bithacks.html#RoundUpPowerOf2
+// 
+a3ui32 a3getAllocSize(a3ui32 num) {
+	num--;
+	num |= num >> 1;
+	num |= num >> 2;
+	num |= num >> 4;
+	num |= num >> 8;
+	num |= num >> 16;
+	num++;
+	return num;
+}
 
 //-----------------------------------------------------------------------------
 
@@ -60,12 +73,17 @@ a3ret a3hierarchyCreate(a3_Hierarchy *hierarchy_out, const a3ui32 numNodes, cons
 	{
 		if (!hierarchy_out->nodes)
 		{
-			const a3ui32 dataSize = sizeof(a3_HierarchyNode) * numNodes;
+			const a3ui32 dataSize = a3getAllocSize(sizeof(a3_HierarchyNode) * numNodes);
+			const a3ui32 capacity = dataSize / sizeof(a3_HierarchyNode);
+			
 			a3ui32 i;
 			const a3byte *tmpName;
+			hierarchy_out->numNodes = numNodes;
+			hierarchy_out->capacity = capacity;
 			hierarchy_out->nodes = (a3_HierarchyNode *)malloc(dataSize);
 			memset(hierarchy_out->nodes, 0, dataSize);
-			hierarchy_out->numNodes = numNodes;
+			
+
 			if (names_opt)
 			{
 				for (i = 0; i < numNodes; ++i)
@@ -263,6 +281,127 @@ a3ret a3hierarchyRelease(a3_Hierarchy *hierarchy)
 	}
 	return -1;
 }
+/*
+// input is unsorted hierarchy
+// output is sorted hierarchy
+a3ret a3hierarchyFixOrder(a3_Hierarchy* hierarchy_inout) {
+	
+	const a3ui32 numNodes = hierarchy_inout->numNodes;
+	const a3_HierarchyNode* nodesStart = hierarchy_inout->nodes;
+	const a3_HierarchyNode* nodesEnd = nodesStart + numNodes;
 
+	a3_HierarchyNode* out_nodes = (a3_HierarchyNode*)malloc(numNodes * sizeof(a3_HierarchyNode));
+	
+	a3_HierarchyNode* root = NULL;
+
+	// find root node (should be first node but just incase)
+	for (a3_HierarchyNode* itr = nodesStart; itr < nodesEnd; itr++) {
+		if (itr->parentIndex == -1) {
+			root = itr;
+			break;
+		}
+	}
+
+
+	if (root == NULL) 
+		// missing root node
+		return -1;
+
+
+	a3ui32 outIndex = 0;
+	
+	// out list maintains its "index" from original list until the end to make finding children easier
+}
+*/
+
+
+a3ret a3hierarchyExpand(a3_Hierarchy* hierarchy) {
+	const a3ui32 oldDataSize = hierarchy->numNodes * sizeof(a3_HierarchyNode);
+	const a3ui32 newDataSize = a3getAllocSize(oldDataSize) * 2; // get the next power of two
+	const a3ui32 newCapacity = newDataSize / sizeof(a3_HierarchyNode);
+
+	a3_HierarchyNode* newNodes = (a3_HierarchyNode*)malloc(newDataSize);
+	memcpy(newNodes, hierarchy->nodes, oldDataSize);
+	free(hierarchy->nodes);
+	hierarchy->nodes = newNodes;
+	hierarchy->capacity = newCapacity;
+
+	return 1;
+}
+
+a3ret a3hierarchyAppend(a3_Hierarchy* hierarchy, const a3i32 parentIndex, const a3byte* name) {
+
+	// we assume that the hierarchy is not broken
+	if (hierarchy->numNodes >= hierarchy->capacity)
+		a3hierarchyExpand(hierarchy);
+	
+	const a3i32 index = hierarchy->numNodes;
+	a3_HierarchyNode* node = hierarchy->nodes + index;
+	node->index = index;
+	node->childCount = 0;
+	node->parentIndex = parentIndex;
+	a3hierarchySetName(hierarchy, index, name);
+
+	if (parentIndex != -1)
+		hierarchy->nodes[parentIndex].childCount++;
+	
+	return 1;
+}
+
+a3ret a3hierarchySetName(a3_Hierarchy* hierarchy, a3i32 index, const a3byte* name) {
+	strcpy(hierarchy->nodes[index].name, name, a3node_nameSize);
+	return 1;
+}
+
+
+a3ret a3hierarchyUpdateChildCount(a3_Hierarchy* hierarchy) {
+	for (a3i32 i = 0; i < hierarchy->numNodes; i++) {
+		hierarchy->nodes[i].childCount = 0;
+	}
+	for (a3i32 i = 0; i < hierarchy->numNodes; i++) {
+		a3_HierarchyNode* node = hierarchy->nodes + i;
+		if (node->parentIndex != -1) {
+			hierarchy->nodes[node->parentIndex].childCount++;
+		}
+	}
+}
+
+const a3byte* a3hierarchyGetName(const a3_Hierarchy* hierarchy, a3i32 index) {
+	return hierarchy->nodes[index].name;
+}
+
+// remove node and children from hierarchy, create new hierarchy with node as root 
+a3ret a3hierarchySplit(a3_Hierarchy* src, a3_Hierarchy* dst, a3i32 index) {
+
+}
+
+// append all nodes of src as child of node in dst
+a3ret a3hierarchyJoin(const a3_Hierarchy* src, a3_Hierarchy* dst, a3i32 parentIndex) {
+
+	if (parentIndex == -1)
+		return -1;
+
+	dst->nodes[parentIndex].childCount++;
+
+	const a3ui32 capacityNeeded = src->numNodes + dst->numNodes;
+	const a3ui32 indexOffset = src->numNodes;
+
+	while (dst->capacity < capacityNeeded) {
+		a3hierarchyExpand(dst);
+	}
+
+	const a3_HierarchyNode* srcNode = src->nodes;
+	a3_HierarchyNode* dstNode = dst->nodes;
+
+	const a3_HierarchyNode* srcEnd = src->nodes + src->numNodes;
+
+	for (; srcNode < srcEnd; dstNode++, srcNode++) {
+		*dstNode = *srcNode;
+		dstNode->index += indexOffset;
+		dstNode->parentIndex += indexOffset;
+	}
+
+
+}
 
 //-----------------------------------------------------------------------------

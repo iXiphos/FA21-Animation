@@ -60,6 +60,8 @@ struct a3_HierarchyNode
 	a3byte name[a3node_nameSize];
 	a3i32 index;
 	a3i32 parentIndex;
+	// count of direct children
+	a3i32 childCount;
 };
 
 
@@ -70,6 +72,7 @@ struct a3_Hierarchy
 {
 	a3_HierarchyNode *nodes;
 	a3ui32 numNodes;
+	a3ui32 capacity;
 };
 
 
@@ -82,6 +85,33 @@ struct a3_Hierarchy
 //	return: numNodes if success
 //	return: -1 if invalid params
 a3ret a3hierarchyCreate(a3_Hierarchy *hierarchy_out, const a3ui32 numNodes, const a3byte **names_opt);
+
+
+a3ret a3hierarchyFixOrder(a3_Hierarchy* hierarchy);
+
+// add node to hierarchy
+// return: new node index if success
+// return: -1 if invalid params
+a3ret a3hierarchyAppend(a3_Hierarchy* hierarchy, const a3i32 parentIndex, const a3byte* name);
+
+// expands hierarchy allocation size by next power of two
+a3ret a3hierarchyExpand(a3_Hierarchy* hierarchy);
+
+
+a3ret a3hierarchyUpdateChildCount(a3_Hierarchy* hierarchy);
+
+
+const a3byte* a3hierarchyGetName(a3_Hierarchy* hierarchy, a3i32 index);
+
+
+a3ret a3hierarchySetName(a3_Hierarchy* hierarchy, a3i32 index, const a3byte* name);
+
+// remove node and children from hierarchy, create new hierarchy with node as root 
+a3ret a3hierarchySplit(a3_Hierarchy* src, a3_Hierarchy* dst, a3i32 index);
+
+// append all nodes of src as child of node in dst
+// does not modify src
+a3ret a3hierarchyJoin(const a3_Hierarchy* src, a3_Hierarchy* dst, a3i32 parentIndex);
 
 // A3: Set a hierarchy node's info; overwrites existing node at index.
 //	param hierarchy: non-null pointer to initialized hierarchy

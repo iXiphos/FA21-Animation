@@ -500,10 +500,10 @@ void a3animation_update(a3_DemoState* demoState, a3_DemoMode1_Animation* demoMod
 	demoMode->obj_skeleton_ctrl->euler.z = -a3trigValid_sind(demoMode->rot);
 }
 
-
+void a3animation_drawHierarchyUI(a3_Hierarchy* hierarchy, const char* title);
 void a3animation_updateUI(a3_DemoState* demoState, a3_DemoMode1_Animation* demoMode, a3f64 const dt) {
 
-	//igShowDemoWindow(NULL);
+	igShowDemoWindow(NULL);
 
 	const char* format = "%.3f";
 
@@ -519,6 +519,52 @@ void a3animation_updateUI(a3_DemoState* demoState, a3_DemoMode1_Animation* demoM
 	igDragFloat2("pos", demoMode->pos.v, 0.5, -10, 10, format, 0);
 
 
+	// draw hierarchy
+	a3animation_drawHierarchyUI(demoMode->hierarchy_skel, "Skeleton");
+}
+
+ImRect a3animation_drawHierarchyNodeUI(a3_Hierarchy* hierarchy, a3ui32 index) {
+
+	bool open = igTreeNodeEx_Str(hierarchy->nodes[index].name, ImGuiTreeNodeFlags_DefaultOpen | ImGuiTreeNodeFlags_SpanFullWidth);
+	ImRect nodeRect;
+	igGetItemRectMin(&nodeRect.Min);
+	igGetItemRectMax(&nodeRect.Max);
+
+	if (open) {
+		const ImU32 TreeLineColor = igGetColorU32_Col(ImGuiCol_Text, 1.0f);
+		const float SmallOffsetX = 11.0f; //for now, a hardcoded value; should take into account tree indent size
+		ImDrawList* drawList = igGetWindowDrawList();
+
+		ImVec2 verticalLineStart;
+		igGetCursorScreenPos(&verticalLineStart);
+		verticalLineStart.x += SmallOffsetX; //to nicely line up with the arrow symbol
+		ImVec2 verticalLineEnd = verticalLineStart;
+
+
+		for (a3ui32 i = index; i < hierarchy->numNodes; i++) {
+			a3_HierarchyNode* node = hierarchy->nodes + i;
+			if (node->parentIndex == index) {
+				
+				const ImRect childRect = a3animation_drawHierarchyNodeUI(hierarchy, i);
+				const float midpoint = (childRect.Min.y + childRect.Max.y) / 2.0f;
+				verticalLineEnd.y = midpoint;
+			}
+		}
+
+
+
+		ImDrawList_AddLine(drawList, verticalLineStart, verticalLineEnd, TreeLineColor, 1.0f);
+		igTreePop();
+	}
+
+	return nodeRect;
+}
+
+void a3animation_drawHierarchyUI(a3_Hierarchy* hierarchy, const char* title) {
+	if (igTreeNode_Str(title)) {
+		a3animation_drawHierarchyNodeUI(hierarchy, 0);
+		igTreePop();
+	}
 }
 
 //-----------------------------------------------------------------------------
