@@ -38,6 +38,15 @@ extern "C"
 
 #endif	// __cplusplus
 	
+struct a3_SpatialPoseBlendNodeType {
+	const char name[25];
+
+	// number of pose parameters
+	a3byte ctrlCount;
+
+	// number of float params ("u")
+	a3byte inputCount;
+};
 
 //-----------------------------------------------------------------------------
 

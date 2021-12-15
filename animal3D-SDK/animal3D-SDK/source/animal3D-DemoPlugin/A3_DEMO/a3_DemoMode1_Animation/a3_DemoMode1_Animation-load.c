@@ -32,6 +32,8 @@
 
 #include "../a3_DemoState.h"
 
+#include "../_animation/a3_NodeEditor.h"
+
 
 //-----------------------------------------------------------------------------
 
@@ -576,6 +578,14 @@ void a3animation_init_animation(a3_DemoState const* demoState, a3_DemoMode1_Anim
 			a3animation_load_resetEffectors(demoMode, demoMode->hierarchyState_skel_fk, hierarchyPoseGroup);
 		}
 	}
+
+
+
+	// LOAD TEST NODES
+
+	a3_NodeEditorAddNode(demoMode->nodeEditorCtx, "node 2/3", 2, 3);
+	a3_NodeEditorAddNode(demoMode->nodeEditorCtx, "node 1/2", 1, 2);
+	a3_NodeEditorAddNode(demoMode->nodeEditorCtx, "node 0/1", 0, 1);
 }
 
 a3ubyte a3demoHasInput(const a3_DemoMode1_Animation* demoMode) {

@@ -46,7 +46,9 @@
 #include "a3_DemoMode0_Starter.h"
 #include "a3_DemoMode1_Animation.h"
 
+#ifndef CIMGUI_DEFINE_ENUMS_AND_STRUCTS
 #define CIMGUI_DEFINE_ENUMS_AND_STRUCTS
+#endif
 #undef true
 #undef false
 #include "cimgui/cimgui.h"

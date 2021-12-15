@@ -349,21 +349,22 @@ a3ret a3hierarchyAppend(a3_Hierarchy* hierarchy, const a3i32 parentIndex, const 
 }
 
 a3ret a3hierarchySetName(a3_Hierarchy* hierarchy, a3i32 index, const a3byte* name) {
-	strcpy(hierarchy->nodes[index].name, name, a3node_nameSize);
+	strncpy(hierarchy->nodes[index].name, name, a3node_nameSize);
 	return 1;
 }
 
 
 a3ret a3hierarchyUpdateChildCount(a3_Hierarchy* hierarchy) {
-	for (a3i32 i = 0; i < hierarchy->numNodes; i++) {
+	for (a3ui32 i = 0; i < hierarchy->numNodes; i++) {
 		hierarchy->nodes[i].childCount = 0;
 	}
-	for (a3i32 i = 0; i < hierarchy->numNodes; i++) {
+	for (a3ui32 i = 0; i < hierarchy->numNodes; i++) {
 		a3_HierarchyNode* node = hierarchy->nodes + i;
 		if (node->parentIndex != -1) {
 			hierarchy->nodes[node->parentIndex].childCount++;
 		}
 	}
+	return 1;
 }
 
 const a3byte* a3hierarchyGetName(const a3_Hierarchy* hierarchy, a3i32 index) {
@@ -373,6 +374,7 @@ const a3byte* a3hierarchyGetName(const a3_Hierarchy* hierarchy, a3i32 index) {
 // remove node and children from hierarchy, create new hierarchy with node as root 
 a3ret a3hierarchySplit(a3_Hierarchy* src, a3_Hierarchy* dst, a3i32 index) {
 
+	return -1;
 }
 
 // append all nodes of src as child of node in dst
@@ -401,7 +403,7 @@ a3ret a3hierarchyJoin(const a3_Hierarchy* src, a3_Hierarchy* dst, a3i32 parentIn
 		dstNode->parentIndex += indexOffset;
 	}
 
-
+	return 1;
 }
 
 //-----------------------------------------------------------------------------

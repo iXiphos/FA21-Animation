@@ -36,6 +36,7 @@
 
 #include "_animation/a3_KeyframeAnimationController.h"
 #include "_animation/a3_HierarchyStateBlend.h"
+#include "_animation/a3_NodeEditor.h"
 
 
 //-----------------------------------------------------------------------------
@@ -227,6 +228,8 @@ typedef enum a3_DemoMode1_Animation_InputMode				a3_DemoMode1_Animation_InputMod
 					proj_camera_main[1];
 			};
 		};
+
+		NodeEditorCtx nodeEditorCtx[1];
 	};
 
 

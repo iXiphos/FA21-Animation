@@ -35,6 +35,7 @@
 
 #include "../_a3_demo_utilities/a3_DemoMacros.h"
 
+#include "../_animation/a3_NodeEditor.h"
 
 //-----------------------------------------------------------------------------
 // UTILS
@@ -521,6 +522,10 @@ void a3animation_updateUI(a3_DemoState* demoState, a3_DemoMode1_Animation* demoM
 
 	// draw hierarchy
 	a3animation_drawHierarchyUI(demoMode->hierarchy_skel, "Skeleton");
+
+
+	a3_NodeEditorUpdate(demoMode->nodeEditorCtx);
+
 }
 
 ImRect a3animation_drawHierarchyNodeUI(a3_Hierarchy* hierarchy, a3ui32 index) {
@@ -556,6 +561,8 @@ ImRect a3animation_drawHierarchyNodeUI(a3_Hierarchy* hierarchy, a3ui32 index) {
 		ImDrawList_AddLine(drawList, verticalLineStart, verticalLineEnd, TreeLineColor, 1.0f);
 		igTreePop();
 	}
+
+	
 
 	return nodeRect;
 }

@@ -101,7 +101,7 @@ a3ret a3hierarchyExpand(a3_Hierarchy* hierarchy);
 a3ret a3hierarchyUpdateChildCount(a3_Hierarchy* hierarchy);
 
 
-const a3byte* a3hierarchyGetName(a3_Hierarchy* hierarchy, a3i32 index);
+const a3byte* a3hierarchyGetName(const a3_Hierarchy* hierarchy, a3i32 index);
 
 
 a3ret a3hierarchySetName(a3_Hierarchy* hierarchy, a3i32 index, const a3byte* name);
