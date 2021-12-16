@@ -1,3 +1,4 @@
+#include "..\a3_HierarchyStateBlend.h"
 /*
 	Copyright 2011-2020 Daniel S. Buckstein
 
@@ -684,6 +685,12 @@ inline a3_HierarchyPose* a3hierarchyPoseOpInverseKinematics(a3_HierarchyPose* po
 	pose_out->pose = poseLoc->pose;
 
 	return pose_out;
+}
+
+inline a3_SpatialPose* a3ExecuteBlendNode(a3_SpatialPose* spatialPose_Out, a3_SpatialPoseBlendNodeType* node)
+{
+	node->BlendType(spatialPose_Out, node->values);
+	return spatialPose_Out;
 }
 
 

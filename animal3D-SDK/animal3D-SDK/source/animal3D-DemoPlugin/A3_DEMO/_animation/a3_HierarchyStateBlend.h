@@ -38,15 +38,6 @@ extern "C"
 
 #endif	// __cplusplus
 	
-struct a3_SpatialPoseBlendNodeType {
-	const char name[25];
-
-	// number of pose parameters
-	a3byte ctrlCount;
-
-	// number of float params ("u")
-	a3byte inputCount;
-};
 
 typedef a3vec4(*a3_BlendOpLerp)(a3vec4 v0, a3vec4 v1, a3real const u);
 typedef struct a3SpatialposeBlendOpLerp {
@@ -208,6 +199,32 @@ a3_HierarchyPose* a3hierarchyPoseOpRevert(a3_HierarchyPose* pose_out, a3_Hierarc
 a3_HierarchyPose* a3hierarchyPoseOKinematics(a3_HierarchyPose* pose_out, a3_Hierarchy const* hierarchy, a3_HierarchyPose const* poseObj, a3_HierarchyPose const* poseLoc);
 
 a3_HierarchyPose* a3hierarchyPoseOpInverseKinematics(a3_HierarchyPose* pose_out, a3_Hierarchy const* hierarchy, a3_HierarchyPose const* poseObj, a3_HierarchyPose const* poseLoc);
+
+typedef struct a3_SpatialPoseBlendNodeType {
+	void (*BlendType)(a3_SpatialPose*, a3_SpatialPoseBlendArgs);
+
+	a3_SpatialPoseBlendArgs values;
+
+	// number of pose parameters
+	a3byte ctrlCount;
+
+	// number of float params ("u")
+	a3byte inputCount;
+}a3_SpatialPoseBlendNodeType;
+
+typedef struct a3_SpatialPoseNode {
+	a3_SpatialPose* pose;
+};
+
+a3_SpatialPose* a3ExecuteBlendNode(a3_SpatialPose* spatialPose_Out, a3_SpatialPoseBlendNodeType* node);
+
+
+
+
+
+
+
+
 
 
 #ifdef __cplusplus
