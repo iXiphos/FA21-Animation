@@ -37,9 +37,10 @@ extern "C"
 #else	// !__cplusplus
 
 #endif	// __cplusplus
-	
+
 
 typedef a3vec4(*a3_BlendOpLerp)(a3vec4 v0, a3vec4 v1, a3real const u);
+
 typedef struct a3SpatialposeBlendOpLerp {
 	a3_BlendOpLerp opOrientation, opAngles, opScale, opTranslation;
 } a3SpatialposeBlendOpLerp;
@@ -70,7 +71,7 @@ inline a3vec4 a3vec4LogLerp(a3vec4 v0, a3vec4 v1, a3real const u) {
 	//implement log interpolation 
 
 	a3real4DivComp(v1.v, v0.v);
-	v1.x = powf(v1.x, u);
+	v1.x = (a3real)powf((float)v1.x, (float)u);
 	v1.y = powf(v1.y, u);
 	v1.z = powf(v1.z, u);
 
@@ -105,6 +106,21 @@ typedef struct a3_SpatialPoseBlendArgs {
 } a3_SpatialPoseBlendArgs;
 
 typedef a3_SpatialPose* (*a3_SpatialPoseBlendOp)(a3_SpatialPose* pose_out, a3_SpatialPoseBlendArgs args);
+
+typedef struct a3_SpatialPoseBlendNodeType {
+	a3_SpatialPoseBlendOp* function;
+
+	a3_SpatialPoseBlendArgs values;
+
+	// number of pose parameters
+	a3byte ctrlCount;
+
+	// number of float params ("u")
+	a3byte inputCount;
+}a3_SpatialPoseBlendNodeType;
+
+
+a3_SpatialPose* a3ExecuteBlendNode(a3_SpatialPose* spatialPose_Out, a3_SpatialPoseBlendNodeType* node);
 
 // pointer-based reset/identity operation for single spatial pose
 a3_SpatialPose* a3spatialPoseOpIdentity(a3_SpatialPose* pose_out);
@@ -149,8 +165,6 @@ a3_SpatialPose* a3spatialPoseOpBiCubic(a3_SpatialPose* pose_out, a3_SpatialPose 
 // pointer-based reset/identity operation for single spatial pose
 a3_SpatialPose* a3spatialPoseOpIdentity(a3_SpatialPose* pose_out);
 
-// pointer-based LERP operation for single spatial pose
-a3_SpatialPose* a3spatialPoseOpLERP(a3_SpatialPose* pose_out, a3_SpatialPose const* pose0, a3_SpatialPose const* pose1, a3real const u);
 
 
 //-----------------------------------------------------------------------------
@@ -186,7 +200,49 @@ a3_HierarchyPose* a3hierarchyPoseOpBiNearest(a3_HierarchyPose* pose_out, a3_Hier
 
 a3_HierarchyPose* a3hierarchyPoseOpBiLinear(a3_HierarchyPose* pose_out, a3_HierarchyPose const* pose0, a3_HierarchyPose const* pose1, a3_HierarchyPose const* pose2, a3_HierarchyPose const* pose3, a3real const u1, a3real const u2, a3real const u3, a3ui32 num_nodes);
 
-a3_HierarchyPose* a3hierarchyPoseOpBiCubic(a3_HierarchyPose* pose_out, a3_HierarchyPose const* poses0[4], a3_HierarchyPose const* poses1[4], a3_HierarchyPose const* poses2[4], a3_HierarchyPose const* poses3[4], a3real const u[5], a3ui32 num_nodes);
+a3_SpatialPose* a3spatialPoseOpBiCubic(a3_SpatialPose* pose_out, a3_SpatialPose* poses0[4], a3_SpatialPose* poses1[4], a3_SpatialPose* poses2[4], a3_SpatialPose* poses3[4], a3real u[5]);
+
+//-----------------------------------------------------------------------------
+
+// data-based reset/identity
+a3_SpatialPose a3spatialPoseDOpIdentity();
+
+
+// pointer-based LERP operation for single spatial pose
+a3_SpatialPose* a3spatialPoseOpLERP(a3_SpatialPose* pose_out, a3_SpatialPoseBlendArgs args);
+
+
+
+//-----------------------------------------------------------------------------
+
+
+a3_HierarchyPose* a3hierarchyPoseOpIdentity(a3_HierarchyPose* pose_out, a3ui32 num_nodes);
+
+a3_HierarchyPose* a3hierarchyPoseOpLERP(a3_HierarchyPose* pose_out, a3_HierarchyPose const* pose0, a3_HierarchyPose const* pose1, a3real const u, a3ui32 num_nodes);
+
+a3_HierarchyPose* a3hierarchyPoseOpConstruct(a3_HierarchyPose* pose_out, a3vec4 orientation, a3vec4 scale, a3vec4 translation, a3ui32 num_nodes);
+
+a3_HierarchyPose* a3hierarchyPoseOpCopy(a3_HierarchyPose* pose_out, a3_HierarchyPose const* pose, a3ui32 num_nodes);
+
+a3_HierarchyPose* a3hierarchyPoseOpInvert(a3_HierarchyPose* pose_out, a3_HierarchyPose const* pose, a3ui32 num_nodes);
+
+a3_HierarchyPose* a3hierarchyPoseOpConcat(a3_HierarchyPose* pose_out, a3_HierarchyPose const* pose0, a3_HierarchyPose const* pose1, a3ui32 num_nodes);
+
+a3_HierarchyPose* a3hierarchyPoseOpNearest(a3_HierarchyPose* pose_out, a3_HierarchyPose const* pose0, a3_HierarchyPose const* pose1, a3real const u, a3ui32 num_nodes);
+
+a3_HierarchyPose* a3hierarchyPoseOpCubic(a3_HierarchyPose* pose_out, a3_HierarchyPose const* pose0, a3_HierarchyPose const* pose1, a3_HierarchyPose const* pose2, a3_HierarchyPose const* pose3, a3real const u, a3ui32 num_nodes);
+
+a3_HierarchyPose* a3hierarchyPoseOpDeconcat(a3_HierarchyPose* pose_out, a3_HierarchyPose const* pose0, a3_HierarchyPose const* pose1, a3ui32 num_nodes);
+
+a3_HierarchyPose* a3hierarchyPoseOpScale(a3_HierarchyPose* pose_out, a3_HierarchyPose const* pose0, a3real const u, a3ui32 num_nodes);
+
+a3_HierarchyPose* a3hierarchyPoseOpTriangular(a3_HierarchyPose* pose_out, a3_HierarchyPose const* pose0, a3_HierarchyPose const* pose1, a3_HierarchyPose const* pose2, a3real const u1, a3real const u2, a3ui32 num_nodes);
+
+a3_HierarchyPose* a3hierarchyPoseOpBiNearest(a3_HierarchyPose* pose_out, a3_HierarchyPose const* pose0, a3_HierarchyPose const* pose1, a3_HierarchyPose const* pose2, a3_HierarchyPose const* pose3, a3real const u1, a3real const u2, a3real const u3, a3ui32 num_nodes);
+
+a3_HierarchyPose* a3hierarchyPoseOpBiLinear(a3_HierarchyPose* pose_out, a3_HierarchyPose const* pose0, a3_HierarchyPose const* pose1, a3_HierarchyPose const* pose2, a3_HierarchyPose const* pose3, a3real const u1, a3real const u2, a3real const u3, a3ui32 num_nodes);
+
+a3_HierarchyPose* a3hierarchyPoseOpBiCubic(a3_HierarchyPose* pose_out, a3_HierarchyPose* poses0[4], a3_HierarchyPose* poses1[4], a3_HierarchyPose* poses2[4], a3_HierarchyPose* poses3[4], a3real  u[5], a3ui32 num_nodes);
 
 a3_HierarchyPose* a3hierarchyPoseOpSmoothLERP(a3_HierarchyPose* pose_out, a3_HierarchyPose const* pose0, a3_HierarchyPose const* pose1, a3real const u, a3ui32 num_nodes);
 
@@ -200,31 +256,31 @@ a3_HierarchyPose* a3hierarchyPoseOKinematics(a3_HierarchyPose* pose_out, a3_Hier
 
 a3_HierarchyPose* a3hierarchyPoseOpInverseKinematics(a3_HierarchyPose* pose_out, a3_Hierarchy const* hierarchy, a3_HierarchyPose const* poseObj, a3_HierarchyPose const* poseLoc);
 
-typedef struct a3_SpatialPoseBlendNodeType {
-	void (*BlendType)(a3_SpatialPose*, a3_SpatialPoseBlendArgs);
-
-	a3_SpatialPoseBlendArgs values;
-
-	// number of pose parameters
-	a3byte ctrlCount;
-
-	// number of float params ("u")
-	a3byte inputCount;
-}a3_SpatialPoseBlendNodeType;
-
-typedef struct a3_SpatialPoseNode {
-	a3_SpatialPose* pose;
-};
-
-a3_SpatialPose* a3ExecuteBlendNode(a3_SpatialPose* spatialPose_Out, a3_SpatialPoseBlendNodeType* node);
+//-----------------------------------------------------------------------------
 
 
+#ifdef __cplusplus
+}
+#endif	// __cplusplus
 
 
+#include "_inl/a3_HierarchyStateBlend.inl"
 
 
+#endif	// !__ANIMAL3D_HIERARCHYSTATEBLEND_H
 
 
+a3_HierarchyPose* a3hierarchyPoseOpSmoothLERP(a3_HierarchyPose* pose_out, a3_HierarchyPose const* pose0, a3_HierarchyPose const* pose1, a3real const u, a3ui32 num_nodes);
+
+a3_HierarchyPose* a3hierarchyPoseOpDeScale(a3_HierarchyPose* pose_out, a3_HierarchyPose const* pose0, a3real const u, a3ui32 num_nodes);
+
+a3_HierarchyPose* a3hierarchyPoseOpConvert(a3_HierarchyPose* pose_out, a3_HierarchyPose const* pose, a3ui32 num_nodes);
+
+a3_HierarchyPose* a3hierarchyPoseOpRevert(a3_HierarchyPose* pose_out, a3_HierarchyPose const* pose, a3ui32 num_nodes);
+
+a3_HierarchyPose* a3hierarchyPoseOKinematics(a3_HierarchyPose* pose_out, a3_Hierarchy const* hierarchy, a3_HierarchyPose const* poseObj, a3_HierarchyPose const* poseLoc);
+
+a3_HierarchyPose* a3hierarchyPoseOpInverseKinematics(a3_HierarchyPose* pose_out, a3_Hierarchy const* hierarchy, a3_HierarchyPose const* poseObj, a3_HierarchyPose const* poseLoc);
 
 
 #ifdef __cplusplus
