@@ -121,6 +121,30 @@ typedef struct a3_SpatialPoseBlendNode {
 
 
 
+typedef struct a3_HierarchyPoseBlendArgs {
+	union {
+		a3_SpatialPose poses[4];
+		struct {
+			a3_SpatialPose* pose0;
+			a3_SpatialPose* pose1;
+			a3_SpatialPose* pose2;
+			a3_SpatialPose* pose3;
+		};
+	};
+
+	union {
+		a3f64 params[5];
+		struct {
+			a3f64 param0;
+			a3f64 param1;
+			a3f64 param2;
+			a3f64 param3;
+			a3f64 param4;
+		};
+	};
+} a3_HierarchyPoseBlendArgs;
+
+
 a3_SpatialPose* a3ExecuteBlendNode(a3_SpatialPose* spatialPose_Out, a3_SpatialPoseBlendNodeType* node);
 
 // pointer-based reset/identity operation for single spatial pose

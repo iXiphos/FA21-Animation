@@ -242,14 +242,16 @@ void a3animation_update_animation(a3_DemoMode1_Animation* demoMode, a3f64 const 
 	sampleIndex0 = demoMode->clipPool->keyframe[clipCtrl_1->keyframeIndex].sampleIndex0;
 	sampleIndex1 = demoMode->clipPool->keyframe[clipCtrl_1->keyframeIndex].sampleIndex1;
 
-
+	a3hierarchyPoseLerp(activeHS->animPose,
+		poseGroup->hpose + sampleIndex0, poseGroup->hpose + sampleIndex1,
+		(a3real)clipCtrl_1->keyframeParam, activeHS->hierarchy->numNodes);
 
 	a3hierarchyPoseCopy(activeHS->animPose,
 		newState->animPose,
 		activeHS->hierarchy->numNodes);
 
 	// run FK pipeline (skinning optional)
-	//a3animation_update_fk(activeHS, baseHS, poseGroup);
+	a3animation_update_fk(activeHS, baseHS, poseGroup);
 	a3animation_update_skin(activeHS, baseHS);
 
 
@@ -372,10 +374,8 @@ void a3animation_update_nodehierarchy(a3_DemoMode1_Animation* demoMode, a3f64 co
 	for (a3i32 i = 0; i < demoMode->clipNodeCount; i++) {
 		a3_SpatialPoseBlendNode node = demoMode->clipNodes[i];
 		//
-		args[node.output_node].poses[node.output_pin];
+		args[node.output_node].poses[node.output_pin] = *demoMode->hierarchyState_skel_final->animPose->pose;
 	}
-
-	a3_SpatialPose finalpose;
 
 	// iterate through list of poses backwards, executing node and copying to destination
 	for (a3i32 i = demoMode->blendNodeCount - 1; i >= 0; i--) {
@@ -387,12 +387,12 @@ void a3animation_update_nodehierarchy(a3_DemoMode1_Animation* demoMode, a3f64 co
 		if (i != 0)
 			args[node.output_node].poses[node.output_pin] = pose;
 		else
-			finalpose = pose;
+			demoMode->blendNodesResult[0] = pose;
 	}
 
 
 	// apply to skeleton
-
+	demoMode->hierarchyState_skel_final->animPose->pose = demoMode->blendNodesResult;
 	free(args);
 }
 
@@ -533,7 +533,7 @@ void a3animation_update(a3_DemoState* demoState, a3_DemoMode1_Animation* demoMod
 void a3animation_drawHierarchyUI(a3_Hierarchy* hierarchy, const char* title);
 void a3animation_updateUI(a3_DemoState* demoState, a3_DemoMode1_Animation* demoMode, a3f64 const dt) {
 
-	igShowDemoWindow(NULL);
+	//igShowDemoWindow(NULL);
 	/*
 	const char* format = "%.3f";
 
