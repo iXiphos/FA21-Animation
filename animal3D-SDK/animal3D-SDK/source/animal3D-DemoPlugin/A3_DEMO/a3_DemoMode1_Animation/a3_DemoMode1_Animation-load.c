@@ -507,6 +507,10 @@ void a3animation_init_animation(a3_DemoState const* demoState, a3_DemoMode1_Anim
 		j = a3clipGetIndexInPool(demoMode->clipPool, "xbot_skintest");
 		a3clipControllerInit(demoMode->clipCtrlB, "xbot_ctrlB", demoMode->clipPool, j, rate, fps);
 
+		for (a3i32 i = 0; i < 10; i++) {
+			a3clipControllerInit(demoMode->nodeClipCtrls + i, "ctrl", demoMode->clipPool, j, rate, fps);
+		}
+
 		// setup transitions
 		{
 			
@@ -598,23 +602,23 @@ void a3animation_init_animation(a3_DemoState const* demoState, a3_DemoMode1_Anim
 
 	demoMode->blendNodesType[0].name = "Lerp";
 	demoMode->blendNodesType[0].function = &a3hierarchyPoseOpLERP;
-	demoMode->blendNodesType[0].paramCount = 2;
-	demoMode->blendNodesType[0].ctrlCount = 1;
+	demoMode->blendNodesType[0].paramCount = 1;
+	demoMode->blendNodesType[0].ctrlCount = 2;
 
 	demoMode->blendNodesType[1].name = "Concat";
 	demoMode->blendNodesType[1].function = &a3hierarchyPoseOpConcat;
-	demoMode->blendNodesType[1].paramCount = 2;
-	demoMode->blendNodesType[1].ctrlCount = 1;
+	demoMode->blendNodesType[1].paramCount = 1;
+	demoMode->blendNodesType[1].ctrlCount = 2;
 
 	demoMode->blendNodesType[2].name = "Nearest";
 	demoMode->blendNodesType[2].function = &a3hierarchyPoseOpNearest;
-	demoMode->blendNodesType[2].paramCount = 2;
-	demoMode->blendNodesType[2].ctrlCount = 1;
+	demoMode->blendNodesType[2].paramCount = 1;
+	demoMode->blendNodesType[2].ctrlCount = 2;
 
 	demoMode->blendNodesType[3].name = "Cubic";
 	demoMode->blendNodesType[3].function = &a3hierarchyPoseOpCubic;
-	demoMode->blendNodesType[3].paramCount = 2;
-	demoMode->blendNodesType[3].ctrlCount = 1;
+	demoMode->blendNodesType[3].paramCount = 1;
+	demoMode->blendNodesType[3].ctrlCount = 2;
 
 
 	demoMode->blendNodesType[4].name = "Scale";
@@ -624,8 +628,8 @@ void a3animation_init_animation(a3_DemoState const* demoState, a3_DemoMode1_Anim
 
 	demoMode->blendNodesType[5].name = "Smooth Step";
 	demoMode->blendNodesType[5].function = &a3hierarchyPoseOpSmoothLERP;
-	demoMode->blendNodesType[5].paramCount = 2;
-	demoMode->blendNodesType[5].ctrlCount = 1;
+	demoMode->blendNodesType[5].paramCount = 1;
+	demoMode->blendNodesType[5].ctrlCount = 2;
 
 
 }

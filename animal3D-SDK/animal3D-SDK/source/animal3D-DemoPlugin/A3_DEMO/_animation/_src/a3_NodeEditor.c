@@ -127,13 +127,15 @@ void a3_NodeEditor_DrawNodeList(a3_DemoMode1_Animation* demoMode) {
 						.param_count = 0,
 						.output_type = NodeEditorPinType_OutCtrl,
 						.subtype = NodeEditorNodeSubtype_Clip,
-						.index = i
+						.index = demoMode->nodeClipCount
 					};
 					strncpy(type.name, clip->name, 25);
 					type.name[24] = 0;
 					type.name_len = (a3byte)strlen(type.name);
 					a3_NodeEditorAddNode(ctx, type);
-					a3clipControllerSetClip(demoMode->clipCtrlA, demoMode->clipPool, i, rate, fps);
+
+					a3clipControllerSetClip(demoMode->nodeClipCtrls + demoMode->nodeClipCount, demoMode->clipPool, clip->index, rate, fps);
+					demoMode->nodeClipCount++;
 				}
 			}
 			igTreePop();
