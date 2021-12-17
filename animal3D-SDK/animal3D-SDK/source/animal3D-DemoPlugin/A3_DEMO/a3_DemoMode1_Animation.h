@@ -144,6 +144,8 @@ typedef enum a3_DemoMode1_Animation_InputMode				a3_DemoMode1_Animation_InputMod
 	};
 
 
+
+
 //-----------------------------------------------------------------------------
 
 	// demo mode for basic shading
@@ -164,6 +166,10 @@ typedef enum a3_DemoMode1_Animation_InputMode				a3_DemoMode1_Animation_InputMod
 		// animation controllers
 		a3_ClipController clipCtrl[1], clipCtrlA[1], clipCtrlB[1];
 		a3_ClipPool clipPool[1];
+
+		a3_ClipController nodeClipCtrls[10];
+		a3i32 nodeClipCount;
+
 
 		// skeletal animation
 		union {
@@ -230,7 +236,17 @@ typedef enum a3_DemoMode1_Animation_InputMode				a3_DemoMode1_Animation_InputMod
 		};
 
 		NodeEditorCtx nodeEditorCtx[1];
-		a3_SpatialPoseBlendNodeType* blendNodesType;
+		a3_SpatialPoseBlendNodeType blendNodesType[20];
+		
+		a3_SpatialPoseBlendNode* blendNodes;
+		a3i32 blendNodeCount;
+
+		a3_SpatialPoseBlendNode* clipNodes;
+		a3i32 clipNodeCount;
+
+		a3_SpatialPoseBlendNode* paramNodes;
+		a3i32 paramNodeCount;
+	
 	};
 
 

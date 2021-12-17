@@ -329,6 +329,13 @@ a3ret a3hierarchyExpand(a3_Hierarchy* hierarchy) {
 	return 1;
 }
 
+// clear the hierarchy but dont free the underlying memory
+a3ret a3hierarchyClear(a3_Hierarchy* hierarchy) {
+	hierarchy->nodes = 0;
+	memset(hierarchy->nodes, 0, hierarchy->capacity * sizeof(a3_HierarchyNode));
+	return 1;
+}
+
 a3ret a3hierarchyAppend(a3_Hierarchy* hierarchy, const a3i32 parentIndex, const a3byte* name) {
 
 	// we assume that the hierarchy is not broken
@@ -345,7 +352,7 @@ a3ret a3hierarchyAppend(a3_Hierarchy* hierarchy, const a3i32 parentIndex, const 
 	if (parentIndex != -1)
 		hierarchy->nodes[parentIndex].childCount++;
 	
-	return 1;
+	return index;
 }
 
 a3ret a3hierarchySetName(a3_Hierarchy* hierarchy, a3i32 index, const a3byte* name) {

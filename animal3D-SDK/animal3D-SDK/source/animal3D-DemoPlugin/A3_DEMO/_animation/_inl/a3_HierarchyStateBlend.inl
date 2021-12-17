@@ -667,7 +667,7 @@ inline a3_HierarchyPose* a3hierarchyPoseOpInverseKinematics(a3_HierarchyPose* po
 
 inline a3_SpatialPose* a3ExecuteBlendNode(a3_SpatialPose* spatialPose_Out, a3_SpatialPoseBlendNodeType* node)
 {
-	node->function(spatialPose_Out, node->values);
+	//node->type->function(spatialPose_Out, node->values);
 	return spatialPose_Out;
 }
 

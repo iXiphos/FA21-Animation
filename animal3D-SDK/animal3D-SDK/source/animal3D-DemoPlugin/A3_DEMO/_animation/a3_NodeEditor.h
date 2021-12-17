@@ -27,6 +27,9 @@ typedef struct NodeEditorNode NodeEditorNode;
 typedef struct NodeEditorPin NodeEditorPin;
 typedef struct NodeEditorLink NodeEditorLink;
 typedef enum NodeEditorPinType NodeEditorPinType;
+typedef struct NodeEditorNodeType NodeEditorNodeType;
+typedef enum NodeEditorNodeSubtype NodeEditorNodeSubtype;
+typedef struct a3_DemoMode1_Animation a3_DemoMode1_Animation;
 
 #define nodetitlemaxlen 32
 
@@ -75,6 +78,9 @@ struct NodeEditorCtx {
 
 	NodeEditorNode* nodes;
 	a3i32 nodes_count;
+	a3i32 param_node_count;
+	a3i32 clip_node_count;
+	a3i32 blend_node_count;
 
 	NodeEditorPin* pins;
 	a3i32 pins_count;
@@ -83,15 +89,32 @@ struct NodeEditorCtx {
 	a3i32 links_count;
 };
 
+enum NodeEditorNodeSubtype {
+	NodeEditorNodeSubtype_None,
+	NodeEditorNodeSubtype_Param,
+	NodeEditorNodeSubtype_Clip,
+	NodeEditorNodeSubtype_Blend,
+	NodeEditorNodeSubtype_Output,
+};
+
+struct NodeEditorNodeType {
+	char name[25];
+	a3byte name_len;
+	a3i32 index;
+	NodeEditorNodeSubtype subtype;
+	// we could get this information elseware but this makes it easier/cleaner
+	a3byte ctrl_count;
+	a3byte param_count;
+	NodeEditorPinType output_type;
+};
 
 struct NodeEditorNode {
 	a3i32 index;
 	a3vec2 pos;
-	const char* title;
-	a3ui32 title_len;
-	a3i32 inCtrl_count;
-	a3i32 inParam_count;
+	NodeEditorNodeType type;
 };
+
+
 
 enum NodeEditorPinType {
 	NodeEditorPinType_None,
@@ -132,7 +155,7 @@ struct NodeEditorLink {
 // rebuild our list of pins and links
 // MUST BE CALLED BEFORE DOING ANYTHING WITH THESE LISTS IF ctx->isDirty
 void a3_NodeEditorRebuildLists(NodeEditorCtx* ctx);
-void a3_NodeEditorAddNode(NodeEditorCtx* ctx, const char* title, a3i32 ctrl_count, a3i32 param_count);
+void a3_NodeEditorAddNode(NodeEditorCtx* ctx, NodeEditorNodeType type);
 
 void a3_NodeEditorPin_Set(NodeEditorCtx* ctx, a3i32 index, a3i32 node_index, a3i32 pin_index, NodeEditorPinType type);
 
@@ -144,5 +167,9 @@ void a3_NodeEditorPin_RefreshPos(NodeEditorCtx* ctx, a3i32 index);
 void a3_NodeEditorPin_Draw(NodeEditorCtx* ctx, a3i32 index);
 
 void a3_NodeEditorUpdate(NodeEditorCtx* ctx);
+
+void a3_NodeEditor_DrawNodeList(a3_DemoMode1_Animation* demoMode);
+
+void a3_NodeEditor_Process(a3_DemoMode1_Animation* demoMode);
 
 #endif

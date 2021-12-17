@@ -86,8 +86,8 @@ struct a3_Hierarchy
 //	return: -1 if invalid params
 a3ret a3hierarchyCreate(a3_Hierarchy *hierarchy_out, const a3ui32 numNodes, const a3byte **names_opt);
 
-
-a3ret a3hierarchyFixOrder(a3_Hierarchy* hierarchy);
+// clear the hierarchy but dont free the underlying memory
+a3ret a3hierarchyClear(a3_Hierarchy* hierarchy);
 
 // add node to hierarchy
 // return: new node index if success

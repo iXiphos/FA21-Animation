@@ -1,7 +1,13 @@
 #include "../a3_NodeEditor.h"
+#include "../../a3_DemoMode1_Animation.h"
 
-
-
+const char* ParamNames[10] = {
+	"time",
+	"x_input",
+	"y_input",
+	"sin_time",
+	"cos_time"
+};
 
 // rebuild our list of pins and links
 // MUST BE CALLED BEFORE DOING ANYTHING WITH THESE LISTS IF ctx->isDirty
@@ -12,17 +18,18 @@ void a3_NodeEditorRebuildLists(NodeEditorCtx* ctx) {
 	a3i32 pin_index = 0;
 	for (a3i32 n = 0; n < ctx->nodes_count; n++) {
 		const NodeEditorNode node = ctx->nodes[n];
+		const NodeEditorNodeType type = node.type;
 		a3i32 subpin_index = 0;
-		for (a3i32 p = 0; p < node.inCtrl_count; p++) {
+		for (a3i32 p = 0; p < type.ctrl_count; p++) {
 			a3_NodeEditorPin_Set(ctx, pin_index++, n, subpin_index++, NodeEditorPinType_InCtrl);
 		}
 
-		for (a3i32 p = 0; p < node.inParam_count; p++) {
+		for (a3i32 p = 0; p < type.param_count; p++) {
 			a3_NodeEditorPin_Set(ctx, pin_index++, n, subpin_index++, NodeEditorPinType_InParam);
 		}
 		
-		//TODO: output type
-		a3_NodeEditorPin_Set(ctx, pin_index++, n, 0, NodeEditorPinType_OutCtrl);
+		if (type.output_type != NodeEditorPinType_None)
+			a3_NodeEditorPin_Set(ctx, pin_index++, n, 0, type.output_type);
 	}
 
 	ctx->isDirty = false;
@@ -41,9 +48,24 @@ void a3_NodeEditorPin_Set(NodeEditorCtx* ctx, a3i32 index, a3i32 node_index, a3i
 	a3_NodeEditorPin_RefreshPos(ctx, index);
 }
 
-void a3_NodeEditorAddNode(NodeEditorCtx* ctx, const char* title, a3i32 ctrl_count, a3i32 param_count) {
+void a3_NodeEditorAddNode(NodeEditorCtx* ctx, NodeEditorNodeType type) {
+	
+	switch (type.subtype) {
+	case NodeEditorNodeSubtype_Param:
+		ctx->param_node_count++;
+		break;
+	case NodeEditorNodeSubtype_Blend:
+		ctx->blend_node_count++;
+		break;
+	case NodeEditorNodeSubtype_Clip:
+		ctx->clip_node_count++;
+		break;
+	}
+
 	ctx->isDirty = true;
-	ctx->pins_count += ctrl_count + param_count + 1;
+	ctx->pins_count += type.ctrl_count + type.param_count;
+	if (type.output_type != NodeEditorPinType_None)
+		ctx->pins_count++;
 
 	const a3ui32 old_size = ctx->nodes_count * sizeof(NodeEditorNode);
 	const a3ui32 new_size = old_size + sizeof(NodeEditorNode);
@@ -58,17 +80,96 @@ void a3_NodeEditorAddNode(NodeEditorCtx* ctx, const char* title, a3i32 ctrl_coun
 	ctx->nodes[ctx->nodes_count] =
 		(NodeEditorNode){
 			.index = ctx->nodes_count,
-			.inCtrl_count = ctrl_count,
-			.inParam_count = param_count,
-			.title = title,
-			.title_len = (a3ui32)strlen(title),
+			.type = type
 	};
 
 	ctx->nodes = new_nodes;
 	ctx->nodes_count++;
 }
 
+
+void a3_NodeEditor_DrawNodeList(a3_DemoMode1_Animation* demoMode) {
+	NodeEditorCtx* ctx = demoMode->nodeEditorCtx;
+
+	igBeginGroup();
+	igBeginChild_Str(
+		"nodes_region",
+		(ImVec2) { 200.0f, 0.0f },
+		true,
+			ImGuiWindowFlags_NoMove);
+	igPushItemWidth(200);
+	if (igTreeNodeEx_Str("Nodes", ImGuiTreeNodeFlags_DefaultOpen)) {
+		if (igTreeNodeEx_Str("Params", ImGuiTreeNodeFlags_DefaultOpen)) {
+			for (a3i32 i = 0; i < 5; i++) {
+				if (igButton(ParamNames[i], (ImVec2) { 0, 0 })) {
+					NodeEditorNodeType type = (NodeEditorNodeType){
+						.ctrl_count = 0,
+						.param_count = 0,
+						.output_type = NodeEditorPinType_OutParam,
+						.subtype = NodeEditorNodeSubtype_Param,
+						.index = i
+					};
+					strncpy(type.name, ParamNames[i], 25);
+					type.name[24] = 0;
+					type.name_len = (a3byte)strlen(type.name);
+					a3_NodeEditorAddNode(ctx, type);
+				}
+			}
+			igTreePop();
+		}
+		if (igTreeNodeEx_Str("Clips", ImGuiTreeNodeFlags_DefaultOpen )) {
+			for (a3ui32 i = 0; i < demoMode->clipPool->clipCount; i++) {
+				a3_Clip* clip = demoMode->clipPool->clip + i;
+				if (igButton(clip->name, (ImVec2) { 0, 0 })) {
+					NodeEditorNodeType type = (NodeEditorNodeType){
+						.ctrl_count = 0,
+						.param_count = 0,
+						.output_type = NodeEditorPinType_OutCtrl,
+						.subtype = NodeEditorNodeSubtype_Clip,
+						.index = i
+					};
+					strncpy(type.name, clip->name, 25);
+					type.name[24] = 0;
+					type.name_len = (a3byte)strlen(type.name);
+					a3_NodeEditorAddNode(ctx, type);
+				}
+			}
+			igTreePop();
+		}
+		if (igTreeNodeEx_Str("Blend", ImGuiTreeNodeFlags_DefaultOpen)) {
+			for (a3ui32 i = 0; i < 6; i++) {
+				a3_SpatialPoseBlendNodeType blendnodetype = demoMode->blendNodesType[i];
+				if (igButton(blendnodetype.name, (ImVec2) { 0, 0 })) {
+
+					NodeEditorNodeType type = (NodeEditorNodeType){
+						.ctrl_count = blendnodetype.ctrlCount,
+						.param_count = blendnodetype.paramCount,
+						.output_type = NodeEditorPinType_OutCtrl,
+						.subtype = NodeEditorNodeSubtype_Blend,
+						.index = i
+					};
+					strncpy(type.name, blendnodetype.name, 25);
+					type.name[24] = 0;
+					type.name_len = (a3byte)strlen(type.name);
+					a3_NodeEditorAddNode(ctx, type);
+				}
+			}
+			igTreePop();
+		}
+	
+
+		igTreePop();
+	}
+	igPopItemWidth();
+	igEndChild();
+	igEndGroup();
+}
+
 void a3_NodeEditorUpdate(NodeEditorCtx* ctx) {
+
+	
+
+
 
 	igBeginGroup();
 	igPushStyleVar_Vec2(ImGuiStyleVar_FramePadding, (ImVec2) { 1.f, 1.f });
@@ -300,11 +401,28 @@ void a3_NodeEditorNode_Draw(NodeEditorCtx* ctx, a3i32 index) {
 	const ImU32 title_color = IM_COL32(255, 255, 255, 255);
 	const ImU32 nodebase_color = IM_COL32(50, 50, 50, 255);
 	const ImU32 nodehover_color = IM_COL32(75, 75, 75, 255);
-	const ImU32 titlebar_color = IM_COL32(41, 74, 122, 255);
+	const ImU32 titlebar_param_color = IM_COL32(41, 74, 122, 255);
+	const ImU32 titlebar_blend_color = IM_COL32(122, 74, 41, 255);
+	const ImU32 titlebar_clip_color = IM_COL32(41, 122, 74, 255);
+	const ImU32 titlebar_output_color = IM_COL32(255, 122, 74, 255);
 	const ImU32 outline_color = IM_COL32(200, 200, 200, 255);
 	const ImU32 node_color = index != ctx->node_hovered ? nodebase_color : nodehover_color;
 
-
+	ImU32 titlebar_color;
+	switch (node->type.subtype) {
+	case NodeEditorNodeSubtype_Param:
+		titlebar_color = titlebar_param_color;
+		break;
+	case NodeEditorNodeSubtype_Blend:
+		titlebar_color = titlebar_blend_color;
+		break;
+	case NodeEditorNodeSubtype_Clip:
+		titlebar_color = titlebar_clip_color;
+		break;
+	case NodeEditorNodeSubtype_Output:
+		titlebar_color = titlebar_output_color;
+		break;
+	}
 
 	a3vec2 offset = node->pos;
 	a3real2Add(offset.v, ctx->canvas_origin.v);
@@ -319,6 +437,10 @@ void a3_NodeEditorNode_Draw(NodeEditorCtx* ctx, a3i32 index) {
 	if (ctx->node_selected == index)
 		ImDrawList_AddRect(ctx->CanvasDrawList, rect_min, rect_max, outline_color, 10.0f, ImDrawFlags_RoundCornersAll, 2.0f);
 
-	ImVec2 title_start = (ImVec2){ offset.x + 10.0f, offset.y + 10.0f };
-	ImDrawList_AddText_Vec2(ctx->CanvasDrawList, title_start, title_color, node->title, node->title + node->title_len);
+	ImVec2 title_start = (ImVec2){ offset.x + 10.0f, offset.y + 5.0f };
+	ImDrawList_AddText_Vec2(ctx->CanvasDrawList, title_start, title_color, node->type.name, node->type.name + node->type.name_len);
+}
+
+void a3_NodeEditor_Process(a3_DemoMode1_Animation* demoMode) {
+
 }
