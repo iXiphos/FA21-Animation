@@ -53,12 +53,15 @@ struct NodeEditorCtx {
 	list of links?
 
 	*/
+
+	a3i32 pin_hovered;
+	a3i32 pin_dragging;
+
 	a3i32 node_selected;
 	a3i32 node_hovered;
 	a3i32 node_dragging;
 
-	a3i32 pin_selected;
-	a3i32 pin_hovered;
+
 
 	ImVec2 mouse_pos;
 	ImVec2 mouse_delta;
@@ -86,25 +89,30 @@ struct NodeEditorNode {
 	a3vec2 pos;
 	const char* title;
 	a3ui32 title_len;
-	a3i32 pin_count;
-
+	a3i32 inCtrl_count;
+	a3i32 inParam_count;
 };
 
 enum NodeEditorPinType {
 	NodeEditorPinType_None,
 
-	NodeEditorPinType_InCtrl = 1,
-	NodeEditorPinType_OutCtrl = 2,
+	NodeEditorPinType_MaskIn = 0b01,
 
-	NodeEditorPinType_InParam = 3,
-	NodeEditorPinType_OutParam = 4,
+	NodeEditorPinType_MaskCtrl = 0b10,
+	NodeEditorPinType_OutCtrl =  0b10,
+	NodeEditorPinType_InCtrl  =	 0b11,
+	
+	NodeEditorPinType_MaskParam = 0b100,
+	NodeEditorPinType_OutParam =  0b100,
+	NodeEditorPinType_InParam =   0b101,
+
 };
 
 struct NodeEditorPin {
 	a3i32 index;
 	ImVec2 pos;
 	a3i32 node_index;
-	a3i32 link_index;
+	a3i32 input_index;
 	NodeEditorPinType type;
 	//# of pin inside node
 	a3ui8 pin_index;
@@ -116,6 +124,7 @@ struct NodeEditorLink {
 	a3vec2 end;
 	a3i32 start_index;
 	a3i32 end_index;
+	bool active;
 };
 
 
@@ -124,6 +133,8 @@ struct NodeEditorLink {
 // MUST BE CALLED BEFORE DOING ANYTHING WITH THESE LISTS IF ctx->isDirty
 void a3_NodeEditorRebuildLists(NodeEditorCtx* ctx);
 void a3_NodeEditorAddNode(NodeEditorCtx* ctx, const char* title, a3i32 ctrl_count, a3i32 param_count);
+
+void a3_NodeEditorPin_Set(NodeEditorCtx* ctx, a3i32 index, a3i32 node_index, a3i32 pin_index, NodeEditorPinType type);
 
 void a3_NodeEditorNode_Update(NodeEditorCtx* ctx, a3i32 index);
 void a3_NodeEditorNode_Draw(NodeEditorCtx* ctx, a3i32 index);

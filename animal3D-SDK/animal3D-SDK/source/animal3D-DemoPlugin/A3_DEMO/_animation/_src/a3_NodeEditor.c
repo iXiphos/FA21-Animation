@@ -12,34 +12,33 @@ void a3_NodeEditorRebuildLists(NodeEditorCtx* ctx) {
 	a3i32 pin_index = 0;
 	for (a3i32 n = 0; n < ctx->nodes_count; n++) {
 		const NodeEditorNode node = ctx->nodes[n];
-		for (a3i32 p = 0; p < node.pin_count; p++) {
-			
-			ImVec2 pos = (ImVec2){ node.pos.x + 10.0f, node.pos.y + 30.0f + ((float)p * 20.0f)};
-			ctx->pins[pin_index] =
-				(NodeEditorPin){
-					.index = pin_index,
-					.node_index = n,
-					.pos = pos,
-					.type = NodeEditorPinType_None
-					// TODO: LINK INDEX
-			};
-			pin_index++;
+		a3i32 subpin_index = 0;
+		for (a3i32 p = 0; p < node.inCtrl_count; p++) {
+			a3_NodeEditorPin_Set(ctx, pin_index++, n, subpin_index++, NodeEditorPinType_InCtrl);
 		}
 
-		ctx->pins[pin_index] =
-			(NodeEditorPin){
-				.index = pin_index,
-				.node_index = n,
-				.pos = (ImVec2){ node.pos.x + 90.0f, node.pos.y + 30.0f},
-				.type = NodeEditorPinType_OutCtrl
-				// TODO: LINK INDEX
-		};
-		pin_index++;
-
+		for (a3i32 p = 0; p < node.inParam_count; p++) {
+			a3_NodeEditorPin_Set(ctx, pin_index++, n, subpin_index++, NodeEditorPinType_InParam);
+		}
+		
+		//TODO: output type
+		a3_NodeEditorPin_Set(ctx, pin_index++, n, 0, NodeEditorPinType_OutCtrl);
 	}
 
 	ctx->isDirty = false;
 	//free(ctx->links);
+}
+
+void a3_NodeEditorPin_Set(NodeEditorCtx* ctx, a3i32 index, a3i32 node_index, a3i32 pin_index, NodeEditorPinType type) {
+	ctx->pins[index] =
+		(NodeEditorPin){
+			.index = index,
+			.node_index = node_index,
+			.type = type,
+			.pin_index = pin_index,
+			.input_index = -1
+	};
+	a3_NodeEditorPin_RefreshPos(ctx, index);
 }
 
 void a3_NodeEditorAddNode(NodeEditorCtx* ctx, const char* title, a3i32 ctrl_count, a3i32 param_count) {
@@ -59,7 +58,8 @@ void a3_NodeEditorAddNode(NodeEditorCtx* ctx, const char* title, a3i32 ctrl_coun
 	ctx->nodes[ctx->nodes_count] =
 		(NodeEditorNode){
 			.index = ctx->nodes_count,
-			.pin_count = ctrl_count + param_count,
+			.inCtrl_count = ctrl_count,
+			.inParam_count = param_count,
 			.title = title,
 			.title_len = (a3ui32)strlen(title),
 	};
@@ -143,6 +143,8 @@ void a3_NodeEditorUpdate(NodeEditorCtx* ctx) {
 
 
 	ctx->node_hovered = -1;
+	ctx->pin_hovered = -1;
+
 
 	for (a3i32 n = 0; n < ctx->nodes_count; n++) {
 		a3_NodeEditorNode_Update(ctx, n);
@@ -151,8 +153,39 @@ void a3_NodeEditorUpdate(NodeEditorCtx* ctx) {
 		a3_NodeEditorPin_Update(ctx, n);
 	}
 
+
+
 	if (ctx->mouse_clicked) {
-		ctx->node_selected = ctx->node_dragging = ctx->node_hovered;
+
+		ctx->pin_dragging = ctx->pin_hovered;
+
+		if (ctx->pin_hovered == -1)
+			ctx->node_selected = ctx->node_dragging = ctx->node_hovered;
+		else
+			ctx->node_dragging = -1;
+	}
+
+	if (ctx->mouse_released) {
+		if (ctx->pin_dragging != -1 && ctx->pin_hovered != -1) {
+			// check node types
+			NodeEditorPin* start = ctx->pins + ctx->pin_dragging;
+			NodeEditorPin* end = ctx->pins + ctx->pin_hovered;
+
+			// started from an input
+			if (start->type & NodeEditorPinType_MaskIn) {
+				NodeEditorPin* tmp = start;
+				start = end;
+				end = tmp;
+			}
+
+			if ((start->type ^ NodeEditorPinType_MaskIn) == end->type)
+				end->input_index = start->index;
+
+		}
+
+
+		ctx->node_dragging = -1;
+		ctx->pin_dragging = -1;
 	}
 
 	for (a3i32 n = 0; n < ctx->nodes_count; n++) {
@@ -178,32 +211,56 @@ void a3_NodeEditorUpdate(NodeEditorCtx* ctx) {
 void a3_NodeEditorPin_RefreshPos(NodeEditorCtx* ctx, a3i32 index) {
 	NodeEditorPin* pin = ctx->pins + index;
 	const NodeEditorNode node = ctx->nodes[pin->node_index];
-	pin->pos = (ImVec2){ node.pos.x + 90.0f, node.pos.y + 30.0f };
+	float right = pin->type & NodeEditorPinType_MaskIn ? 10.0f : 90.0f;
+	pin->pos = (ImVec2){ node.pos.x + right, node.pos.y + 30.0f + (15.0f * (float)pin->pin_index) };
 }
 
 void a3_NodeEditorPin_Update(NodeEditorCtx* ctx, a3i32 index) {
 	NodeEditorPin* pin = ctx->pins + index;
 
-	if (ctx->node_dragging == pin->node_index) {
-		a3_NodeEditorPin_RefreshPos(ctx, index);
+	a3_NodeEditorPin_RefreshPos(ctx, index);
+
+	ImVec2 center = (ImVec2){ pin->pos.x + ctx->canvas_origin.x, pin->pos.y + ctx->canvas_origin.y };
+
+	ImVec2 mouse = ctx->mouse_pos;
+	ImVec2 diff = (ImVec2){ (center.x - mouse.x), (center.y - mouse.y) };
+
+	const float radius = 6.0f;
+	bool mouse_over = (diff.x * diff.x + diff.y * diff.y) <= (radius * radius);
+
+	if (mouse_over) {
+		ctx->pin_hovered = index;
 	}
-
-
 }
-
 
 
 void a3_NodeEditorPin_Draw(NodeEditorCtx* ctx, a3i32 index) {
 	NodeEditorPin* pin = ctx->pins + index;
-	ImU32 pin_color = IM_COL32(255, 255, 255, 255);
+	const ImU32 pin_base_color = IM_COL32(255, 255, 255, 255);
+	const ImU32 pin_ctrl_color = IM_COL32(255, 100, 100, 255);
+	const ImU32 pin_param_color = IM_COL32(100, 100, 255, 255);
+	const ImU32 white = IM_COL32(255, 255, 255, 255);
 
+	ImU32 pin_color = pin->type & NodeEditorPinType_MaskCtrl ? pin_ctrl_color : pin_param_color;
 
 	ImVec2 center = (ImVec2){ pin->pos.x + ctx->canvas_origin.x, pin->pos.y + ctx->canvas_origin.y };
 
+	bool show_hover = ctx->pin_hovered == index && (ctx->pin_dragging == -1 || ((pin->type ^ NodeEditorPinType_MaskIn) == ctx->pins[ctx->pin_dragging].type));
+	if (show_hover)
+		ImDrawList_AddCircle(ctx->CanvasDrawList, center, 5.0f, pin_color, 10, 2.0f);
+	else
+		ImDrawList_AddCircleFilled(ctx->CanvasDrawList, center, 5.0f, pin_color, 10);
 
-	ImDrawList_AddCircleFilled(ctx->CanvasDrawList, center, 5.0f, pin_color, 10);
 	
-	
+	if (ctx->pin_dragging == index) {
+		ImDrawList_AddLine(ctx->CanvasDrawList, center, ctx->mouse_pos, pin_color, 2.0f);
+	}
+	else if (pin->input_index != -1) {
+		ImVec2 dst = ctx->pins[pin->input_index].pos;
+		dst.x += ctx->canvas_origin.x;
+		dst.y += ctx->canvas_origin.y;
+		ImDrawList_AddLine(ctx->CanvasDrawList, center, dst, pin_color, 2.0f);
+	}
 }
 
 
