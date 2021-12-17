@@ -230,6 +230,7 @@ typedef enum a3_DemoMode1_Animation_InputMode				a3_DemoMode1_Animation_InputMod
 		};
 
 		NodeEditorCtx nodeEditorCtx[1];
+		a3_SpatialPoseBlendNodeType* blendNodesType;
 	};
 
 

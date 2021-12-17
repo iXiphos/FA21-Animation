@@ -586,6 +586,33 @@ void a3animation_init_animation(a3_DemoState const* demoState, a3_DemoMode1_Anim
 	a3_NodeEditorAddNode(demoMode->nodeEditorCtx, "node 2/3", 2, 3);
 	a3_NodeEditorAddNode(demoMode->nodeEditorCtx, "node 1/2", 1, 2);
 	a3_NodeEditorAddNode(demoMode->nodeEditorCtx, "node 0/1", 0, 1);
+
+
+	demoMode->blendNodesType[0].function = &a3spatialPoseOpLERP;
+	demoMode->blendNodesType[0].inputCount = 2;
+	demoMode->blendNodesType[0].ctrlCount = 1;
+
+	demoMode->blendNodesType[1].function = &a3spatialPoseOpConcat;
+	demoMode->blendNodesType[1].inputCount = 2;
+	demoMode->blendNodesType[1].ctrlCount = 1;
+
+	demoMode->blendNodesType[2].function = &a3spatialPoseOpNearest;
+	demoMode->blendNodesType[2].inputCount = 2;
+	demoMode->blendNodesType[2].ctrlCount = 1;
+
+	demoMode->blendNodesType[3].function = &a3spatialPoseOpCubic;
+	demoMode->blendNodesType[3].inputCount = 2;
+	demoMode->blendNodesType[3].ctrlCount = 1;
+
+	demoMode->blendNodesType[4].function = &a3spatialPoseOpScale;
+	demoMode->blendNodesType[4].inputCount = 1;
+	demoMode->blendNodesType[4].ctrlCount = 1;
+
+	demoMode->blendNodesType[5].function = &a3spatialPoseOpSmoothStep;
+	demoMode->blendNodesType[5].inputCount = 2;
+	demoMode->blendNodesType[5].ctrlCount = 1;
+
+
 }
 
 a3ubyte a3demoHasInput(const a3_DemoMode1_Animation* demoMode) {

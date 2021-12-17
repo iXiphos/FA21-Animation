@@ -107,6 +107,9 @@ typedef struct a3_SpatialPoseBlendArgs {
 typedef a3_SpatialPose* (*a3_SpatialPoseBlendOp)(a3_SpatialPose* pose_out, a3_SpatialPoseBlendArgs args);
 
 typedef struct a3_SpatialPoseBlendNodeType {
+	
+	char name[25];
+	
 	a3_SpatialPoseBlendOp function;
 
 	a3_SpatialPoseBlendArgs values;
