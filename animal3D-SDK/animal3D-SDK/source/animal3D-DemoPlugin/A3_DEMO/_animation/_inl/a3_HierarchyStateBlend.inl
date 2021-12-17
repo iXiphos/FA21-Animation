@@ -89,7 +89,7 @@ inline a3_SpatialPose* a3spatialPoseOpInvert(a3_SpatialPose* pose_out, a3_Spatia
 	*pose_out = *args.pose0;
 
 	// Invert quaternion rotation
-	a3quatInvert(pose_out->transformMat.m);
+	a3quatInvert(pose_out->rotate.v);
 	// Inverse translation
 	a3real4MulS(pose_out->translate.v, -1);
 	// Inverse Euler rotation
@@ -131,11 +131,11 @@ inline a3_SpatialPose* a3spatialPoseOpNearest(a3_SpatialPose* pose_out, a3_Spati
 inline a3_SpatialPose* a3spatialPoseOpCubic(a3_SpatialPose* pose_out, a3_SpatialPoseBlendArgs args)
 {
 	// Interpolate Euler rotation
-	a3real4CatmullRom(pose_out->rotate.v, args.pose0->rotate.v, args.pose1->rotate.v, args.pose2->rotate.v, args.pose3->rotate.v, args.param0);
+	a3real4CatmullRom(pose_out->rotate.v, args.pose0->rotate.v, args.pose1->rotate.v, args.pose2->rotate.v, args.pose3->rotate.v, (a3real)args.param0);
 	// Interpolate scale
-	a3real4CatmullRom(pose_out->scale.v, args.pose0->scale.v, args.pose1->scale.v, args.pose2->scale.v, args.pose3->scale.v, args.param0);
+	a3real4CatmullRom(pose_out->scale.v, args.pose0->scale.v, args.pose1->scale.v, args.pose2->scale.v, args.pose3->scale.v, (a3real)args.param0);
 	// Interpolate translation
-	a3real4CatmullRom(pose_out->translate.v, args.pose0->translate.v, args.pose1->translate.v, args.pose2->translate.v, args.pose3->translate.v, args.param0);
+	a3real4CatmullRom(pose_out->translate.v, args.pose0->translate.v, args.pose1->translate.v, args.pose2->translate.v, args.pose3->translate.v, (a3real)args.param0);
 
 	// Calculate transform
 	a3spatialPoseConvert(pose_out, a3poseChannel_none, a3poseEulerOrder_xyz);
