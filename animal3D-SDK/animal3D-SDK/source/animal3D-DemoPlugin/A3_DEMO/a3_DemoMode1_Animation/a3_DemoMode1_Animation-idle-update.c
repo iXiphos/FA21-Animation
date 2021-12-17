@@ -219,151 +219,35 @@ void a3animation_update_nodehierarchy(a3_DemoMode1_Animation* demoMode, a3f64 co
 void a3animation_update_applyEffectors(a3_DemoMode1_Animation* demoMode,
 	a3_HierarchyState* activeHS, a3_HierarchyState const* baseHS, a3_HierarchyPoseGroup const* poseGroup)
 {
-	if (activeHS->hierarchy == baseHS->hierarchy &&
-		activeHS->hierarchy == poseGroup->hierarchy)
-	{
-		a3_DemoSceneObject* sceneObject = demoMode->obj_skeleton;
-		a3ui32 j = sceneObject->sceneGraphIndex;
 
-		// need to properly transform joints to their parent frame and vice-versa
-		a3mat4 const controlToSkeleton = demoMode->sceneGraphState->localSpaceInv->pose[j].transformMat;
-		a3vec4 controlLocator_neckLookat, controlLocator_wristEffector, controlLocator_wristConstraint, controlLocator_wristBase;
-		a3mat4 jointTransform_neck = a3mat4_identity, jointTransform_wrist = a3mat4_identity, jointTransform_elbow = a3mat4_identity, jointTransform_shoulder = a3mat4_identity;
-		a3ui32 j_neck, j_wrist, j_elbow, j_shoulder;
-
-		// NECK LOOK-AT
-		{
-			// look-at effector
-			sceneObject = demoMode->obj_skeleton_neckLookat_ctrl;
-			a3real4Real4x4Product(controlLocator_neckLookat.v, controlToSkeleton.m,
-				demoMode->sceneGraphState->localSpace->pose[sceneObject->sceneGraphIndex].transformMat.v3.v);
-			j = j_neck = a3hierarchyGetNodeIndex(activeHS->hierarchy, "mixamorig:Neck");
-			jointTransform_neck = activeHS->objectSpace->pose[j].transformMat;
-
-			// ****TO-DO: 
-			// make "look-at" matrix
-			// in this example, +Z is towards locator, +Y is up
-			a3vec4 neck = activeHS->objectSpace->pose[j].translate;
-			a3vec4 neckLook = activeHS->objectSpace->pose[j].translate;
-			a3vec4 lookDir = controlLocator_neckLookat;
-			a3vec4 x = a3vec4_zero;
-
-			a3real4Normalize(a3real4Sub(lookDir.v, neck.v));
-			a3real4Normalize(a3real4Sub(lookDir.v, neckLook.v));
-			a3real3Cross(x.xyz.v, a3vec3_y.v, lookDir.v);
-			a3real4Normalize(x.v);
-
-			a3vec4 u = a3vec4_zero;
-			a3real3Cross(u.v, lookDir.v, x.v);
-			a3real2Normalize(u.v);
-
-			a3mat4 rot = a3mat4_identity;
-
-			//Thanks to Ethan Heil for pointing me to this function
-			a3real4x4SetMajors(rot.m, x.v, u.v, lookDir.v, a3vec4_w.v);
-
-			a3real4x4Concat(rot.m, activeHS->objectSpace->pose[j].transformMat.m);
-
-			a3vec4 eulerRot = a3vec4_zero;
-			a3real4x4GetEulerXYZIgnoreScale(rot.m, &eulerRot.x, &eulerRot.y, &eulerRot.z);
-
-			activeHS->objectSpace->pose[j].rotate = eulerRot;
-
-
-			// ****TO-DO: 
-			// reassign resolved transforms to OBJECT-SPACE matrices
-			// resolve local and animation pose for affected joint
-			//	(instead of doing IK for whole skeleton when only one joint has changed)
-			//a3kinematicsSolveInverseSingle(activeHS, j, activeHS->hierarchy->nodes[j].parentIndex);
-		}
-
-		// RIGHT ARM REACH
-		{
-			// right wrist effector
-			sceneObject = demoMode->obj_skeleton_wristEffector_r_ctrl;
-			a3real4Real4x4Product(controlLocator_wristEffector.v, controlToSkeleton.m,
-				demoMode->sceneGraphState->localSpace->pose[sceneObject->sceneGraphIndex].transformMat.v3.v);
-			j = j_wrist = a3hierarchyGetNodeIndex(activeHS->hierarchy, "mixamorig:RightHand");
-			jointTransform_wrist = activeHS->objectSpace->pose[j].transformMat;
-
-			// right wrist constraint
-			sceneObject = demoMode->obj_skeleton_wristConstraint_r_ctrl;
-			a3real4Real4x4Product(controlLocator_wristConstraint.v, controlToSkeleton.m,
-				demoMode->sceneGraphState->localSpace->pose[sceneObject->sceneGraphIndex].transformMat.v3.v);
-			j = j_elbow = a3hierarchyGetNodeIndex(activeHS->hierarchy, "mixamorig:RightForeArm");
-			jointTransform_elbow = activeHS->objectSpace->pose[j].transformMat;
-
-			// right wrist base
-			j = j_shoulder = a3hierarchyGetNodeIndex(activeHS->hierarchy, "mixamorig:RightArm");
-			jointTransform_shoulder = activeHS->objectSpace->pose[j].transformMat;
-			controlLocator_wristBase = jointTransform_shoulder.v3;
-
-			// ****TO-DO: 
-			// solve positions and orientations for joints
-			// in this example, +X points away from child, +Y is normal
-			// 1) check if solution exists
-			//	-> get vector between base and end effector; if it extends max length, straighten limb
-			//	-> position of end effector's target is at the minimum possible distance along this vector
-			
-			// ****TO-DO: 
-			// reassign resolved transforms to OBJECT-SPACE matrices
-			// work from root to leaf too get correct transformations
-
-		}
-	}
 }
 
 void a3animation_update_animation(a3_DemoMode1_Animation* demoMode, a3f64 const dt,
 	a3boolean const updateIK)
 {
-	a3_HierarchyState* activeHS_fk = demoMode->hierarchyState_skel_fk;
-	a3_HierarchyState* activeHS_ik = demoMode->hierarchyState_skel_ik;
+	a3_ClipController* clipCtrl_1 = demoMode->clipCtrlA;
+	a3_ClipController* clipCtrl_2 = demoMode->clipCtrlB;
+	a3ui32 sampleIndex0, sampleIndex1;
+
 	a3_HierarchyState* activeHS = demoMode->hierarchyState_skel_final;
 	a3_HierarchyState const* baseHS = demoMode->hierarchyState_skel_base;
 	a3_HierarchyPoseGroup const* poseGroup = demoMode->hierarchyPoseGroup_skel;
 
-	// switch controller to see different states
-	// A is idle, arms down; B is skin test, arms out
-	a3_ClipController* clipCtrl_fk = demoMode->clipCtrlA;
-	a3ui32 sampleIndex0, sampleIndex1;
+	a3_HierarchyState* newState = demoMode->hierarchyState_skel_final;
 
-	// resolve FK state
-	// update clip controller, keyframe lerp
-	a3clipControllerUpdate(clipCtrl_fk, dt);
-	sampleIndex0 = demoMode->clipPool->keyframe[clipCtrl_fk->keyframeIndex].sampleIndex0;
-	sampleIndex1 = demoMode->clipPool->keyframe[clipCtrl_fk->keyframeIndex].sampleIndex1;
-	a3hierarchyPoseLerp(activeHS_fk->animPose,
-		poseGroup->hpose + sampleIndex0, poseGroup->hpose + sampleIndex1,
-		(a3real)clipCtrl_fk->keyframeParam, activeHS_fk->hierarchy->numNodes);
-	// run FK pipeline
-	a3animation_update_fk(activeHS_fk, baseHS, poseGroup);
+	newState->animPose->pose = activeHS->animPose->pose; //Set this equal to the final Pose
 
-	// resolve IK state
-	// copy FK to IK
-	a3hierarchyPoseCopy(
-		activeHS_ik->animPose,	// dst: IK anim
-		activeHS_fk->animPose,	// src: FK anim
-		//baseHS->animPose,	// src: base anim
-		activeHS_ik->hierarchy->numNodes);
-	// run FK
-	a3animation_update_fk(activeHS_ik, baseHS, poseGroup);
-	if (updateIK)
-	{
-		// invert object-space
-		a3hierarchyStateUpdateObjectInverse(activeHS_ik);
-		// run solvers
-		a3animation_update_applyEffectors(demoMode, activeHS_ik, baseHS, poseGroup);
-		// run full IK pipeline (if not resolving with effectors)
-		//a3animation_update_ik(activeHS_ik, baseHS, poseGroup);
-	}
 
-	// blend FK/IK to final
-	// testing: copy source to final
-	a3hierarchyPoseCopy(activeHS->animPose,	// dst: final anim
-		//activeHS_fk->animPose,	// src: FK anim
-		activeHS_ik->animPose,	// src: IK anim
-		//baseHS->animPose,	// src: base anim (identity)
+	a3clipControllerUpdate(clipCtrl_1, dt);
+	sampleIndex0 = demoMode->clipPool->keyframe[clipCtrl_1->keyframeIndex].sampleIndex0;
+	sampleIndex1 = demoMode->clipPool->keyframe[clipCtrl_1->keyframeIndex].sampleIndex1;
+
+
+
+	a3hierarchyPoseCopy(activeHS->animPose,
+		newState->animPose,
 		activeHS->hierarchy->numNodes);
+
 	// run FK pipeline (skinning optional)
 	//a3animation_update_fk(activeHS, baseHS, poseGroup);
 	a3animation_update_skin(activeHS, baseHS);
@@ -586,59 +470,59 @@ void a3animation_update(a3_DemoState* demoState, a3_DemoMode1_Animation* demoMod
 
 	// ****TO-DO:
 	// process input
-	switch (demoMode->ctrl_position)
-	{
-	case animation_input_direct:
-		demoMode->pos.x = (a3f32)(demoMode->axis_l[0] * dt);
-		demoMode->pos.y = (a3f32)(demoMode->axis_l[1] * dt);
-		break;
+	//switch (demoMode->ctrl_position)
+	//{
+	//case animation_input_direct:
+	//	demoMode->pos.x = (a3f32)(demoMode->axis_l[0] * dt);
+	//	demoMode->pos.y = (a3f32)(demoMode->axis_l[1] * dt);
+	//	break;
 
-	case animation_input_euler:
-		demoMode->pos.x = demoMode->obj_skeleton_ctrl->position.x + (a3f32)(demoMode->axis_l[0] * dt);
-		demoMode->pos.y = demoMode->obj_skeleton_ctrl->position.x + (a3f32)(demoMode->axis_l[1] * dt);
-		break;
+	//case animation_input_euler:
+	//	demoMode->pos.x = demoMode->obj_skeleton_ctrl->position.x + (a3f32)(demoMode->axis_l[0] * dt);
+	//	demoMode->pos.y = demoMode->obj_skeleton_ctrl->position.x + (a3f32)(demoMode->axis_l[1] * dt);
+	//	break;
 
-	case animation_input_interpolate1:
-		demoMode->pos.x = (a3f32)(demoMode->obj_skeleton_ctrl->position.x + (5 * demoMode->axis_l[0] - demoMode->obj_skeleton_ctrl->position.x) * dt);
-		demoMode->pos.y = (a3f32)(demoMode->obj_skeleton_ctrl->position.y + (5 * demoMode->axis_l[1] - demoMode->obj_skeleton_ctrl->position.y) * dt);
-		break;
+	//case animation_input_interpolate1:
+	//	demoMode->pos.x = (a3f32)(demoMode->obj_skeleton_ctrl->position.x + (5 * demoMode->axis_l[0] - demoMode->obj_skeleton_ctrl->position.x) * dt);
+	//	demoMode->pos.y = (a3f32)(demoMode->obj_skeleton_ctrl->position.y + (5 * demoMode->axis_l[1] - demoMode->obj_skeleton_ctrl->position.y) * dt);
+	//	break;
 
-	case animation_input_interpolate2:
-		demoMode->vel.x = (a3f32)(demoMode->vel.x + (5 * demoMode->axis_l[0] - demoMode->vel.x) * dt);
-		demoMode->vel.y = (a3f32)(demoMode->vel.y + (5 * demoMode->axis_l[1] - demoMode->vel.y) * dt);
+	//case animation_input_interpolate2:
+	//	demoMode->vel.x = (a3f32)(demoMode->vel.x + (5 * demoMode->axis_l[0] - demoMode->vel.x) * dt);
+	//	demoMode->vel.y = (a3f32)(demoMode->vel.y + (5 * demoMode->axis_l[1] - demoMode->vel.y) * dt);
 
-		demoMode->pos.x = demoMode->obj_skeleton_ctrl->position.x + (a3f32)(demoMode->vel.x * dt);
-		demoMode->pos.y = demoMode->obj_skeleton_ctrl->position.y + (a3f32)(demoMode->vel.y * dt);
-		break;
+	//	demoMode->pos.x = demoMode->obj_skeleton_ctrl->position.x + (a3f32)(demoMode->vel.x * dt);
+	//	demoMode->pos.y = demoMode->obj_skeleton_ctrl->position.y + (a3f32)(demoMode->vel.y * dt);
+	//	break;
 
-	case animation_input_kinematic:
-		demoMode->vel.x = (a3real)(demoMode->vel.x + demoMode->axis_l[0] * dt);
-		demoMode->vel.y = (a3real)(demoMode->vel.y + demoMode->axis_l[1] * dt);
+	//case animation_input_kinematic:
+	//	demoMode->vel.x = (a3real)(demoMode->vel.x + demoMode->axis_l[0] * dt);
+	//	demoMode->vel.y = (a3real)(demoMode->vel.y + demoMode->axis_l[1] * dt);
 
-		demoMode->pos.x = demoMode->obj_skeleton_ctrl->position.x + demoMode->vel.x + (a3f32)(demoMode->axis_l[0] * (dt * dt) / 2.0f);
-		demoMode->pos.y = demoMode->obj_skeleton_ctrl->position.y + demoMode->vel.y + (a3f32)(demoMode->axis_l[1] * (dt * dt) / 2.0f);
-		break;
-	}
+	//	demoMode->pos.x = demoMode->obj_skeleton_ctrl->position.x + demoMode->vel.x + (a3f32)(demoMode->axis_l[0] * (dt * dt) / 2.0f);
+	//	demoMode->pos.y = demoMode->obj_skeleton_ctrl->position.y + demoMode->vel.y + (a3f32)(demoMode->axis_l[1] * (dt * dt) / 2.0f);
+	//	break;
+	//}
 
-	switch (demoMode->ctrl_rotation) {
-	case animation_input_direct:
-		demoMode->rot = (a3f32)demoState->xcontrol->ctrl.rThumbX_unit * 180.0f;
-		break;
-	case animation_input_euler:
-		demoMode->velr = (a3f32)demoState->xcontrol->ctrl.rThumbX_unit * 180.0f;
-		demoMode->rot = demoMode->obj_skeleton_ctrl->euler.z + (a3f32)(demoMode->velr * dt);
-		break;
-	case animation_input_interpolate1:
-		demoMode->rot = (a3f32)(demoMode->obj_skeleton_ctrl->euler.z + (demoState->xcontrol->ctrl.rThumbX_unit * 180 - demoMode->obj_skeleton_ctrl->euler.z) * dt);
-		break;
-	case animation_input_interpolate2:
-		//This needs to be velocity interpolate
-		break;
-	case animation_input_kinematic:
-		demoMode->velr = (a3real)(demoMode->velr + demoState->xcontrol->ctrl.rThumbX_unit * 180 * dt);
-		demoMode->rot = demoMode->obj_skeleton_ctrl->euler.z + demoMode->velr + (a3f32)(demoState->xcontrol->ctrl.rThumbX_unit * 180 * (dt * dt) / 2.0f);
-		break;
-	}
+	//switch (demoMode->ctrl_rotation) {
+	//case animation_input_direct:
+	//	demoMode->rot = (a3f32)demoState->xcontrol->ctrl.rThumbX_unit * 180.0f;
+	//	break;
+	//case animation_input_euler:
+	//	demoMode->velr = (a3f32)demoState->xcontrol->ctrl.rThumbX_unit * 180.0f;
+	//	demoMode->rot = demoMode->obj_skeleton_ctrl->euler.z + (a3f32)(demoMode->velr * dt);
+	//	break;
+	//case animation_input_interpolate1:
+	//	demoMode->rot = (a3f32)(demoMode->obj_skeleton_ctrl->euler.z + (demoState->xcontrol->ctrl.rThumbX_unit * 180 - demoMode->obj_skeleton_ctrl->euler.z) * dt);
+	//	break;
+	//case animation_input_interpolate2:
+	//	//This needs to be velocity interpolate
+	//	break;
+	//case animation_input_kinematic:
+	//	demoMode->velr = (a3real)(demoMode->velr + demoState->xcontrol->ctrl.rThumbX_unit * 180 * dt);
+	//	demoMode->rot = demoMode->obj_skeleton_ctrl->euler.z + demoMode->velr + (a3f32)(demoState->xcontrol->ctrl.rThumbX_unit * 180 * (dt * dt) / 2.0f);
+	//	break;
+	//}
 
 	// apply input
 	demoMode->obj_skeleton_ctrl->position.x = +(demoMode->pos.x);
