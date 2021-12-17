@@ -40,7 +40,6 @@ inline a3_SpatialPose* a3spatialPoseOpIdentity(a3_SpatialPose* pose_out)
 // pointer-based LERP operation for single spatial pose
 inline a3_SpatialPose* a3spatialPoseOpLERP(a3_SpatialPose* pose_out, a3_SpatialPoseBlendArgs args)
 {
-	/* TO-DO: Make sure these are all the correct calculations*/
 	if (args.pose0 && args.pose1)
 	{
 		pose_out->rotate = a3vec4Lerp(args.pose0->rotate, args.pose1->rotate, (a3real)args.param0);
@@ -49,9 +48,7 @@ inline a3_SpatialPose* a3spatialPoseOpLERP(a3_SpatialPose* pose_out, a3_SpatialP
 
 		pose_out->translate = a3vec4Lerp(args.pose0->translate, args.pose1->translate, (a3real)args.param0);
 
-
 	}
-	// done
 	return pose_out;
 }
 
@@ -65,6 +62,7 @@ inline a3_SpatialPose* a3spatialPoseOpConstruct(a3_SpatialPose* pose_out, a3vec4
 	pose_out->rotate = angles;
 	pose_out->scale = scale;
 	pose_out->translate = translation;
+	a3spatialPoseConvert(pose_out, a3poseChannel_none, a3poseEulerOrder_xyz);
 	return pose_out;
 }
 
@@ -87,15 +85,22 @@ Return: inverted/negated control pose.
 Controls (1): spatial pose.*/
 inline a3_SpatialPose* a3spatialPoseOpInvert(a3_SpatialPose* pose_out, a3_SpatialPoseBlendArgs args)
 {
-	//I think this is right but I could be wrong
-	pose_out->rotate = args.pose0->rotate;
+	// Assign the data from pose_in to pose_out
+	*pose_out = *args.pose0;
+
+	// Invert quaternion rotation
+	a3quatInvert(pose_out->transformMat.m);
+	// Inverse translation
+	a3real4MulS(pose_out->translate.v, -1);
+	// Inverse Euler rotation
 	a3real4MulS(pose_out->rotate.v, -1);
 
-	pose_out->scale = args.pose0->scale;
-	a3real4MulS(pose_out->scale.v, -1);
+	// Inverse scale
+	pose_out->scale.x = 1 / args.pose0->scale.x;
+	pose_out->scale.y = 1 / args.pose0->scale.y;
+	pose_out->scale.z = 1 / args.pose0->scale.z;
 
-	pose_out->transformMat = args.pose0->transformMat;
-	a3real4x4MulS(pose_out->transformMat.m, -1);
+	a3spatialPoseConvert(pose_out, a3poseChannel_none, a3poseEulerOrder_xyz);
 
 
 	return pose_out;
@@ -104,6 +109,7 @@ inline a3_SpatialPose* a3spatialPoseOpInvert(a3_SpatialPose* pose_out, a3_Spatia
 inline a3_SpatialPose* a3spatialPoseOpConcat(a3_SpatialPose* pose_out, a3_SpatialPoseBlendArgs args)
 {
 	a3spatialPoseConcat(pose_out, args.pose0, args.pose1);
+	a3spatialPoseConvert(pose_out, a3poseChannel_none, a3poseEulerOrder_xyz);
 	return pose_out;
 }
 
@@ -124,58 +130,33 @@ inline a3_SpatialPose* a3spatialPoseOpNearest(a3_SpatialPose* pose_out, a3_Spati
 
 inline a3_SpatialPose* a3spatialPoseOpCubic(a3_SpatialPose* pose_out, a3_SpatialPoseBlendArgs args)
 {
-	a3real mu2 = (a3real)args.param0 * (a3real)args.param0;
-	a3_SpatialPoseBlendArgs temp;
+	// Interpolate Euler rotation
+	a3real4CatmullRom(pose_out->rotate.v, args.pose0->rotate.v, args.pose1->rotate.v, args.pose2->rotate.v, args.pose3->rotate.v, args.param0);
+	// Interpolate scale
+	a3real4CatmullRom(pose_out->scale.v, args.pose0->scale.v, args.pose1->scale.v, args.pose2->scale.v, args.pose3->scale.v, args.param0);
+	// Interpolate translation
+	a3real4CatmullRom(pose_out->translate.v, args.pose0->translate.v, args.pose1->translate.v, args.pose2->translate.v, args.pose3->translate.v, args.param0);
 
-	a3_SpatialPose a0[1];
-
-	temp.pose0 = args.pose3;
-	temp.pose1 = args.pose2;
-	a3spatialPoseOpDeconcat(a0, args);
-
-	temp.pose0 = a0;
-	temp.pose1 = args.pose0;
-	a3spatialPoseOpDeconcat(a0, temp);
-
-	temp.pose1 = args.pose1;
-	a3spatialPoseOpConcat(a0, args);
-
-	a3_SpatialPose a1[1];
-
-	temp.pose0 = args.pose0;
-	temp.pose1 = args.pose1;
-	a3spatialPoseOpDeconcat(a1, temp);
-
-	temp.pose0 = a0;
-	temp.pose1 = a1;
-	a3spatialPoseOpDeconcat(a1, temp);
-
-	a3_SpatialPose a2[1];
-	temp.pose0 = args.pose2;
-	temp.pose1 = args.pose0;
-	a3spatialPoseOpDeconcat(a2, temp);
-
-	temp.pose0 = a0;
-	temp.pose1 = a1;
-	temp.pose2 = a2;
-	temp.param0 = args.param0;
-	temp.param1 = mu2;
-
-	a3spatialPoseOpTriangular(pose_out, temp);
+	// Calculate transform
+	a3spatialPoseConvert(pose_out, a3poseChannel_none, a3poseEulerOrder_xyz);
 
 	return pose_out;
 }
 
 inline a3_SpatialPose* a3spatialPoseOpDeconcat(a3_SpatialPose* pose_out, a3_SpatialPoseBlendArgs args)
 {
+	pose_out = args.pose1;
 
-	a3_SpatialPoseBlendArgs tempArgs;
-	tempArgs.pose0 = args.pose1;
-	a3spatialPoseOpInvert(args.pose1, tempArgs);
-	a3spatialPoseConcat(pose_out, args.pose0, args.pose1);
+	a3real4Sub(pose_out->rotate.v, args.pose1->rotate.v);
+	// deconcatenate Scale
+	a3real4DivComp(pose_out->scale.v, args.pose1->rotate.v);
+	// deconcatenate Translation
+	a3real4Sub(pose_out->translate.v, args.pose1->translate.v);
+
+	// Calculate transformation
+	a3spatialPoseConvert(pose_out, a3poseChannel_none, a3poseEulerOrder_xyz);
 
 	return pose_out;
-
 }
 
 inline a3_SpatialPose* a3spatialPoseOpScale(a3_SpatialPose* pose_out, a3_SpatialPoseBlendArgs args)

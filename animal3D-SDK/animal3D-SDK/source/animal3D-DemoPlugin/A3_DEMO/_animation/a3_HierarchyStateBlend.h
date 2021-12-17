@@ -54,8 +54,8 @@ inline a3vec4 a3vec4Lerp(a3vec4 v0, a3vec4 v1, a3real const u) {
 
 inline a3vec4 a3vec4SLerp(a3vec4 v0, a3vec4 v1, a3real const u) {
 	//implement spherical interpolation 
-
-
+	a3vec4 out_vec = a3vec4_zero;
+	a3real4Slerp(out_vec.v, v0.v, v1.v, u);
 	return v0;
 }
 inline a3vec4 a3vec4NLerp(a3vec4 v0, a3vec4 v1, a3real const u) {
