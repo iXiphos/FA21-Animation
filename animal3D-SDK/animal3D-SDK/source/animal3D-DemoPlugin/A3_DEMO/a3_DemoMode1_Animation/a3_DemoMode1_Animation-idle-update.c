@@ -242,9 +242,12 @@ void a3animation_update_animation(a3_DemoMode1_Animation* demoMode, a3f64 const 
 	sampleIndex0 = demoMode->clipPool->keyframe[clipCtrl_1->keyframeIndex].sampleIndex0;
 	sampleIndex1 = demoMode->clipPool->keyframe[clipCtrl_1->keyframeIndex].sampleIndex1;
 
+	/*
 	a3hierarchyPoseLerp(activeHS->animPose,
 		poseGroup->hpose + sampleIndex0, poseGroup->hpose + sampleIndex1,
 		(a3real)clipCtrl_1->keyframeParam, activeHS->hierarchy->numNodes);
+
+		*/
 
 	a3hierarchyPoseCopy(activeHS->animPose,
 		newState->animPose,
@@ -279,15 +282,16 @@ void a3animation_add_nodehierarchy(a3_DemoMode1_Animation* demoMode, a3i32 index
 		dst_array = demoMode->clipNodes;
 		break;
 
+	case NodeEditorNodeSubtype_Output:
 	case NodeEditorNodeSubtype_Blend:
 		p_index = demoMode->blendNodeCount++;
 		dst_array = demoMode->blendNodes;
 		break;
+
 	default:
 		return;
 	}
 
-	
 	dst_array[p_index] = (a3_SpatialPoseBlendNode){
 		.type_index=node->type.index,
 		.output_node=parent_node_index,
@@ -307,7 +311,6 @@ void a3animation_add_nodehierarchy(a3_DemoMode1_Animation* demoMode, a3i32 index
 }
 
 void a3animation_update_nodehierarchy(a3_DemoMode1_Animation* demoMode, a3f64 const dt) {
-	
 
 	float param_options[10];
 
@@ -336,7 +339,7 @@ void a3animation_update_nodehierarchy(a3_DemoMode1_Animation* demoMode, a3f64 co
 	// TODO: only rebuild list if we need to
 	NodeEditorCtx* ctx = demoMode->nodeEditorCtx;
 
-	const size_t alloc_count = ctx->blend_node_count + ctx->param_node_count + ctx->clip_node_count;
+	const size_t alloc_count = ctx->blend_node_count + ctx->param_node_count + ctx->clip_node_count + 1;
 	demoMode->blendNodes = (a3_SpatialPoseBlendNode*)malloc(alloc_count * sizeof(a3_SpatialPoseBlendNode));
 	demoMode->paramNodes = demoMode->blendNodes + ctx->blend_node_count;
 	demoMode->clipNodes = demoMode->paramNodes + ctx->param_node_count;
@@ -349,9 +352,22 @@ void a3animation_update_nodehierarchy(a3_DemoMode1_Animation* demoMode, a3f64 co
 
 	// create hierarchy
 	a3animation_add_nodehierarchy(demoMode, root_index, -1, -1);
+	if (demoMode->clipNodeCount == 0) return;
 
-	a3_SpatialPoseBlendArgs* args = (a3_SpatialPoseBlendArgs*)malloc(demoMode->blendNodeCount * sizeof(a3_SpatialPoseBlendArgs));
-	// TODO: load base pose into 
+	const a3i32 numNodes = demoMode->hierarchy_skel->numNodes;
+
+	a3_HierarchyPoseBlendArgs* args = (a3_HierarchyPoseBlendArgs*)malloc(demoMode->blendNodeCount * sizeof(a3_HierarchyPoseBlendArgs));
+	a3_SpatialPose* spatialPoses = (a3_SpatialPose*)malloc(numNodes * demoMode->blendNodeCount * 4 * sizeof(a3_SpatialPose));
+
+	a3_SpatialPose* itr = spatialPoses;
+	for (a3i32 i = 0; i < demoMode->blendNodeCount; i++) {
+		for (a3i32 j = 0; j < 4; j++) {
+			args[i].poses[j].pose = itr;
+			itr += numNodes;
+		}
+	}
+
+	
 	/*
 	* (STEP 0): update clip controllers
 	STEP 1: make array of actual blend nodes 
@@ -359,41 +375,60 @@ void a3animation_update_nodehierarchy(a3_DemoMode1_Animation* demoMode, a3f64 co
 	STEP 3: from the bottom of the list, 
 	STEP 3.1: do blend op
 	STEP 3.2: copy result to correct destination
-	GOTO 3.1
+				GOTO 3.1
 
 	STEP 4: apply to skeleton
 	*/
 
 	for (a3i32 i = 0; i < demoMode->paramNodeCount; i++) {
 		a3_SpatialPoseBlendNode node = demoMode->paramNodes[i];
-		// 
+		 
 		args[node.output_node].params[node.output_pin] = param_options[node.type_index];
 	}
 
+	a3_HierarchyPoseGroup const* poseGroup = demoMode->hierarchyPoseGroup_skel;
 
 	for (a3i32 i = 0; i < demoMode->clipNodeCount; i++) {
 		a3_SpatialPoseBlendNode node = demoMode->clipNodes[i];
-		//
-		args[node.output_node].poses[node.output_pin] = *demoMode->hierarchyState_skel_final->animPose->pose;
+		a3_ClipController* clipCtrl_1 = demoMode->clipCtrlA;
+		a3ui32 sampleIndex0, sampleIndex1;
+		
+	
+
+		a3clipControllerUpdate(clipCtrl_1, dt);
+		sampleIndex0 = demoMode->clipPool->keyframe[clipCtrl_1->keyframeIndex].sampleIndex0;
+		sampleIndex1 = demoMode->clipPool->keyframe[clipCtrl_1->keyframeIndex].sampleIndex1;
+
+		a3hierarchyPoseLerp(&args[node.output_node].poses[node.output_pin],
+			poseGroup->hpose + sampleIndex0, poseGroup->hpose + sampleIndex1,
+			(a3real)clipCtrl_1->keyframeParam, numNodes);
+
 	}
 
+	
 	// iterate through list of poses backwards, executing node and copying to destination
 	for (a3i32 i = demoMode->blendNodeCount - 1; i >= 0; i--) {
 		a3_SpatialPoseBlendNode node = demoMode->blendNodes[i];
 		a3_SpatialPoseBlendNodeType type = demoMode->blendNodesType[node.type_index];
-		a3_SpatialPose pose;
-		type.function(&pose, args[i]);
+		a3_HierarchyPose* output = &args[node.output_node].poses[node.output_pin];
 
-		if (i != 0)
-			args[node.output_node].poses[node.output_pin] = pose;
-		else
-			demoMode->blendNodesResult[0] = pose;
+		// for root, copy to output
+		if (i == 0) {
+			output = demoMode->hierarchyState_skel_final->animPose;
+			if (demoMode->blendNodeCount == 1) {
+				a3hierarchyPoseCopy(output, args[i].pose0, numNodes);
+				break;
+
+			}
+		}
+
+		type.function(output, args[i], numNodes);
 	}
 
 
 	// apply to skeleton
-	demoMode->hierarchyState_skel_final->animPose->pose = demoMode->blendNodesResult;
 	free(args);
+	free(spatialPoses);
 }
 
 void a3animation_update_sceneGraph(a3_DemoMode1_Animation* demoMode, a3f64 const dt)
@@ -466,7 +501,7 @@ void a3animation_update(a3_DemoState* demoState, a3_DemoMode1_Animation* demoMod
 	}
 
 	
-	//a3animation_update_nodehierarchy(demoMode, dt);
+	a3animation_update_nodehierarchy(demoMode, dt);
 
 	// ****TO-DO:
 	// process input

@@ -502,7 +502,7 @@ void a3animation_init_animation(a3_DemoState const* demoState, a3_DemoMode1_Anim
 
 		j = a3clipGetIndexInPool(demoMode->clipPool, "xbot");
 		a3clipControllerInit(demoMode->clipCtrl, "xbot_ctrl", demoMode->clipPool, j, rate, fps);
-		j = a3clipGetIndexInPool(demoMode->clipPool, "xbot_idle_f");
+		j = a3clipGetIndexInPool(demoMode->clipPool, "xbot_r");
 		a3clipControllerInit(demoMode->clipCtrlA, "xbot_ctrlA", demoMode->clipPool, j, rate, fps);
 		j = a3clipGetIndexInPool(demoMode->clipPool, "xbot_skintest");
 		a3clipControllerInit(demoMode->clipCtrlB, "xbot_ctrlB", demoMode->clipPool, j, rate, fps);
@@ -597,33 +597,33 @@ void a3animation_init_animation(a3_DemoState const* demoState, a3_DemoMode1_Anim
 	a3_NodeEditorAddNode(demoMode->nodeEditorCtx, type);
 
 	demoMode->blendNodesType[0].name = "Lerp";
-	demoMode->blendNodesType[0].function = &a3spatialPoseOpLERP;
+	demoMode->blendNodesType[0].function = &a3hierarchyPoseOpLERP;
 	demoMode->blendNodesType[0].paramCount = 2;
 	demoMode->blendNodesType[0].ctrlCount = 1;
 
 	demoMode->blendNodesType[1].name = "Concat";
-	demoMode->blendNodesType[1].function = &a3spatialPoseOpConcat;
+	demoMode->blendNodesType[1].function = &a3hierarchyPoseOpConcat;
 	demoMode->blendNodesType[1].paramCount = 2;
 	demoMode->blendNodesType[1].ctrlCount = 1;
 
 	demoMode->blendNodesType[2].name = "Nearest";
-	demoMode->blendNodesType[2].function = &a3spatialPoseOpNearest;
+	demoMode->blendNodesType[2].function = &a3hierarchyPoseOpNearest;
 	demoMode->blendNodesType[2].paramCount = 2;
 	demoMode->blendNodesType[2].ctrlCount = 1;
 
 	demoMode->blendNodesType[3].name = "Cubic";
-	demoMode->blendNodesType[3].function = &a3spatialPoseOpCubic;
+	demoMode->blendNodesType[3].function = &a3hierarchyPoseOpCubic;
 	demoMode->blendNodesType[3].paramCount = 2;
 	demoMode->blendNodesType[3].ctrlCount = 1;
 
 
 	demoMode->blendNodesType[4].name = "Scale";
-	demoMode->blendNodesType[4].function = &a3spatialPoseOpScale;
+	demoMode->blendNodesType[4].function = &a3hierarchyPoseOpScale;
 	demoMode->blendNodesType[4].paramCount = 1;
 	demoMode->blendNodesType[4].ctrlCount = 1;
 
 	demoMode->blendNodesType[5].name = "Smooth Step";
-	demoMode->blendNodesType[5].function = &a3spatialPoseOpSmoothStep;
+	demoMode->blendNodesType[5].function = &a3hierarchyPoseOpSmoothLERP;
 	demoMode->blendNodesType[5].paramCount = 2;
 	demoMode->blendNodesType[5].ctrlCount = 1;
 

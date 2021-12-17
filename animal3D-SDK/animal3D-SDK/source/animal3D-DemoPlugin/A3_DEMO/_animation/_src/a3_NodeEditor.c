@@ -90,7 +90,8 @@ void a3_NodeEditorAddNode(NodeEditorCtx* ctx, NodeEditorNodeType type) {
 
 void a3_NodeEditor_DrawNodeList(a3_DemoMode1_Animation* demoMode) {
 	NodeEditorCtx* ctx = demoMode->nodeEditorCtx;
-
+	a3ui32 const rate = 24;
+	a3f64 const fps = (a3f64)rate;
 	igBeginGroup();
 	igBeginChild_Str(
 		"nodes_region",
@@ -132,6 +133,7 @@ void a3_NodeEditor_DrawNodeList(a3_DemoMode1_Animation* demoMode) {
 					type.name[24] = 0;
 					type.name_len = (a3byte)strlen(type.name);
 					a3_NodeEditorAddNode(ctx, type);
+					a3clipControllerSetClip(demoMode->clipCtrlA, demoMode->clipPool, i, rate, fps);
 				}
 			}
 			igTreePop();

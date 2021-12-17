@@ -247,8 +247,6 @@ typedef enum a3_DemoMode1_Animation_InputMode				a3_DemoMode1_Animation_InputMod
 		a3_SpatialPoseBlendNode* paramNodes;
 		a3i32 paramNodeCount;
 	
-
-		a3_SpatialPose blendNodesResult[1];
 	};
 
 

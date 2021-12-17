@@ -104,24 +104,6 @@ typedef struct a3_SpatialPoseBlendArgs {
 	};
 } a3_SpatialPoseBlendArgs;
 
-typedef a3_SpatialPose* (*a3_SpatialPoseBlendOp)(a3_SpatialPose* pose_out, a3_SpatialPoseBlendArgs args);
-typedef a3_HierarchyPose* (*a3_HierarchyPoseBlendOp)(a3_HierarchyPose* pose_out, a3_HierarchyPoseBlendArgs args);
-
-typedef struct a3_SpatialPoseBlendNodeType {
-	const char* name;
-	a3_HierarchyPoseBlendOp function;
-	a3byte ctrlCount;
-	a3byte paramCount;
-} a3_SpatialPoseBlendNodeType;
-
-typedef struct a3_SpatialPoseBlendNode {
-	a3i32 type_index;
-	a3i32 output_node;
-	a3i32 output_pin;
-} a3_SpatialPoseBlendNode;
-
-
-
 typedef struct a3_HierarchyPoseBlendArgs {
 	union {
 		a3_HierarchyPose poses[4];
@@ -144,6 +126,26 @@ typedef struct a3_HierarchyPoseBlendArgs {
 		};
 	};
 } a3_HierarchyPoseBlendArgs;
+
+
+typedef a3_SpatialPose* (*a3_SpatialPoseBlendOp)(a3_SpatialPose* pose_out, a3_SpatialPoseBlendArgs args);
+typedef a3_HierarchyPose* (*a3_HierarchyPoseBlendOp)(a3_HierarchyPose* pose_out, a3_HierarchyPoseBlendArgs args, a3ui32 num_nodes);
+
+typedef struct a3_SpatialPoseBlendNodeType {
+	const char* name;
+	a3_HierarchyPoseBlendOp function;
+	a3byte ctrlCount;
+	a3byte paramCount;
+} a3_SpatialPoseBlendNodeType;
+
+typedef struct a3_SpatialPoseBlendNode {
+	a3i32 type_index;
+	a3i32 output_node;
+	a3i32 output_pin;
+} a3_SpatialPoseBlendNode;
+
+
+
 
 
 a3_SpatialPose* a3ExecuteBlendNode(a3_SpatialPose* spatialPose_Out, a3_SpatialPoseBlendNodeType* node);
